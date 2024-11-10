@@ -1,0 +1,1169 @@
+@font-face {
+font-family: 'SportsJersey';
+font-style: normal;
+font-weight: normal;
+src: local('SportsJersey'), url('https://xbox-sports.com/leagues/xbshl/fonts/sportsjersey.woff') format('woff');
+}
+
+font,
+th,
+td,
+li,
+p,
+a:link,
+a:visited
+{ outline: none; color: #555555; text-decoration: none; font-size: 9px; font-family: verdana, geneva, lucida, 'lucida grande', arial, helvetica, sans-serif; }
+li { margin-top: 1em; }
+
+td a:link,
+td a:active,
+td a:visited
+{ color: #c70000; }
+td a:hover
+{ color: #FFFFFF; }
+
+th a:link,
+th a:active,
+th a:visited
+{ color: #fafafa; font-weight: bold; }
+th a:hover
+{ color: #c70000; font-weight: bold; }
+
+.color_1a, a.color_1a:link, a.color_1a:visited {
+    color: #fafafa;
+}
+
+.color_1e,
+a.color_1e:link,
+a.color_1e:visited
+{ color: #999; }
+
+.color_1b,
+a.color_1b:link,
+a.color_1b:visited
+{ color: #555555; }
+a.color_1b:hover
+{ color: #b8581c; }
+
+/* ***| FONT COLOR #1 - BLACK |***/
+.color_2a,
+a.color_2a:link,
+a.color_2a:visited
+{ color: #111; }
+a.color_2a:hover
+{ color: #c70000; }
+
+.color_stats_2a,
+a.color_stats_2a:link,
+a.color_stats_2a:visited
+{ color: #000000;
+  font-size: 14px; }
+a.color_stats_2a:hover
+{ color: #c70000; }
+
+.color_2aa,
+a.color_2aa:link,
+a.color_2aa:visited
+{ color: #000000; }
+a.color_2aa:hover
+{ color: #FFFFFF; }
+
+.color_2b,
+a.color_2b:link,
+a.color_2b:visited
+{ color: #FFFFFF; }
+a.color_2b:hover
+{ color: #b8581c; }
+
+.color_2bb,
+a.color_2bb:link,
+a.color_2bb:visited
+{ color: #FFFFFF; }
+a.color_2bb:hover
+{ color: #000000; }
+
+.color_2c, a.color_2c:link, a.color_2c:visited {
+    color: #AAAAAA;
+}
+a.color_2c:hover {
+    color: #c70000;
+}
+
+
+.color_3a, a.color_3a:link, a.color_3a:visited { color: #089013; }
+.color_4a,
+a.color_4a:link,
+a.color_4a:visited
+{ color: #444444; }
+a.color_4a:hover
+{ color: #b8581c; }
+.color_5a, a.color_5a:link, a.color_5a:visited { color: #945600; }
+.color_6a, a.color_6a:link, a.color_6a:visited { color: #c70000; }
+a.color_6a:hover
+{ color: #ffffff; }
+.color_7a, a.color_7a:link, a.color_7a:visited { color: #d00000; }
+a.color_7a:hover
+{ color: #000000; }
+.color_8a, a.color_8a:link, a.color_8a:visited { color: #c70000; }
+a.color_8a:hover
+{ color: #111; }
+
+
+/* ***| PRIMARY BUTTON |*** */
+/* The main button elements. */
+.button_1a {
+	background: #c70000;
+	border: 1px solid #c70000;
+	padding: 3px;
+	font-size: 9px;
+	font-weight: bold;
+	color: #eeeeee;
+}
+/* The main hover. */
+.button_1a:hover {
+	background: #d80000;
+	border: 1px solid #d80000;
+	padding: 3px;
+	font-size: 9px;
+	font-weight: bold;
+	color: #ffffff;
+}
+
+
+.button_1
+{ background: #ec9000; border: 1px solid #ffa71d; font-size: 9px; font-weight: bold; color: #FFFFFF; padding: 5px; }
+.button_1:hover
+{ background: #DDDDDD; border: 1px solid #FFFFFF; font-size: 9px; font-weight: bold; color: #000000; padding: 5px; }
+
+.button_2
+{ background: #ec9000; border: 1px solid #ffa71d; font-size: 7px; font-weight: bold; color: #000000; padding: 3px; }
+.button_2:hover
+{ background: #DDDDDD; border: 1px solid #FFFFFF; font-size: 7px; font-weight: bold; color: #000000; padding: 3px; }
+
+.button_3
+{ background: #EEEEEE; border: 1px solid #FFFFFF; font-size: 9px; font-weight: bold; color: #000000; padding: 3px; }
+.button_3:hover
+{ background: #ec9000; border: 1px solid #ffa71d; font-size: 9px; font-weight: bold; color: #000000; padding: 3px; }
+
+.button_4
+{ background: none; border: none; font-size: 9px; color: #000000; padding: 0px; }
+.button_4:hover
+{ color: #ec9000; }
+
+
+/* ***| PRIMARY INPUT |*** */
+/* The main input elements. */
+.input_1a {
+	background: #222222;
+	border: 0px;
+
+	padding: 1px;
+	text-align: center;
+	line-height: 16px;
+
+	font-size: 9px;
+	font-weight: bold;
+	color: #ffffff;
+}
+/* The primary input options. */
+.input_1a option {
+	background: #222222;
+	border: 0px;
+
+	padding-top: 3px;
+	padding-left: 5px;
+	padding-right: 5px;
+	padding-bottom: 1px;
+	vertical-align: middle;
+	text-align: center;
+
+	font-size: 9px;
+	font-weight: normal;
+	color: #eeeeee;
+}
+
+
+.input_1
+{ background: #EEEEEE; border: 1px solid #BBBBBB; font-size: 9px; color: #333333; padding: 3px; border-radius: 3px; outline: 0; text-align: center; }
+input.input_1
+{ height: 21px; }
+.input_1 select
+{ background: #a98061; border: 0px solid #bc987d; font-size: 9px; color: #333333; padding: 0px; text-align: center; }
+.input_1 option
+{ border: 0px solid #bc987d; font-size: 9px; color: #333333; padding: 2px; vertical-align: middle; text-align: center; }
+
+.input_2
+{ background: #EEEEEE; border: 1px solid #BBBBBB; font-size: 9px; color: #333333; padding: 3px; border-radius: 3px; outline: 0; text-align: center; }
+.input_2 select
+{ background: #a98061; border: 0px solid #bc987d; font-size: 9px; color: #333333; padding: 0px; text-align: center; }
+.input_2 option
+{ border: 0px solid #bc987d; font-size: 9px; color: #333333; padding: 2px; vertical-align: middle; text-align: center; }
+
+.input_3
+{ background: #333333; border: 1px solid #000000; font-size: 9px; font-weight: bold; color: #FFFFFF; padding: 0px; outline: 0; text-align: center; }
+.input_3 select
+{ background: #444444; border: 0px solid #bc987d; font-size: 9px; font-weight: bold; color: #FFFFFF; padding: 0px; text-align: center; }
+.input_3 option
+{ border: 0px solid #bc987d; font-size: 9px; font-weight: bold; color: #FFFFFF; padding: 2px; vertical-align: middle; text-align: center; }
+
+.input_4
+{ background: #333333; border: 1px solid #333333; font-size: 9px; color: #fafafa; padding: 2px; outline: 0; text-align: center; }
+.input_4 select
+{ background: #a98061; border: 0px solid #bc987d; font-size: 9px; color: #333333; padding: 2px; text-align: center; }
+.input_4 option
+{ border: 0px solid #bc987d; font-size: 9px; color: #999999; padding: 2px; vertical-align: middle; text-align: center; }
+
+
+.xbshl-table-header {
+    height: 27px;
+    background: url('../../forum/images/dark_board/gradients/header_2.gif') repeat-x;
+    border-top: 1px solid #c70000;
+    border-left: 1px solid #c70000;
+    border-right: 1px solid #c70000;
+    font-size: 9px;
+    color: #fafafa;
+    font-weight: bold;
+    text-align: left;
+}
+
+.xbshl-game-summary-header {
+    height: 27px;
+    background: url('../../forum/images/dark_board/gradients/header_2.gif') repeat-x;
+    border-top: 1px solid #c70000;
+    border-left: 1px solid #c70000;
+    border-right: 1px solid #c70000;
+    font-size: 9px;
+    color: #fafafa;
+    font-weight: bold;
+    text-align: center;
+}
+
+.header_1c, .header_1c_h, .header_1c, .header_1c_h, .header_1c, .header_1c_h {
+    background: #222222;
+    color: #fafafa;
+    font-weight: bold;
+    text-align: center;
+    border: 0;
+}
+
+.header_1c_h:hover, .header_1c_h:hover, .header_1c_h:hover {
+    background: #DDDDDD;
+    border: 0px solid #FFFFFF;
+}
+
+.header_1c_h a:link, .header_1c_h a:visited, .header_1c_h a:link, .header_1c_h a:visited {
+    color: #999999;
+}
+
+.header_1c_h a:hover, .header_1c_h a:hover {
+    color: #c70000;
+}
+.table_1 {
+    background: #404040;
+}
+.table_2 { background: #ec9000; border: 1px solid #ffa71d; }
+.table_3 { background: #2a2a2a; border: 1px solid #4a4a4a; }
+.table_4 { background: #DDDDDD; border: 1px solid #FFFFFF; }
+.table_5 { background: #5e844d; border: 1px solid #77a264; }
+.table_6 { background: #1a1a1a; border: 1px solid #333333; text-align: center; color: #999999; line-height: 18px; }
+.table_7 { background: #CCCCCC; border: 1px solid #EEEEEE; }
+.table_8 { background: #cb0000; border: 1px solid #FF0000; }
+.table_9 { background: #c70000; }
+
+/* ***| PRIMARY FOOTER |*** */
+/* White - No text. */
+.foot_1a {
+	background: #ededed;
+	border-top: 1px solid #dddddd;
+	height: 25px;
+	font-weight: bold;
+	color: #000000;
+}
+
+
+/* ***| HIDDEN ELEMENTS |***
+/* Allow some images to pre-load */
+.preload{ display: none; }
+
+/* ***| PRIMARY HEADER |*** */
+td.header_1a,
+td.header_1a_h,
+th.header_1a,
+th.header_1a_h,
+tr.header_1a,
+tr.header_1a_h
+{ background: #353535; border: 1px solid #303030; color: #999999; font-weight: bold; text-align: center; }
+td.header_1a_h:hover,
+th.header_1a_h:hover,
+tr.header_1a_h:hover
+{ background: #DDDDDD; border: 1px solid #FFFFFF; }
+th.header_1a_h a:link,
+th.header_1a_h a:visited,
+tr.header_1a_h a:link,
+tr.header_1a_h a:visited
+{ color: #999999; }
+th.header_1a_h a:hover,
+tr.header_1a_h a:hover
+{ color: #e75e08; }
+
+
+td.header_1b,
+td.header_1b_h,
+th.header_1b,
+th.header_1b_h,
+tr.header_1b,
+tr.header_1b_h
+{ background: #2a2a2a; color: #555555; font-weight: bold; text-align: center; }
+td.header_1b_h:hover,
+tr.header_1b_h:hover
+{ background: #DDDDDD; border: 1px solid #FFFFFF; }
+td.header_1b_selected,
+tr.header_1b_selected
+{ background:url('https://xbox-sports.com/leagues/images/collapse_black_arrow_collapsed.gif') no-repeat #DDDDDD; background-position: 225px 5px; border: 1px solid #FFFFFF; font-weight: bold; }
+td.header_1b_selected a:link,
+td.header_1b_selected a:visited,
+tr.header_1b_selected a:link,
+tr.header_1b_selected a:visited
+{ color: #000000; }
+td.header_1b_selected a:hover,
+tr.header_1b_selected a:hover
+{ color: #FFFFFF; }
+
+
+td.header_1d,
+td.header_1d_h,
+tr.header_1d,
+tr.header_1d_h
+{ background: #34607a; color: #FFFFFF; text-align: center; border: 1px solid #588ba8; }
+td.header_1d_h:hover,
+tr.header_1d_h:hover
+{ background: #DDDDDD; border: 1px solid #FFFFFF; color: #000000; }
+tr.header_1d_h a:link,
+tr.header_1d_h a:visited
+{ color: #999999; }
+tr.header_1d_h a:hover
+{ color: #e75e08; }
+
+td.header_1e,
+td.header_1e_h,
+tr.header_1e,
+tr.header_1e_h
+{ background: #888888; color: #FFFFFF; text-align: center; border: 1px solid #555555; }
+td.header_1e_h:hover,
+tr.header_1e_h:hover
+{ background: #ec9000; border: 1px solid #FFFFFF; color: #ffa71d; }
+tr.header_1e_h a:link,
+tr.header_1e_h a:visited
+{ color: #999999; }
+tr.header_1e_h a:hover
+{ color: #e75e08; }
+
+
+.header_2a {
+    background: #bbbbbb;
+	height: 26px;
+	text-align: center;
+	font-weight: bold;
+	color: #ffffff;
+}
+
+
+
+/* ***| PRIMARY HEADER |*** */
+td.row_1a,
+td.row_1a_h,
+th.row_1a,
+th.row_1a_h,
+tr.row_1a,
+tr.row_1a_h
+{ background: #ededed; font-weight: bold; text-align: center; }
+td.row_1a_h:hover,
+tr.row_1a:hover,
+tr.row_1a_h:hover
+{ background: #DDDDDD; }
+th.row_1a_h a:link,
+th.row_1a_h a:visited,
+tr.row_1a_h a:link,
+tr.row_1a_h a:visited
+{ color: #111111; }
+td.row_1a_h_selected
+{ background:url('https://xbox-sports.com/leagues/images/collapse_black_arrow_collapsed.gif') no-repeat #DDDDDD; background-position: 225px 5px; border: 1px solid #FFFFFF; font-weight: bold; }
+td.row_1a_h_selected a:link,
+td.row_1a_h_selected a:visited
+{ color: #000000; }
+td.row_1a_h_selected a:hover
+{ color: #FFFFFF; }
+
+
+td.row_1b,
+td.row_1b_h,
+th.row_1b,
+th.row_1b_h,
+tr.row_1b,
+tr.row_1b_h
+{ background: #e6e6e6; color: #555555; font-weight: bold; text-align: center; }
+td.row_1b_h:hover,
+tr.row_1b:hover,
+tr.row_1b_h:hover
+{ background: #DDDDDD; }
+th.row_1b_h a:link,
+th.row_1b_h a:visited,
+tr.row_1b_h a:link,
+tr.row_1b_h a:visited
+{ color: #111111; }
+td.row_1b_h_selected
+{ background:url('https://xbox-sports.com/leagues/images/collapse_black_arrow_collapsed.gif') no-repeat #DDDDDD; background-position: 225px 5px; border: 1px solid #FFFFFF; font-weight: bold; }
+td.row_1b_h_selected a:link,
+td.row_1b_h_selected a:visited
+{ color: #000000; }
+td.row_1b_h_selected a:hover
+{ color: #FFFFFF; }
+
+
+/* Grey - Primary alternating row color. */
+.row_1c, .row_1c_h { background: #dfdfdf; color: #222222; text-align: center; }
+.row_1c_h:hover { background: #dddddd; color: #eeeeee; }
+
+/* Grey - Slightly darker. */
+.row_1d, .row_1d_h { background: #d6d6d6; color: #333333; text-align: center; }
+.row_1d_h:hover { background: #eeeeee; color: #222222; }
+
+
+td.row_1e,
+tr.row_1e,
+td.row_1e_h,
+tr.row_1e_h
+{ background: #252525; border: 1px solid #181818; color: #555555; text-align: center; }
+td.row_1e_h:hover,
+tr.row_1e_h:hover
+{ background: #DDDDDD; border: 1px solid #FFFFFF; }
+
+td.row_1f, tr.row_1f, td.row_1f_h, tr.row_1f_h {
+    background: #e6e6e6;
+    color: #1a1a1a;
+    text-align: center;
+}
+
+td.row_1f_h:hover, tr.row_1f_h:hover {
+
+}
+
+td.row_1g, tr.row_1g, td.row_1g_h, tr.row_1g_h {
+    background: #ededed;
+    color: #1a1a1a;
+    text-align: center;
+}
+
+td.row_1g_h:hover, tr.row_1g_h:hover {
+
+}
+
+td.row_1h,
+tr.row_1h,
+td.row_1h_h,
+tr.row_1h_h
+{ background: #DDDDDD; border: 1px solid #FFFFFF; color: #000000; text-align: center; }
+td.row_1h_h:hover,
+tr.row_1h_h:hover
+{ opacity: .50; filter: alpha(opacity=50); }
+
+td.row_1i,
+tr.row_1i,
+td.row_1i_h,
+tr.row_1i_h
+{ background: #CCCCCC; border: 1px solid #FFFFFF; color: #000000; text-align: center; }
+td.row_1i_h:hover,
+tr.row_1i_h:hover
+{ opacity: .50; filter: alpha(opacity=50); }
+
+
+td.row_1r, tr.row_1r, td.row_1r_h, tr.row_1r_h {
+    background: #c70000;
+    color: #fafafa;
+    text-align: center;
+}
+
+td.row_1r_h:hover, tr.row_1r_h:hover {
+
+}
+
+
+
+
+td.row_2a,
+td.row_2a_h
+{ background: #b8581c; border: 1px solid #e75e08; color: #FFFFFF; font-weight: bold; text-align: center; }
+td.row_2a_h:hover
+{ background: #DDDDDD; border: 1px solid #FFFFFF; color: #000000; }
+td.row_2a_h a:link
+{ color: #FFFFFF; }
+td.row_2a_h a.selected
+{ display: block; background: #DDDDDD; border: 1px solid #FFFFFF; font-weight: bold; }
+
+
+/* ***| HIGHLIGHT COLUMNS |*** */
+/* White - The primary highlights. */
+
+td.row_highlight_1 {
+	color: #c70000;
+	font-weight: bold;
+}
+
+/* Highlight for the recent games section - played game */
+.highlight_col_2 {
+    z-index:1;
+    position:relative;
+	background: #eeeeee;
+	background: -moz-linear-gradient(top, #eeeeee, #c8c8c8);
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#eeeeee), to(#c8c8c8));
+	border-left: 1px solid #c8c8c8;
+}
+
+.highlight_col_2:before {
+    content:"";
+    position:absolute;
+    z-index:-1;
+    top:0px;
+    left:0px;
+    right:0px;
+    bottom:0px;
+    border-left:1px solid #eeeeee;
+}
+
+/* Highlight for the recent games section - unplayed game */
+.highlight_col_3 {
+    z-index:1;
+    position:relative;
+    background: #353535;
+    background: -moz-linear-gradient(top, #353535 0%, #121212 100%);
+    background: -webkit-linear-gradient(top, #353535 0%,#121212 100%);
+    background: linear-gradient(to bottom, #353535 0%,#121212 100%);
+    border-left: 1px solid #000;
+}
+
+.highlight_col_3:before {
+    content:"";
+    position:absolute;
+    z-index:-1;
+    top:0px;
+    left:0px;
+    right:0px;
+    bottom:0px;
+    border-left:1px solid #353535;
+}
+
+
+
+#tab
+{ margin-top: 5px; margin-bottom: 5px; }
+#tab a
+{ background: #c70000; border: 1px solid #c70000; color: #FFFFFF; font-weight: bold; text-align: center; padding: 5px; }
+#tab a:hover
+{ background: #DDDDDD; border: 1px solid #DDDDDD; color: #000000; font-weight: bold; text-align: center; }
+#tab a.selected
+{ background: #ededed; border: 1px solid #ededed; color: #000000; font-weight: bold; text-align: center; }
+
+
+#tab_prev
+{ margin-top: 5px; margin-bottom: 5px; }
+#tab_prev a
+{ background: #c70000; border: 1px solid #c70000; color: #FFFFFF; font-weight: bold; text-align: center; padding: 5px; }
+#tab a:hover
+{ background: #DDDDDD; border: 1px solid #DDDDDD; color: #000000; font-weight: bold; text-align: center; }
+#tab a.selected
+{ background: #ededed; border: 1px solid #ededed; color: #000000; font-weight: bold; text-align: center; }
+
+
+
+.tab_prev
+{ background:url('https://xbox-sports.com/leagues/xbshl/images/tab_prev_6_01.png') no-repeat; }
+.tab_prev:hover
+{ background:url('https://xbox-sports.com/leagues/xbshl/images/tab_prev_6_02.png') no-repeat; }
+.tab_next
+{ background:url('https://xbox-sports.com/leagues/xbshl/images/tab_next_6_01.png') no-repeat; }
+.tab_next:hover
+{ background:url('https://xbox-sports.com/leagues/xbshl/images/tab_next_6_02.png') no-repeat; }
+.tab_lines
+{ background:url('https://xbox-sports.com/leagues/xbshl/images/tab_view_lines_01.png') no-repeat; }
+.tab_lines:hover
+{ background:url('https://xbox-sports.com/leagues/xbshl/images/tab_view_lines_02.png') no-repeat; }
+
+ul.fdtablePaginater
+{
+	display: table;
+	margin: 0px;
+	padding: 0px;
+	text-align: center;
+	cursor: default;
+}
+
+
+ul.fdtablePaginater li a:hover,
+ul.fdtablePaginater li a.currentPage
+{
+	background: #222;
+	color: #FFF;
+}
+ul.fdtablePaginater li a
+{
+
+}
+
+
+ul.fdtablePaginater li
+{
+	display: table-cell;
+	margin: 0px;
+	padding: 0px;
+
+	-moz-user-select: none;
+	-khtml-user-select: none;
+}
+ul.fdtablePaginater li a.currentPage
+{
+	color: #FFF;
+}
+ul.fdtablePaginater li a:active
+{
+	color: #FFF;
+}
+ul.fdtablePaginater li a,
+ul.fdtablePaginater li div
+{
+	display: block;
+	outline: none;
+	font-size: 9px;
+	color: #222222;
+	background: #ededed;
+	font-weight: bold;
+}
+ul.fdtablePaginater li div
+{
+	cursor: default;
+	background: #222;
+	color: #FFF;
+	opacity: .25;
+	filter: alpha(opacity=25);
+}
+ul.fdtablePaginater li a span,
+ul.fdtablePaginater li div span
+{
+	display: block;
+	padding: 4px;
+	width: 18px;
+}
+ul.fdtablePaginater li a:focus
+{
+	color: #FFF;
+	background: #222;
+}
+ul.fdtablePaginater li .next-page span,
+ul.fdtablePaginater li .previous-page span,
+ul.fdtablePaginater li .first-page span,
+ul.fdtablePaginater li .last-page span
+{
+	font-weight: bold !important;
+	background: #ededed;
+	color: #222222;
+}
+tr.invisibleRow
+{
+	display: none;
+	visibility: hidden;
+}
+p.paginationText
+{
+	font-style: oblique;
+}
+
+/* ***************************************************************** */
+/* ***| -- TEAM LOGOS HEADER -- |*********************************** */
+/* ***************************************************************** */
+td.logo_header {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    border-left: 1px solid #000;
+    background: #353535;
+    background: -moz-linear-gradient(top, #353535 0%, #121212 100%);
+    background: -webkit-linear-gradient(top, #353535 0%,#121212 100%);
+    background: linear-gradient(to bottom, #353535 0%,#121212 100%);
+}
+td.logo_header:hover {
+    background: #c70000;
+    background: -moz-linear-gradient(top, #c70000 0%, #a00000 100%);
+    background: -webkit-linear-gradient(top, #c70000 0%,#a00000 100%);
+    background: linear-gradient(to bottom, #c70000 0%,#a00000 100%);
+    border-left: 1px solid #c70000;
+}
+
+.xbs-border {
+    height: 5px;
+    background: #aa0000;
+    border-top: 1px solid #c70000;
+}
+
+
+.standings_drop {
+    background: #222222;
+    color: #fafafa;
+    text-align: center;
+    border: 1px
+    solid #fafafa;
+}
+
+.standings_drop:hover {
+    background: #c70000;
+    border: 1px
+    solid #FFFFFF;
+    color: #fafafa;
+}
+
+.button_black_background {
+    background: #c70000;
+    border: 1px
+    solid #c70000;
+    font-size: 9px;
+    font-weight: bold;
+    color: #FFFFFF;
+    padding: 5px;
+}
+
+.button_black_background:hover {
+    background: #d80000;;
+	border: 1px solid #d80000;;
+    font-size: 9px;
+    font-weight: bold;
+    color: #FFFFFF;
+    padding: 5px;
+    cursor: pointer;
+}
+
+.admin_button {
+    background: #c70000;
+    border: 1px
+    solid #c70000;
+    font-size: 10px;
+    font-weight: bold;
+    color: #FFFFFF;
+}
+
+.admin_button:hover {
+    background: #d80000;;
+	border: 1px solid #d80000;;
+    font-size: 10px;
+    font-weight: bold;
+    color: #FFFFFF;
+    cursor: pointer;
+}
+
+
+.button_white_background {
+    background: #c70000;
+    border: 1px
+    solid #c70000;
+    font-size: 9px;
+    font-weight: bold;
+    color: #FFFFFF;
+    padding: 5px;
+}
+
+.button_white_background:hover {
+    background: #d80000;;
+	border: 1px solid #d80000;;
+    font-size: 9px;
+    font-weight: bold;
+    color: #FFFFFF;
+    padding: 5px;
+    cursor: pointer;
+}
+
+.main_leader_even {
+    background: #222222;
+    solid #333333;
+    text-align: center;
+    color: #999999;
+    line-height: 18px;
+}
+
+.main_leader_odd {
+    background: #2a2a2a;
+    solid #333333;
+    text-align: center;
+    color: #999999;
+    line-height: 18px;
+}
+
+/* ***************************************************************** */
+/* ***| -- GAME PAGE STYLES -- |************************************ */
+/* ***************************************************************** */
+.game-result-bg {
+    height: 138px;
+    background: url("images/rink_background.png") no-repeat;
+}
+
+.logo-wrapper {
+    width: 100px;
+    height: 95px;
+    background-color: #e6e6e6;
+}
+
+.logo-wrapper img {
+    position: relative;
+    display: block;
+    margin: 0 auto;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* AWAY - Styles for the away team on the box score page */
+
+.away-text-wrapper {
+    float: left;
+    margin-left: 20px;
+}
+
+.away-vertical-align {
+    display: table-cell;
+    height: 99px;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.away-city {
+    color: #111;
+    text-align: left;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.away-name {
+    color: #111;
+    text-align: left;
+    font-size: 17px;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 700;
+}
+
+/* AWAY: SCORE - Styles for the away team on the box score page */
+
+.away-score-text-wrapper {
+    float: left;
+    margin-left: 50px;
+}
+
+.away-score-vertical-align {
+    display: table-cell;
+    height: 99px;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.away-score {
+    color: #111;
+    text-align: left;
+    font-size: 28px;
+    font-weight: bold
+}
+
+/* HOME - Styles for the home team on the box score page */
+
+.home-text-wrapper {
+    float: right;
+    margin-right: 20px;
+}
+
+.home-vertical-align {
+    display: table-cell;
+    height: 99px;
+    vertical-align: middle;
+}
+
+.home-city {
+    color: #111;
+    text-align: right;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.home-name {
+    color: #111;
+    text-align: right;
+    font-size: 17px;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 700;
+}
+
+/* HOME: SCORE - Styles for the home team on the box score page */
+
+.home-score-text-wrapper {
+    float: right;
+    margin-right: 50px;
+}
+
+.home-score-vertical-align {
+    display: table-cell;
+    height: 99px;
+    vertical-align: middle;
+}
+
+.home-score {
+    color: #111;
+    text-align: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+/* ***************************************************************** */
+/* ***| -- RULES PAGE STYLES -- |*********************************** */
+/* ***************************************************************** */
+.rules-header {
+    height: 35px;
+    background: url("images/rules_header.png") no-repeat;
+    font-size: 11px;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 700;
+    text-align: center;
+    text-transform: uppercase;
+    color: #fafafa;
+    line-height: 34px;
+}
+
+/* ***************************************************************** */
+/* ***| -- TEAM ROSTER PAGE  -- |*********************************** */
+/* ***************************************************************** */
+
+.right_box {
+	background: #eeeeee;
+	border-top: 1px solid #cccccc;
+	border-left: 1px solid #cccccc;
+	border-bottom: 1px solid #cccccc;
+
+	padding: 10px;
+	padding-right: 8px;
+}
+
+/* Middle of the site. */
+.middle_box, .middle_box_h {
+	background: #eeeeee;
+	border: 1px solid #cccccc;
+
+	padding: 10px;
+}
+.middle_box_h:hover {
+	background: #df0000;
+	border: 1px solid #bf0000;
+
+	padding: 10px;
+}
+
+.avatar_class
+{
+	background: #e6e6e6;
+	background: -moz-linear-gradient(bottom, #c6c2be, #eeeeee);
+	background: -webkit-gradient(linear, 0% 0%, 100% 0%, from(#c6c2be), to(#eeeeee));
+}
+
+/* ***| GRAYSCALE CLASS |*** */
+/* The class for graying out an image. */
+img.grayscale
+{
+    filter: url("data:image/svg+xml;utf8,<svg xmlns=\'https://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#grayscale"); /* Firefox 3.5+ */
+    filter: gray; /* IE6-9 */
+    -webkit-filter: grayscale(100%); /* Chrome 19+ & Safari 6+ */
+}
+
+
+/* ***************************************************************** */
+/* ***| -- POSITION MENU -- |*************************************** */
+/* ***************************************************************** */
+/* ***| The position mega menu. */
+
+/* ***| MENU ELEMENTS |********************************************* */
+/* These are the basic elements for the mega menu. */
+#position_menu {
+	background: #eeeeee;
+	margin: 0px;
+	padding: 0px;
+	list-style: none;
+}
+/* The button for each dropdown. */
+#position_menu li {
+	position: relative;
+	float: left;
+	padding: 0px;
+	margin: 0px;
+}
+/* The hover effect. */
+#position_menu li a:hover {
+	background: #c70000;
+	color: #eeeeee;
+}
+/* The font for the button. */
+#position_menu a {
+	background: #222222;
+	display: block;
+	outline: 0;
+	text-decoration: none;
+	padding: 8px;
+	vertical-align: middle;
+	text-align: center;
+	color: #ffffff;
+	font-size: 9px;
+	font-weight: bold;
+}
+
+#position_menu a.selected {
+	background: #c70000;
+	position: relative;
+	display: block;
+	list-style: none;
+	vertical-align: middle;
+	text-align: center;
+	color: #ffffff;
+	font-weight: bold;
+}
+
+
+/* ********************************************************************************* */
+/* ***| -- GAME - GAME PIN SECTION -- |********************************************* */
+/* ********************************************************************************* */
+.badge {
+  display: inline-block;
+  min-width: 10px;
+  padding: 5px 20px;
+  line-height: 1;
+  color: #FFF;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  border-radius: 3px;
+  background-color: #c70000;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+
+
+/* ********************************************************************************* */
+/* ***| -- GAME - THREE STARS SECTION -- |****************************************** */
+/* ********************************************************************************* */
+.stars-text-wrapper {
+    float: left;
+    margin-left: 10px;
+}
+
+.stars-vertical-align {
+    display: table-cell;
+    height: 45px;
+    text-align: left;
+    vertical-align: middle;
+    line-height: 15px;
+}
+
+.stars-name {
+    color: #111;
+    text-align: left;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.stars-stats {
+    color: #111;
+    text-align: left;
+    font-size: 9px;
+}
+
+label:not(:last-child):after{
+    content: " \B7 ";
+    font-weight: bold;
+}
+
+/* ********************************************************************* */
+/* ***| -- FOOTER SECTION -- |****************************************** */
+/* ********************************************************************* */
+
+.footer_1a {
+    background: #353535;
+    background: -moz-linear-gradient(top, #353535 0%, #121212 100%);
+    background: -webkit-linear-gradient(top, #353535 0%,#121212 100%);
+    background: linear-gradient(to bottom, #353535 0%,#121212 100%);
+    color: #fafafa;
+    font-weight: bold;
+    text-align: center;
+    border: 0;
+}
+
+.logo_sprite {
+    background-image: url(images/logo_sprite.png);
+    background-repeat: no-repeat;
+    display: block;
+}
+
+/* ********************************************************************* */
+/* ***| -- EVENT NAVIGATION -- |**************************************** */
+/* ********************************************************************* */
+.event-navigation
+{
+  height: 85px;
+}
+
+.event-navigation i
+{
+  font-size: 20px;
+  margin-bottom: 7px;
+}
+
+.event-cursor
+{
+  cursor: pointer;
+}
+
+.event-title
+{
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+}
+
+.jersey-container {
+  position: relative;
+  margin: 0 auto;
+}
+
+.jersey-number {
+  width: 80px;
+  height: 50px;
+  position: absolute;
+  margin: 0 auto;
+  z-index: 2;
+  top: 50px;
+  left: 129px;
+}
+
+/* ********************************************************************* */
+/* ***| -- STREAM STYLES -- |******************************************* */
+/* ********************************************************************* */
+strong.stream-alert {
+  padding: 3px 6px;
+  border-radius: 2px;
+  background-color: #c70000;
+  font-weight: bold;
+  font-size: 9px;
+  color: #FFF;
+}
+
+span.stream-arrow {
+  position: absolute;
+  bottom: 34px;
+  right: 22px;
+  border: 3px solid transparent;
+  border-top-color: #c70000;
+  border-bottom: 1px none #000;
+}
+
+span.stream-total {
+  margin-left: 2px;
+}
