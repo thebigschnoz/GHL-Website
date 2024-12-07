@@ -4,6 +4,18 @@
 	font-style: normal;
 }
 
+$type--base: 16px;
+$type--family: -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;;
+
+$color--red: #db0b17;
+
+$break--mobile: 576px;
+
+* {
+  box-sizing: border-box;
+  font-family: $type--family;
+}
+
 body {
 	background:url(./images/background.jpg) no-repeat top center fixed;
 	min-height:100%;
@@ -16,23 +28,6 @@ body {
 	font-optical-sizing: auto;
 	font-weight: 700;
 	font-style: normal;
-}
-
-tr.scoreboard-full {
-	width: "100%";
-	min-height: 114px;
-}
-
-td.scoreboard-left {
-	width: 48px;
-}
-
-td.scoreboard-right {
-	width: 48px;
-}
-
-td.scoreboard-body {
-	width: auto;
 }
 
 .nav__container {
