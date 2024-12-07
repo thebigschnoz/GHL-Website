@@ -67,47 +67,47 @@ class ScoreBoard extends React.Component {
           final={true}
         />
         <Game
-          away={{ name: "BAL", score: 49, logo: Teams.BAL }} 
-          home={{ name: "CIN", score: 13, logo: Teams.CIN }}
+          away={{ name: "WSH", score: 49, logo: Teams.WSH }} 
+          home={{ name: "STL", score: 13, logo: Teams.STL }}
           final={true}
         />
         <Game
           away={{ name: "BUF", score: 16, logo: Teams.BUF }} 
-          home={{ name: "CLE", score: 19, logo: Teams.CLE }}
+          home={{ name: "CBJ", score: 19, logo: Teams.CBJ }}
           final={true}
         />
         <Game
           away={{ name: "ATL", score: 26, logo: Teams.ATL }} 
-          home={{ name: "NO", score: 9, logo: Teams.NO }} 
+          home={{ name: "ATL", score: 9, logo: Teams.ATL }} 
           final={true}
         />
         <Game
-          away={{ name: "NYG", score: 27, logo: Teams.NYG }} 
-          home={{ name: "NYJ", score: 34, logo: Teams.NYJ }} 
+          away={{ name: "NYI", score: 27, logo: Teams.NYI }} 
+          home={{ name: "NYR", score: 34, logo: Teams.NYR }} 
           final={true}
         />
         <Game
-          away={{ name: "ARI", score: 27, logo: Teams.ARI }} 
-          home={{ name: "TB", score: 30, logo: Teams.TB }} 
+          away={{ name: "UTA", score: 27, logo: Teams.UTA }} 
+          home={{ name: "TBL", score: 30, logo: Teams.TBL }} 
           final={true}
         />
         <Game
-          away={{ name: "KC", score: 32, logo: Teams.KC }} 
-          home={{ name: "TEN", score: 35, logo: Teams.TEN }} 
+          away={{ name: "COL", score: 32, logo: Teams.COL }} 
+          home={{ name: "NSH", score: 35, logo: Teams.NSH }} 
           final={true}
         />
         <Game
-          away={{ name: "MIA", score: 16, logo: Teams.MIA }} 
-          home={{ name: "IND", score: 12, logo: Teams.IND }} 
+          away={{ name: "FLA", score: 16, logo: Teams.FLA }} 
+          home={{ name: "TOR", score: 12, logo: Teams.TOR }} 
           final={true}
         />
         <Game
           away={{ name: "CAR", score: 16, logo: Teams.CAR }} 
-          home={{ name: "GB", score: 24, logo: Teams.GB }} 
+          home={{ name: "EDM", score: 24, logo: Teams.EDM }} 
           final={true}
         />
         <Game
-          away={{ name: "LAR", score: 12, logo: Teams.LAR }} 
+          away={{ name: "SJS", score: 12, logo: Teams.SJS }} 
           home={{ name: "PIT", score: 17, logo: Teams.PIT }} 
           final={true}
         />
