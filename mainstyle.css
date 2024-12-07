@@ -4,23 +4,16 @@
 	font-style: normal;
 }
 
-$type--base: 16px;
-$type--family: -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;;
-
-$color--red: #db0b17;
-
-$break--mobile: 576px;
-
 * {
   box-sizing: border-box;
-  font-family: $type--family;
+  font-family: "Inter", sans-serif;
 }
 
 body {
 	background:url(./images/background.jpg) no-repeat top center fixed;
-	min-height:100%;
-	width:100%;
-	background-color:black;
+	min-height: 100%;
+	width: 100%;
+	background-color: black;
 }
 
 .inter-scoreboard {
