@@ -9,11 +9,67 @@
   font-family: "Inter", sans-serif;
 }
 
+table {
+  border: 0px;
+  table-layout: auto;
+  border-spacing: 15px;
+}
+
 body {
-	background:url(./images/background.jpg) no-repeat top center fixed;
+  color: white;
+	background:url(../GHLWebsiteApp/background.jpg) no-repeat top center fixed;
 	min-height: 100%;
 	width: 100%;
 	background-color: black;
+}
+
+#fakescoreboard {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-height: 120px;
+  height: 120px;
+  border: 3px;
+  border-color: white;
+}
+
+#leftbar {
+  width: 350px;
+  max-width: 350px;
+  background-color: black;
+  vertical-align: top;
+  border: 5px;
+}
+
+#standings {
+  width: 95%;
+  min-width: 95%;
+  background-color: #303030;
+  border-spacing: 5px;
+}
+
+td.points {
+  font-weight: 600;
+}
+
+#divider {
+  height: 5px;
+  background-color: #15b400;
+}
+
+#information {
+  width: 350px;
+  max-width: 350px;
+  background-color: black;
+  vertical-align: top;
+}
+
+#rightbar {
+  width: 950px;
+  max-width: 950px;
+  background-color: black;
+  vertical-align: top;
 }
 
 .inter-scoreboard {
@@ -35,12 +91,12 @@ body {
   display: flex;
 }
 .nav__container .logo__container {
-  background: #db0b17;
+  background: #1cdb0b;
   box-sizing: border-box;
   width: 125px;
   transform: skew(-25deg, 0);
-  border-right: 10px solid #b40000;
-  border-left: 10px solid #b40000;
+  border-right: 10px solid #15b400;
+  border-left: 10px solid #15b400;
 }
 @media (max-width: 576px) {
   .nav__container .logo__container {
