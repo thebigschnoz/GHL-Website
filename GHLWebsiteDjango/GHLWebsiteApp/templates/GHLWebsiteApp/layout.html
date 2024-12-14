@@ -16,6 +16,11 @@
 <body>
 	<main id="sup">
 		<center><div id="fakescoreboard"><!-- TODO: Scoreboard and Navigation will go here --><center>SCOREBOARD AND NAVIGATION</center></div></center>
+		<center>
+			<div id="menu">
+				<a href="{% url 'index' %}">Home</a> | <a href="{% url 'standings' %}">Standings</a>
+			</div>
+		</center>
 		<div id="divider"></div>
 		
 		{% block body %}

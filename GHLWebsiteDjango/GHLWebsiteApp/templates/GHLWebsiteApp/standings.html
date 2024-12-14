@@ -1,0 +1,65 @@
+{% extends 'GHLWebsiteApp/layout.html' %}
+{% load static %}
+{% block body %}
+  <center>
+    <div class="header">Team Standings: Season 8</div>
+    <div class="section">
+      <center>
+      <table id="fullstandings">
+        <col style="width: 90px;">
+        <col style="width: 70px;">
+        <col style="width: 70px;">
+        <col style="width: 350px;">
+        <col style="width: 100px;">
+        <col style="width: 100px;">
+        <col style="width: 100px;">
+        <col style="width: 100px;">
+        <col style="width: 100px;">
+        <col style="width: 100px;">
+        <col style="width: 100px;">
+        <col style="width: 100px;">
+        <col style="width: 100px;">
+        <col style="width: 100px;">
+        <col style="width: 100px;">
+        <col style="width: 100px;">
+        <tr>
+          <th>Pos</th>
+          <th>&nbsp;</th>
+          <th>&nbsp;</th>
+          <th>Team</th>
+          <th>GP</th>
+          <th>W</th>
+          <th>L</th>
+          <th>OTL</th>
+          <th>Pct</th>
+          <th>GF</th>
+          <th>GA</th>
+          <th>PP%</th>
+          <th>PK%</th>
+          <th>L10</th>
+          <th>Str</th>
+          <th>Pts</th>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td class="clinched">Clinched</td>
+          <td>&nbsp;</td>
+          <td>Philadelphia Flyers</td>
+          <td>53</td>
+          <td>48</td>
+          <td>4</td>
+          <td>1</td>
+          <td>.915</td>
+          <td>286</td>
+          <td>116</td>
+          <td>32.5%</td>
+          <td>89.3%</td>
+          <td>8-1-1</td>
+          <td>L1</td>
+          <td class="points">97</td>
+        </tr>
+      </table>
+      </center>
+    </div>
+  </center>
+{% endblock %}
