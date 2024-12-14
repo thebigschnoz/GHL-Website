@@ -15,10 +15,10 @@
 
 <body>
 	<main id="sup">
-		<center><div id="fakescoreboard"><!-- TODO: Scoreboard and Navigation will go here --><center>SCOREBOARD AND NAVIGATION</center></div></center>
+		<div id="fakescoreboard"><!-- TODO: Scoreboard and Navigation will go here --><center>SCOREBOARD AND NAVIGATION</center></div>
 		<center>
 			<div id="menu">
-				<a href="{% url 'index' %}">Home</a> | <a href="{% url 'standings' %}">Standings</a>
+				<a href="{% url 'index' %}">Home</a> | <a href="{% url 'standings' %}">Standings</a> | League Leaders | Skater Stats | Goalie Stats | Draft | Awards
 			</div>
 		</center>
 		<div id="divider"></div>
@@ -28,4 +28,7 @@
 				
 	</main>
 </body>
+<footer>
+	<center><div id="copyright">&#169 2025 GHL, All Rights Reserved</div></center>
+</footer>
 </html>

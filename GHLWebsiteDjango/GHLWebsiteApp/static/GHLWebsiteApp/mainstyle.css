@@ -57,13 +57,18 @@ body {
 }
 
 #fakescoreboard {
-  display: flex;
+  text-align: center;
+  left: 0%;
+  right: 0%;
   justify-content: center;
+  vertical-align: middle;
   align-items: center;
   width: 99%;
   min-height: 120px;
   height: 120px;
   border: 3px solid #e9eaec;
+  line-height: 120px;
+  z-index: -1;
 }
 
 .section {
@@ -73,10 +78,17 @@ body {
   border: 5px solid #e4b61a;
   text-align: center;
   margin-bottom: 10px;
+  width: auto;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
-.subsection {
-  justify-self: center;
+.section_lg {
+  max-width: 90%;
+}
+
+.subsection-container {
+  justify-content: center;
   align-items: center;
   align-content: center;
   text-align: center;
@@ -100,6 +112,10 @@ tr:nth-child(odd) {
   background-color: #606060;
 }
 
+tr.no-bg {
+  background-color: transparent;
+}
+
 th {
   border-bottom: 1px solid #e9eaec;
   background-color: #303030;
@@ -109,22 +125,22 @@ th {
   display: flex;
   align-items: center;
   text-align: center;
-  vertical-align: center;
+  vertical-align: middle;
   justify-content: center;
   background-color: black;
   font-weight: 500;
   padding: 15px;
-  padding-top: 20px;
+  padding-top: 15px;
   font-size: 26px;
+  line-height: 26px;
   text-decoration: underline;
 }
 
 .clinched {
-  box-sizing: border-box;
-  border: 3px;
-  text-shadow: 1px 1px 2px black;
+  outline: 2px;
+  text-shadow: 1px 1px 3px black;
   background-color: #b89217;
-  border-style: outset;
+  outline-style: outset;
 }
 
 .standingstable {
@@ -136,20 +152,26 @@ th {
   border-spacing: 5px;
   margin: 5px;
   margin-bottom: 15px;
+  min-width: 85%;
 }
 
 #fullstandings {
-  overflow: hidden;
   table-layout: fixed;
   align-self: center;
   justify-self: center;
   border: 1px solid #e9eaec;
   padding: 3px;
-  white-space: nowrap;
   background-color: #303030;
   border-spacing: 5px;
   margin: 5px;
   margin-bottom: 15px;
+}
+
+#playoffInfo {
+  font-weight: 150;
+  color: #959697;
+  font-style: italic;
+  margin: 5px;
 }
 
 td {
@@ -169,6 +191,7 @@ td.points {
 
 #divider {
   height: 5px;
+  margin-bottom: 5px;
   background-color: #e4b61a;
 }
 
@@ -186,16 +209,25 @@ td.points {
 }
 
 #playerfocustable {
-  width: 60%;
   align-items: center;
   align-content: center;
   text-align: center;
   display: inline;
+  flex-grow: 1;
+  line-height: 20px;
+}
+
+#playerfocustable table {
+  border: 1px solid #e9eaec;
+}
+
+#playerfocustable table, #playerfocustable td {
+  border-spacing: 0;
 }
 
 #playerfocusimg {
-  width: 30%;
   display: inline;
+  flex-grow: 1;
 }
 
 .inter-scoreboard {
@@ -345,4 +377,16 @@ td.points {
 
 .hide {
   display: none;
+}
+
+#copyright {
+  vertical-align: bottom;
+  text-align: center;
+  align-self: center;
+  text-shadow: 1px 1px 5px black;
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, 0);
+  background-color: rgba(0, 0, 0, 0.5);
 }

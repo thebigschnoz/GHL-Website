@@ -3,7 +3,7 @@
 {% block body %}
 <center>
     <table>
-        <tr>
+        <tr class="no-bg">
             <td id="leftside">
                 <div class="section">
                     <center>
@@ -18,7 +18,7 @@
                                 <th>PTS</th>
                             </tr>
                             <tr>
-                                <td>Flyers</td>
+                                <td>PHI</td>
                                 <td>52</td>
                                 <td>47</td>
                                 <td>4</td>
@@ -26,7 +26,7 @@
                                 <td class="points">95</td>
                             </tr>
                             <tr class="odd">
-                                <td>Maple Leafs</td>
+                                <td>TOR</td>
                                 <td>54</td>
                                 <td>43</td>
                                 <td>10</td>
@@ -34,7 +34,7 @@
                                 <td class="points">87</td>
                             </tr>
                             <tr>
-                                <td>Thrashers</td>
+                                <td>ATL</td>
                                 <td>52</td>
                                 <td>34</td>
                                 <td>14</td>
@@ -42,7 +42,7 @@
                                 <td class="points">72</td>
                             </tr>
                             <tr class="odd">
-                                <td>Utah HC</td>
+                                <td>UTA</td>
                                 <td>51</td>
                                 <td>28</td>
                                 <td>18</td>
@@ -50,7 +50,7 @@
                                 <td class="points">61</td>
                             </tr>
                             <tr>
-                                <td>Blue Jackets</td>
+                                <td>CBJ</td>
                                 <td>53</td>
                                 <td>23</td>
                                 <td>29</td>
@@ -58,7 +58,7 @@
                                 <td class="points">47</td>
                             </tr>
                             <tr class="odd">
-                                <td>Red Wings</td>
+                                <td>DET</td>
                                 <td>54</td>
                                 <td>20</td>
                                 <td>28</td>
@@ -66,7 +66,7 @@
                                 <td class="points">46</td>
                             </tr>
                             <tr>
-                                <td>Rangers</td>
+                                <td>NYR</td>
                                 <td>53</td>
                                 <td>19</td>
                                 <td>29</td>
@@ -74,7 +74,7 @@
                                 <td class="points">43</td>
                             </tr>
                             <tr class="odd">
-                                <td>Lightning</td>
+                                <td>TBL</td>
                                 <td>53</td>
                                 <td>20</td>
                                 <td>31</td>
@@ -82,7 +82,7 @@
                                 <td class="points">42</td>
                             </tr>
                             <tr>
-                                <td>Sabres</td>
+                                <td>BUF</td>
                                 <td>52</td>
                                 <td>17</td>
                                 <td>30</td>
@@ -90,7 +90,7 @@
                                 <td class="points">39</td>
                             </tr>
                             <tr class="odd">
-                                <td>Flames</td>
+                                <td>CGY</td>
                                 <td>52</td>
                                 <td>12</td>
                                 <td>36</td>
@@ -158,34 +158,41 @@
                 </div>
                 <div class="section">
                     <div class="header">Player Focus</div>
-                    <div class="subsection">
+                    <div class="subsection-container">
                         <div id="playerfocustable">
-                            <center><table width=90%>
-                                <tr class="bottomborder">
+                            <center><table>
+                                <col style="width: 35%;">
+                                <col style="width: 65%;">
+
+                                <tr>
                                     <td>Username:</td>
                                     <td>thebigschnoz</td>
                                 </tr>
-                                <tr class="bottomborder">
+                                <tr>
                                     <td>Player Name:</td>
                                     <td>Kielbasa Crusher</td>
                                 </tr>
-                                <tr class="bottomborder">
-                                    <td>Positions:</td>
-                                    <td>G, then C/RW/RD</td>
+                                <tr>
+                                    <td>Primary Pos:</td>
+                                    <td>G</td>
                                 </tr>
-                                <tr class="bottomborder">
+                                <tr>
+                                    <td>Secondary Pos:</td>
+                                    <td>C/RW/RD</td>
+                                </tr>
+                                <tr>
                                     <td>Games Played:</td>
                                     <td>6</td>
                                 </tr>
-                                <tr class="bottomborder">
+                                <tr>
                                     <td>Goals:</td>
                                     <td>5</td>
                                 </tr>
-                                <tr class="bottomborder">
+                                <tr>
                                     <td>Assists:</td>
                                     <td>4</td>
                                 </tr>
-                                <tr class="bottomborder">
+                                <tr>
                                     <td>+/-:</td>
                                     <td>-8</td>
                                 </tr>
@@ -196,7 +203,7 @@
                             </table></center>
                         </div>
                         <div id="playerfocusimg">
-                            <img src="{% static 'GHLWebsiteApp/stock-user-photo.jpg' %}" width=250 height=250 />
+                            <img src="{% static 'GHLWebsiteApp/stock-user-photo.jpg' %}" width=220 height=220 />
                         </div>
                     </div>
                 </div>
