@@ -1,0 +1,143 @@
+{% extends "GHLWebsiteApp/layout.html" %}
+{% load static %}
+{% block body %}
+<center>
+    <div class="section section_lg"><center>
+        <div><h1>Awards</h1></div>
+        <div style="padding: 10px;">
+            <a>Click me for award voting!</a>
+        </div>
+        <div class="header">
+            Mark Messier (Leadership)
+        </div>
+        <div class="selectionmenu">
+            <form>
+                <select id="awardtype" name="awardtype">
+                    <optgroup>
+                        <option selected disabled value="">Choose an award...</option>
+                        <option value="">Stanley Cup</option>
+                        <option value="">Presidents Trophy</option>
+                        <option value="">Conn Smythe (Playoff MVP)</option>
+                        <option value="">Hart (Team MVP)</option>
+                        <option value="">Vezina (Goalie)</option>
+                        <option value="">Art Ross (Points)</option>
+                        <option value="">Rocket Richard (Goals)</option>
+                        <option value="">Selke (Defensive Forward)</option>
+                        <option value="">Norris (Defenseman)</option>
+                        <option value="">Lady Byng (Sportsmanship)</option>
+                        <option value="">Calder (Rookie)</option>
+                        <option value="">Mark Messier (Leadership)</option>
+                        <option value="">Roger Crozier (Saves)</option>
+                        <option value="">GM of the Year</option>
+                    </optgroup>
+                </select>
+            </form>
+        </div>
+        <div class="subsection-container">
+            <table>
+                <col style="width: 25%;">
+                <col style="width: 25%;">
+                <col style="width: 50%;">
+                <tr class="no-bg">
+                    <td>
+                        <img src="{% static 'GHLWebsiteApp/stock-user-photo.jpg' %}" width=220 height=220 />
+                    </td>
+                    <td>
+                        <img src="https://loodibee.com/wp-content/uploads/nhl-chicago-blackhawks-logo.png" width=220 height=220 />
+                    </td>
+                    <td>
+                        <table class="standingstable">
+                            <tr>
+                                <th>Pos</th>
+                                <th>Player</th>
+                                <th colspan=2>Team</th>
+                                <th>Votes</th>
+                            </tr>
+                            <tr>
+                                <td>1</td>
+                                <td class="points">Quality Yams</td>
+                                <td><img src="https://loodibee.com/wp-content/uploads/nhl-chicago-blackhawks-logo.png"  height="24" width="24" /></td>
+                                <td>Chicago Blackhawks</td>
+                                <td>22</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>Seanahue99</td>
+                                <td><img src="https://loodibee.com/wp-content/uploads/nhl-columbus-blue-jackets-logo.png"  height="24" width="24" /></td>
+                                <td>Columbus Blue Jackets</td>
+                                <td>5</td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>Captain Frat</td>
+                                <td><img src="https://loodibee.com/wp-content/uploads/nhl-tampa-bay-lightning-logo.png"  height="24" width="24" /></td>
+                                <td>Tampa Bay Lightning</td>
+                                <td>3</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="subsection-container-vert">
+            <div class="header">Previous Winners</div>
+            <div class="subsection-container" style="width: 70%;">
+                <table class="standingstable">
+                    <tr>
+                        <th>Season</th>
+                        <th>Player</th>
+                        <th colspan=2>Team</th>
+                        <th>Votes</th>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td class="points">Quality Yams</td>
+                        <td><img src="https://loodibee.com/wp-content/uploads/nhl-chicago-blackhawks-logo.png"  height="24" width="24" /></td>
+                        <td>Chicago Blackhawks</td>
+                        <td>22</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td class="points">Quality Yams</td>
+                        <td><img src="https://loodibee.com/wp-content/uploads/nhl-chicago-blackhawks-logo.png"  height="24" width="24" /></td>
+                        <td>Chicago Blackhawks</td>
+                        <td>22</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td class="points">FloppyWha1eMeat</td>
+                        <td><img src="https://loodibee.com/wp-content/uploads/nhl-chicago-blackhawks-logo.png"  height="24" width="24" /></td>
+                        <td>Chicago Blackhawks</td>
+                        <td>22</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td class="points">Yarmo</td>
+                        <td><img src="https://loodibee.com/wp-content/uploads/nhl-chicago-blackhawks-logo.png"  height="24" width="24" /></td>
+                        <td>Chicago Blackhawks</td>
+                        <td>22</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td class="points">Drunkencomb</td>
+                        <td><img src="https://loodibee.com/wp-content/uploads/nhl-chicago-blackhawks-logo.png"  height="24" width="24" /></td>
+                        <td>Chicago Blackhawks</td>
+                        <td>22</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td class="points">Drunkencomb</td>
+                        <td><img src="https://loodibee.com/wp-content/uploads/nhl-chicago-blackhawks-logo.png"  height="24" width="24" /></td>
+                        <td>Chicago Blackhawks</td>
+                        <td>22</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td colspan=4>Innaugural Season - No Awards</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </center></div>
+</center>
+{% endblock %}

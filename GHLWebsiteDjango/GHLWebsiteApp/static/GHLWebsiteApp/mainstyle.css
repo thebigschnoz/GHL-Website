@@ -23,6 +23,11 @@ a {
   font-weight: 600;
 }
 
+.selectionmenu {
+  padding: 3px;
+  overflow: hidden;
+}
+
 #menu {
   background-image: linear-gradient(to right, rgba(0,0,0,0) 20%, rgba(0, 0, 0, 1) 40% 60%, rgba(0,0,0,0) 80%);
   padding: 5px;
@@ -93,6 +98,16 @@ body {
   align-content: center;
   text-align: center;
   display: flex;
+  flex-wrap: nowrap;
+}
+
+.subsection-container-vert {
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
   flex-wrap: nowrap;
 }
 
