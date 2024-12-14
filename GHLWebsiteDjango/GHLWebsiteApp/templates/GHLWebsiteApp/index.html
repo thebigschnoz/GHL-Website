@@ -1,8 +1,205 @@
 {% extends "GHLWebsiteApp/layout.html" %}
-
+{% load static %}
 {% block body %}
-    <div>
-        <center><h1>Testing 1 2 3!</h1>
-        This is a change to test if it's changing my code or not.</center>
-    </div>
+<center>
+    <table>
+        <tr>
+            <td id="leftside">
+                <div class="section">
+                    <center>
+                        <div class="header">Current Standings</div>
+                        <table id="standings">
+                            <tr>
+                                <th>Team</th>
+                                <th>GP</th>
+                                <th>W</th>
+                                <th>L</th>
+                                <th>OTL</th>
+                                <th>PTS</th>
+                            </tr>
+                            <tr>
+                                <td>Flyers</td>
+                                <td>52</td>
+                                <td>47</td>
+                                <td>4</td>
+                                <td>1</td>
+                                <td class="points">95</td>
+                            </tr>
+                            <tr class="odd">
+                                <td>Maple Leafs</td>
+                                <td>54</td>
+                                <td>43</td>
+                                <td>10</td>
+                                <td>1</td>
+                                <td class="points">87</td>
+                            </tr>
+                            <tr>
+                                <td>Thrashers</td>
+                                <td>52</td>
+                                <td>34</td>
+                                <td>14</td>
+                                <td>4</td>
+                                <td class="points">72</td>
+                            </tr>
+                            <tr class="odd">
+                                <td>Utah HC</td>
+                                <td>51</td>
+                                <td>28</td>
+                                <td>18</td>
+                                <td>5</td>
+                                <td class="points">61</td>
+                            </tr>
+                            <tr>
+                                <td>Blue Jackets</td>
+                                <td>53</td>
+                                <td>23</td>
+                                <td>29</td>
+                                <td>1</td>
+                                <td class="points">47</td>
+                            </tr>
+                            <tr class="odd">
+                                <td>Red Wings</td>
+                                <td>54</td>
+                                <td>20</td>
+                                <td>28</td>
+                                <td>6</td>
+                                <td class="points">46</td>
+                            </tr>
+                            <tr>
+                                <td>Rangers</td>
+                                <td>53</td>
+                                <td>19</td>
+                                <td>29</td>
+                                <td>5</td>
+                                <td class="points">43</td>
+                            </tr>
+                            <tr class="odd">
+                                <td>Lightning</td>
+                                <td>53</td>
+                                <td>20</td>
+                                <td>31</td>
+                                <td>2</td>
+                                <td class="points">42</td>
+                            </tr>
+                            <tr>
+                                <td>Sabres</td>
+                                <td>52</td>
+                                <td>17</td>
+                                <td>30</td>
+                                <td>5</td>
+                                <td class="points">39</td>
+                            </tr>
+                            <tr class="odd">
+                                <td>Flames</td>
+                                <td>52</td>
+                                <td>12</td>
+                                <td>36</td>
+                                <td>4</td>
+                                <td class="points">28</td>
+                            </tr>
+                        </table>
+                    </center>
+                </div>
+                <div class="section">
+                    <div class="header">Player Leaders</div>
+                    <center><table id="standings">
+                        <tr>
+                            <td>Pts</td>
+                            <td class="points">JBrewer23</td>
+                            <td>153</td>
+                        </tr>
+                        <tr class="odd">
+                            <td>G</td>
+                            <td class="points">OGLarryBird</td>
+                            <td>85</td>
+                        </tr>
+                        <tr>
+                            <td>A</td>
+                            <td class="points">JBrewer23</td>
+                            <td>91</td>
+                        </tr>
+                        <tr class="odd">
+                            <td>+/-</td>
+                            <td class="points">FloppyWha1eMeat</td>
+                            <td>+109</td>
+                        </tr>
+                        <tr>
+                            <td>GAA</td>
+                            <td class="points">USSR Pepino</td>
+                            <td>2.00</td>
+                        </tr>
+                        <tr class="odd">
+                            <td>SV%</td>
+                            <td class="points">GroomedChampion</td>
+                            <td>90.8%</td>
+                        </tr>
+                        <tr>
+                            <td>W</td>
+                            <td class="points">BigDaddyOdin</td>
+                            <td>44</td>
+                        </tr>
+                        <tr class="odd">
+                            <td>SO</td>
+                            <td class="points">BigDaddyOdin</td>
+                            <td>7</td>
+                        </tr>
+                    </table></center>
+                </div>
+            </td>
+
+            <td id="rightside">
+                <div class="section">
+                    <h1>Announcements</h1>
+                        <div class="bodytext">
+                            I require 1 or 2 members to assist me weekly with 3 stars, power rankings and maybe even helping publish games to keep the standings up to date. If this interests you, please DM myself for more information.
+                            <p />
+                            Thank you.
+                        </div>
+                </div>
+                <div class="section">
+                    <div class="header">Player Focus</div>
+                    <div class="subsection">
+                        <div id="playerfocustable">
+                            <center><table width=90%>
+                                <tr class="bottomborder">
+                                    <td>Username:</td>
+                                    <td>thebigschnoz</td>
+                                </tr>
+                                <tr class="bottomborder">
+                                    <td>Player Name:</td>
+                                    <td>Kielbasa Crusher</td>
+                                </tr>
+                                <tr class="bottomborder">
+                                    <td>Positions:</td>
+                                    <td>G, then C/RW/RD</td>
+                                </tr>
+                                <tr class="bottomborder">
+                                    <td>Games Played:</td>
+                                    <td>6</td>
+                                </tr>
+                                <tr class="bottomborder">
+                                    <td>Goals:</td>
+                                    <td>5</td>
+                                </tr>
+                                <tr class="bottomborder">
+                                    <td>Assists:</td>
+                                    <td>4</td>
+                                </tr>
+                                <tr class="bottomborder">
+                                    <td>+/-:</td>
+                                    <td>-8</td>
+                                </tr>
+                                <tr>
+                                    <td>PIMs:</td>
+                                    <td>317</td>
+                                </tr>
+                            </table></center>
+                        </div>
+                        <div id="playerfocusimg">
+                            <img src="{% static 'GHLWebsiteApp/stock-user-photo.jpg' %}" width=250 height=250 />
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </table></center>
 {% endblock %}

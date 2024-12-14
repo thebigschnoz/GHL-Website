@@ -4,20 +4,43 @@
 	font-style: normal;
 }
 
+/*
+  colors for future use:
+  gold: #e4b61a
+  yellow: #fbe134
+  silver: #e9eaec
+  slate: #2a2e34
+  black: #0b0c0c
+*/
+
 * {
   box-sizing: border-box;
   font-family: "Inter", sans-serif;
 }
 
 table {
-  border: 0px;
-  table-layout: auto;
+  border: 0px auto;
   border-spacing: 15px;
+  padding: 3px;
+}
+
+h1 {
+  text-decoration: underline;
+}
+
+.bodytext {
+  padding-left: 5%;
+  padding-right: 5%;
+}
+
+.sectiondiv {
+  border: 1px solid #e9eaec;
 }
 
 body {
-  color: white;
+  color: #e9eaec;
 	background:url(../GHLWebsiteApp/background.jpg) no-repeat top center fixed;
+  background-size: 80%;
 	min-height: 100%;
 	width: 100%;
 	background-color: black;
@@ -30,31 +53,87 @@ body {
   width: 99%;
   min-height: 120px;
   height: 120px;
-  border: 3px solid white;
+  border: 3px solid #e9eaec;
 }
 
-#leftbar {
-  width: 350px;
-  max-width: 350px;
+.section {
   background-color: black;
   vertical-align: top;
-  border: 5px;
+  border: 5px solid #e4b61a;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.subsection {
+  align-items: center;
+  align-content: center;
+  text-align: center;
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+table th {
+  border-bottom: 1px solid #e9eaec;
+}
+
+#leftside {
+  width: 350px;
+  padding: 5px;
+  vertical-align: top;
+}
+
+#rightside {
+  width: 950px;
+  padding: 5px;
+  vertical-align: top;
+}
+
+.odd {
+  background-color: #606060;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  vertical-align: center;
+  justify-content: center;
+  background-color: black;
+  font-weight: 500;
+  padding: 15px;
+  padding-top: 20px;
+  font-size: 26px;
+  text-decoration: underline;
 }
 
 #standings {
-  width: 95%;
-  min-width: 95%;
+  border: 1px solid #e9eaec;
+  padding: 3px;
+  white-space: nowrap;
   background-color: #303030;
   border-spacing: 5px;
+  margin: 5px;
+  margin-bottom: 15px;
+}
+
+td {
+  text-align: center;
+  padding: 2px 5px 2px 5px;
 }
 
 td.points {
   font-weight: 600;
+  text-align: center;
+  color: #fbe134;
+}
+
+.bottomborder {
+  border-bottom: 1px solid white;
 }
 
 #divider {
   height: 5px;
-  background-color: #15b400;
+  background-color: #e4b61a;
 }
 
 #information {
@@ -65,10 +144,22 @@ td.points {
 }
 
 #rightbar {
-  width: 950px;
-  max-width: 950px;
   background-color: black;
   vertical-align: top;
+  border: 5px solid #e4b61a;
+}
+
+#playerfocustable {
+  width: 60%;
+  align-items: center;
+  align-content: center;
+  text-align: center;
+  display: inline;
+}
+
+#playerfocusimg {
+  width: 30%;
+  display: inline;
 }
 
 .inter-scoreboard {
