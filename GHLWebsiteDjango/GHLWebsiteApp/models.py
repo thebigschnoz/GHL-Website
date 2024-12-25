@@ -26,7 +26,7 @@ class TeamList(models.Model):
 class PlayerList(models.Model):
     ea_player_ID = models.IntegerField(primary_key=True)
     username = models.CharField(max_length=16)
-    current_team = models.ForeignKey(TeamList, on_delete=models.SET_NULL, blank=True, null=True)
+    current_team = models.ForeignKey(TeamList, on_delete = models.CASCADE, blank=True, null=True)
 
 class Positions(models.Model):
     ea_pos = models.IntegerField(primary_key=True)
@@ -40,16 +40,16 @@ class Builds(models.Model):
 
 class Awards(models.Model):
     award_ID = models.AutoField(primary_key=True)
-    ea_player_ID = models.ForeignKey(PlayerList, on_delete=models.SET_NULL)
-    award_type = models.ForeignKey(AwardsList, on_delete=models.SET_NULL)
-    season_ID = models.ForeignKey(Seasons, on_delete=models.SET_NULL)
+    ea_player_ID = models.ForeignKey(PlayerList, on_delete = models.CASCADE)
+    award_type = models.ForeignKey(AwardsList, on_delete = models.CASCADE)
+    season_ID = models.ForeignKey(Seasons, on_delete = models.CASCADE)
 
 class SkaterRecords(models.Model):
-    ea_player_ID = models.ForeignKey(PlayerList, on_delete=models.SET_NULL)
-    game_ID = models.ForeignKey(Games, on_delete=models.SET_NULL)
-    ea_club_ID = models.ForeignKey(TeamList, on_delete=models.SET_NULL)
-    position = models.ForeignKey(Positions, on_delete=models.SET_NULL)
-    build = models.ForeignKey(Builds, on_delete=models.SET_NULL)
+    ea_player_ID = models.ForeignKey(PlayerList, on_delete = models.CASCADE)
+    game_ID = models.ForeignKey(Games, on_delete = models.CASCADE)
+    ea_club_ID = models.ForeignKey(TeamList, on_delete = models.CASCADE)
+    position = models.ForeignKey(Positions, on_delete = models.CASCADE)
+    build = models.ForeignKey(Builds, on_delete = models.CASCADE)
     goals = models.PositiveSmallIntegerField()
     assists = models.PositiveSmallIntegerField()
     hits = models.PositiveSmallIntegerField()
@@ -74,9 +74,9 @@ class SkaterRecords(models.Model):
     fol = models.PositiveSmallIntegerField()
 
 class GoalieRecords(models.Model):
-    ea_player_ID = models.ForeignKey(PlayerList, on_delete=models.SET_NULL)
-    game_ID = models.ForeignKey(Games, on_delete=models.SET_NULL)
-    ea_club_ID = models.ForeignKey(TeamList, on_delete=models.SET_NULL)
+    ea_player_ID = models.ForeignKey(PlayerList, on_delete = models.CASCADE)
+    game_ID = models.ForeignKey(Games, on_delete = models.CASCADE)
+    ea_club_ID = models.ForeignKey(TeamList, on_delete = models.CASCADE)
     shots_against = models.PositiveSmallIntegerField()
     saves = models.PositiveSmallIntegerField()
     breakaway_shots = models.PositiveSmallIntegerField()
@@ -85,8 +85,8 @@ class GoalieRecords(models.Model):
     ps_saves = models.PositiveSmallIntegerField()
 
 class TeamRecords(models.Model):
-    game_ID = models.ForeignKey(Games, on_delete=models.SET_NULL)
-    ea_club_ID = models.ForeignKey(TeamList, on_delete=models.SET_NULL)
+    game_ID = models.ForeignKey(Games, on_delete = models.CASCADE)
+    ea_club_ID = models.ForeignKey(TeamList, on_delete = models.CASCADE)
     home_away = models.BooleanField()
     goals_for = models.PositiveSmallIntegerField()
     goals_against = models.PositiveSmallIntegerField()
