@@ -33,8 +33,33 @@ a {
   padding: 5px;
 }
 
+table.statsbar {
+  border: 1px solid white;
+  border-spacing: 0px;
+  border-collapse: collapse;
+}
+
+table.statsbar th {
+  font-size: 8px;
+}
+
+table.statsbar col {
+  border: 1px solid white;
+  table-layout: fixed;
+}
+
+table.statsbar col:nth-child(odd) {
+  background-color: #606060
+}
+
+table.statsbar col:nth-child(even) {
+  background-color: #303030
+}
+
+
+
 table {
-  border: 0px auto;
+  border-width: 0px;
   border-spacing: 15px;
   padding: 5px;
 }
