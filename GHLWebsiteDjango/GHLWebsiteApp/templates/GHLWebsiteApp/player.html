@@ -1,0 +1,138 @@
+{% extends "GHLWebsiteApp/layout.html" %}
+{% load static %}
+{% block body %}
+<center>
+    <div class="section section_lg"><center>
+        <div class="subsection-container">
+            <table>
+                <col style="width: 25%;">
+                <col style="width: 900px;">
+                <col style="width: 25%;">
+                <tr class="no-bg">
+                    <td>
+                        <img src="{% static 'GHLWebsiteApp/stock-user-photo.jpg' %}" width=220 height=220 />
+                    </td>
+                    <td>
+                        <center>
+                            <font style="font-weight: 700; font-size: 68px">{{ playerID.username }}</font>
+                            <div class="selectionmenu">
+                                <form>
+                                    <select id="awardtype" name="season">
+                                        <optgroup>
+                                            <option selected disabled value="">Choose a season</option>
+                                            <option value="">Season 0</option>
+                                        </optgroup>
+                                    </select>
+                                </form>
+                            </div>
+                        </center>
+                    </td>
+                    <td>
+                        <img src="{{ playerID.current_team.team_logo_link }}" width=220 height=220 />
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="subsection-container" style="width: 100%;">
+            <table class="statsbar">
+                <colgroup>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>GP</th>
+                        <th>G</th>
+                        <th>A</th>
+                        <th>P</th>
+                        <th>Hits</th>
+                        <th>+/-</th>
+                        <th>PIMs</th>
+                        <th>Drawn</th>
+                        <th>PK Clear</th>
+                        <th>S</th>
+                        <th>S %</th>
+                        <th>S Eff</th>
+                        <th>PPG</th>
+                        <th>SHG</th>
+                        <th>Pass %</th>
+                        <th>BS</th>
+                        <th>TK</th>
+                        <th>INT</th>
+                        <th>GVA</th>
+                        <th>TOP</th>
+                        <th>FO%</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="no-bg statline">
+                        <td>TBD</td>
+                        <td>TBD</td>
+                        <td>TBD</td>
+                        <td>TBD</td>
+                        <td>TBD</td>
+                        <td>TBD</td>
+                        <td>TBD</td>
+                        <td>TBD</td>
+                        <td>TBD</td>
+                        <td>TBD</td>
+                        <td>TBD</td>
+                        <td>TBD</td>
+                        <td>TBD</td>
+                        <td>TBD</td>
+                        <td>TBD</td>
+                        <td>TBD</td>
+                        <td>TBD</td>
+                        <td>TBD</td>
+                        <td>TBD</td>
+                        <td>TBD</td>
+                        <td>TBD</td>
+                    </tr>
+                    <tr class="descriptor">
+                        <td>games played</td>
+                        <td>goals</td>
+                        <td>assists</td>
+                        <td>points</td>
+                        <td>hits</td>
+                        <td>total</td>
+                        <td>penalty minutes</td>
+                        <td>penalties drawn</td>
+                        <td>pk clears</td>
+                        <td>shots</td>
+                        <td>shooting percentage</td>
+                        <td>shooting efficiency</td>
+                        <td>powerplay goals</td>
+                        <td>shorthanded goals</td>
+                        <td>passing percentage</td>
+                        <td>blocked shots / game</td>
+                        <td>takeaways / game</td>
+                        <td>interceptions / game</td>
+                        <td>giveaways / game</td>
+                        <td>avg time of possession</td>
+                        <td>faceoff percentage</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </center></div>
+</center>
+{% endblock %}

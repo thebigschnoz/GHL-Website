@@ -37,15 +37,17 @@ table.statsbar {
   border: 1px solid white;
   border-spacing: 0px;
   border-collapse: collapse;
+  table-layout: fixed;
+  width: 90%;
 }
 
 table.statsbar th {
-  font-size: 8px;
+  font-size: 12px;
+  font-weight: 200;
 }
 
 table.statsbar col {
   border: 1px solid white;
-  table-layout: fixed;
 }
 
 table.statsbar col:nth-child(odd) {
@@ -56,7 +58,17 @@ table.statsbar col:nth-child(even) {
   background-color: #303030
 }
 
+table.statsbar tr.descriptor {
+  font-size: 10px;
+  font-weight: 200;
+  font-style: italic;
+}
 
+table.statsbar tr.statline td {
+  font-size: 20px;
+  font-weight: 450;
+  padding-top: 6px;
+}
 
 table {
   border-width: 0px;
