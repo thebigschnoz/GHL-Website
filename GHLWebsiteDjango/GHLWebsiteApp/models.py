@@ -14,7 +14,7 @@ class Games(models.Model):
     season_ID = models.ForeignKey(Seasons, on_delete=models.PROTECT)
     game_length = models.PositiveIntegerField()
     def __str__(self):
-        return self.game_ID
+        return str(self.game_ID)
 
 class AwardsList(models.Model):
     award_ID = models.IntegerField(primary_key=True)
@@ -58,7 +58,7 @@ class Awards(models.Model):
     award_type = models.ForeignKey(AwardsList, on_delete = models.CASCADE)
     season_ID = models.ForeignKey(Seasons, on_delete = models.CASCADE)
     def __str__(self):
-        return self.award_type + " Season ID " + self.season_ID
+        return str(self.award_type) + " Season ID " + str(self.season_ID)
 
 class SkaterRecords(models.Model):
     ea_player_ID = models.ForeignKey(PlayerList, on_delete = models.CASCADE)
@@ -89,7 +89,7 @@ class SkaterRecords(models.Model):
     fow = models.PositiveSmallIntegerField()
     fol = models.PositiveSmallIntegerField()
     def __str__(self):
-        return self.ea_player_ID + " Game " + self.game_ID
+        return str(self.ea_player_ID) + " Game " + str(self.game_ID)
 
 class GoalieRecords(models.Model):
     ea_player_ID = models.ForeignKey(PlayerList, on_delete = models.CASCADE)
@@ -102,7 +102,7 @@ class GoalieRecords(models.Model):
     ps_shots = models.PositiveSmallIntegerField()
     ps_saves = models.PositiveSmallIntegerField()
     def __str__(self):
-        return self.ea_player_ID + " Game " + self.game_ID
+        return str(self.ea_player_ID) + " Game " + str(self.game_ID)
 
 class TeamRecords(models.Model):
     game_ID = models.ForeignKey(Games, on_delete = models.CASCADE)
@@ -124,4 +124,4 @@ class TeamRecords(models.Model):
     shg_team = models.PositiveSmallIntegerField()
     shot_att_team = models.PositiveSmallIntegerField()
     def __str__(self):
-        return "Club " + self.ea_club_ID + " Game " + self.game_ID
+        return "Club " + str(self.ea_club_ID) + " Game " + str(self.game_ID)
