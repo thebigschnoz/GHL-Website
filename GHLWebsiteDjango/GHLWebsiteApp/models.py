@@ -6,43 +6,59 @@ class Seasons(models.Model):
     season_ID = models.AutoField(primary_key=True)
     season_text = models.CharField(max_length=50)
     isPlayoff = models.BooleanField()
+    def __str__(self):
+        return self.season_text
 
 class Games(models.Model):
     game_ID = models.AutoField(primary_key=True)
     season_ID = models.ForeignKey(Seasons, on_delete=models.PROTECT)
     game_length = models.PositiveIntegerField()
+    def __str__(self):
+        return self.game_ID
 
 class AwardsList(models.Model):
     award_ID = models.IntegerField(primary_key=True)
     award_Name = models.CharField(max_length=50)
     award_Desc = models.TextField(blank=True)
+    def __str__(self):
+        return self.award_Name
 
 class TeamList(models.Model):
     ea_club_ID = models.IntegerField(primary_key=True)
     club_full_name = models.CharField(max_length=50)
     club_abbr = models.CharField(max_length=3)
     club_location = models.CharField(max_length=25)
+    def __str__(self):
+        return self.club_full_name
 
 class PlayerList(models.Model):
     ea_player_ID = models.IntegerField(primary_key=True)
     username = models.CharField(max_length=16)
     current_team = models.ForeignKey(TeamList, on_delete = models.CASCADE, blank=True, null=True)
+    def __str__(self):
+        return self.username
 
 class Positions(models.Model):
     ea_pos = models.IntegerField(primary_key=True)
     position = models.CharField(max_length=20)
     positionShort = models.CharField(max_length=2)
+    def __str__(self):
+        return self.positionShort
 
 class Builds(models.Model):
     ea_build = models.IntegerField(primary_key=True)
     build = models.CharField(max_length=25)
     buildShort = models.CharField(max_length=3)
+    def __str__(self):
+        return self.buildShort
 
 class Awards(models.Model):
     award_ID = models.AutoField(primary_key=True)
     ea_player_ID = models.ForeignKey(PlayerList, on_delete = models.CASCADE)
     award_type = models.ForeignKey(AwardsList, on_delete = models.CASCADE)
     season_ID = models.ForeignKey(Seasons, on_delete = models.CASCADE)
+    def __str__(self):
+        return self.award_type + " Season ID " + self.season_ID
 
 class SkaterRecords(models.Model):
     ea_player_ID = models.ForeignKey(PlayerList, on_delete = models.CASCADE)
@@ -72,6 +88,8 @@ class SkaterRecords(models.Model):
     poss_time = models.PositiveSmallIntegerField()
     fow = models.PositiveSmallIntegerField()
     fol = models.PositiveSmallIntegerField()
+    def __str__(self):
+        return self.ea_player_ID + " Game " + self.game_ID
 
 class GoalieRecords(models.Model):
     ea_player_ID = models.ForeignKey(PlayerList, on_delete = models.CASCADE)
@@ -83,6 +101,8 @@ class GoalieRecords(models.Model):
     breakaway_saves = models.PositiveSmallIntegerField()
     ps_shots = models.PositiveSmallIntegerField()
     ps_saves = models.PositiveSmallIntegerField()
+    def __str__(self):
+        return self.ea_player_ID + " Game " + self.game_ID
 
 class TeamRecords(models.Model):
     game_ID = models.ForeignKey(Games, on_delete = models.CASCADE)
@@ -103,3 +123,5 @@ class TeamRecords(models.Model):
     pims_team = models.PositiveSmallIntegerField()
     shg_team = models.PositiveSmallIntegerField()
     shot_att_team = models.PositiveSmallIntegerField()
+    def __str__(self):
+        return "Club " + self.ea_club_ID + " Game " + self.game_ID
