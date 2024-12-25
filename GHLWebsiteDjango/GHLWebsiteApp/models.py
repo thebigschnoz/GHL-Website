@@ -28,6 +28,7 @@ class TeamList(models.Model):
     club_full_name = models.CharField(max_length=50)
     club_abbr = models.CharField(max_length=3)
     club_location = models.CharField(max_length=25)
+    team_logo_link = models.TextField(blank=True, null=True)
     def __str__(self):
         return self.club_full_name
 
