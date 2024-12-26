@@ -5,16 +5,15 @@
     <div class="section section_lg"><center>
         <div class="subsection-container">
             <table>
-                <col style="width: 25%;">
-                <col style="width: 900px;">
-                <col style="width: 25%;">
+                <col style="width: 50%;">
+                <col style="width: 1300px;">
                 <tr class="no-bg">
                     <td>
-                        <img src="{% static 'GHLWebsiteApp/stock-user-photo.jpg' %}" width=220 height=220 />
+                        <img src="{{ team.team_logo_link }}" width=220 height=220 />
                     </td>
                     <td>
                         <center>
-                            <font style="font-weight: 700; font-size: 68px">{{ playernum.username }}</font>
+                            <font style="font-weight: 700; font-size: 64px">{{ team.club_full_name }}</font>
                             <div class="selectionmenu">
                                 <form>
                                     <select id="seasonSel" name="season">
@@ -26,9 +25,7 @@
                             </div>
                         </center>
                     </td>
-                    <td>
-                        <img src="{{ playernum.current_team.team_logo_link }}" width=220 height=220 />
-                    </td>
+                    
                 </tr>
             </table>
         </div>

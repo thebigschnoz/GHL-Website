@@ -18,9 +18,9 @@ def skaters(request):
 def goalies(request):
     return render(request, "GHLWebsiteApp/goalies.html")
 
-def team(request, teamnum):
-    team = get_object_or_404(TeamList, pk=teamnum)
-    context = {"team": team}
+def team(request, team):
+    teamnum = get_object_or_404(TeamList, pk=team)
+    context = {"team": teamnum}
     return render(request, "GHLWebsiteApp/team.html", context)
 
 def player(request, player):
