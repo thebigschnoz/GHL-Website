@@ -136,6 +136,7 @@ body {
   text-align: center;
   display: flex;
   flex-wrap: nowrap;
+  margin-bottom: 15px;
 }
 
 .subsection-container-vert {

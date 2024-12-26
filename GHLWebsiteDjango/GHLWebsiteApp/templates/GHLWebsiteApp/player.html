@@ -14,13 +14,12 @@
                     </td>
                     <td>
                         <center>
-                            <font style="font-weight: 700; font-size: 68px">{{ playerID.username }}</font>
+                            <font style="font-weight: 700; font-size: 68px">{{ playernum.username }}</font>
                             <div class="selectionmenu">
                                 <form>
                                     <select id="awardtype" name="season">
                                         <optgroup>
-                                            <option selected disabled value="">Choose a season</option>
-                                            <option value="">Season 0</option>
+                                            <option selected value="">Season 0</option>
                                         </optgroup>
                                     </select>
                                 </form>
@@ -28,11 +27,12 @@
                         </center>
                     </td>
                     <td>
-                        <img src="{{ playerID.current_team.team_logo_link }}" width=220 height=220 />
+                        <img src="{{ playernum.current_team.team_logo_link }}" width=220 height=220 />
                     </td>
                 </tr>
             </table>
         </div>
+        {% if sk_gp > 0 %}
         <div class="subsection-container" style="width: 100%;">
             <table class="statsbar">
                 <colgroup>
@@ -85,27 +85,27 @@
                 </thead>
                 <tbody>
                     <tr class="no-bg statline">
-                        <td>TBD</td>
-                        <td>TBD</td>
-                        <td>TBD</td>
-                        <td>TBD</td>
-                        <td>TBD</td>
-                        <td>TBD</td>
-                        <td>TBD</td>
-                        <td>TBD</td>
-                        <td>TBD</td>
-                        <td>TBD</td>
-                        <td>TBD</td>
-                        <td>TBD</td>
-                        <td>TBD</td>
-                        <td>TBD</td>
-                        <td>TBD</td>
-                        <td>TBD</td>
-                        <td>TBD</td>
-                        <td>TBD</td>
-                        <td>TBD</td>
-                        <td>TBD</td>
-                        <td>TBD</td>
+                        <td>{{ sk_gp }}</td>
+                        <td>{{ sk_g }}</td>
+                        <td>{{ sk_a }}</td>
+                        <td>{{ sk_p }}</td>
+                        <td>{{ sk_hits }}</td>
+                        <td>{{ sk_plus_minus }}</td>
+                        <td>{{ sk_pims }}</td>
+                        <td>{{ sk_pens_drawn }}</td>
+                        <td>{{ sk_pk_clears }}</td>
+                        <td>{{ sk_sog }}</td>
+                        <td>{{ sk_sht_perc }}</td>
+                        <td>{{ sk_sht_eff }}</td>
+                        <td>{{ sk_ppg }}</td>
+                        <td>{{ sk_shg }}</td>
+                        <td>{{ sk_pass_perc }}</td>
+                        <td>{{ sk_bs }}</td>
+                        <td>{{ sk_tk }}</td>
+                        <td>{{ sk_int }}</td>
+                        <td>{{ sk_gva }}</td>
+                        <td>{{ sk_poss_time }}</td>
+                        <td>{{ sk_fo_perc }}</td>
                     </tr>
                     <tr class="descriptor">
                         <td>games played</td>
@@ -113,7 +113,7 @@
                         <td>assists</td>
                         <td>points</td>
                         <td>hits</td>
-                        <td>total</td>
+                        <td>plus / minus</td>
                         <td>penalty minutes</td>
                         <td>penalties drawn</td>
                         <td>pk clears</td>
@@ -127,12 +127,87 @@
                         <td>takeaways / game</td>
                         <td>interceptions / game</td>
                         <td>giveaways / game</td>
-                        <td>avg time of possession</td>
+                        <td>avg sec of possession</td>
                         <td>faceoff percentage</td>
                     </tr>
                 </tbody>
             </table>
         </div>
+        {% endif %}
+        {% if g_gp > 0 %}
+        <div class="subsection-container" style="width: 100%;">
+            <table class="statsbar">
+                <colgroup>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>GP</th>
+                        <th>W</th>
+                        <th>L</th>
+                        <th>OTL</th>
+                        <th>GA</th>
+                        <th>SH</th>
+                        <th>SV%</th>
+                        <th>GAA</th>
+                        <th>SO</th>
+                        <th>PS</th>
+                        <th>PS%</th>
+                        <th>BRK</th>
+                        <th>BRK%</th>
+                        <th>MIN</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="no-bg statline">
+                        <td>{{ g_gp }}</td>
+                        <td>TBD</td>
+                        <td>TBD</td>
+                        <td>TBD</td>
+                        <td>{{ g_ga }}</td>
+                        <td>{{ g_sha }}</td>
+                        <td>{{ g_svp }}</td>
+                        <td>TBD</td>
+                        <td>TBD</td>
+                        <td>{{ g_ps_sh }}</td>
+                        <td>{{ g_ps_perc }}</td>
+                        <td>{{ g_br_sh }}</td>
+                        <td>{{ g_br_perc }}</td>
+                        <td>TBD</td>
+                    </tr>
+                    <tr class="descriptor">
+                        <td>games played</td>
+                        <td>wins</td>
+                        <td>losses</td>
+                        <td>overtime losses</td>
+                        <td>goals against</td>
+                        <td>shots against</td>
+                        <td>save percentage</td>
+                        <td>goals against average</td>
+                        <td>shutouts</td>
+                        <td>penalty shots</td>
+                        <td>penalty shot %</td>
+                        <td>breakaways</td>
+                        <td>breakaway %</td>
+                        <td>minutes played</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
     </center></div>
 </center>
 {% endblock %}
