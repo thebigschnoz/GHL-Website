@@ -29,7 +29,6 @@
                 </tr>
             </table>
         </div>
-        {% if sk_gp > 0 %}
         <div class="subsection-container" style="width: 100%;">
             <table class="statsbar">
                 <colgroup>
@@ -130,81 +129,6 @@
                 </tbody>
             </table>
         </div>
-        {% endif %}
-        {% if g_gp > 0 %}
-        <div class="subsection-container" style="width: 100%;">
-            <table class="statsbar">
-                <colgroup>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                </colgroup>
-                <thead>
-                    <tr>
-                        <th>GP</th>
-                        <th>W</th>
-                        <th>L</th>
-                        <th>OTL</th>
-                        <th>GA</th>
-                        <th>SH</th>
-                        <th>SV%</th>
-                        <th>GAA</th>
-                        <th>SO</th>
-                        <th>PS</th>
-                        <th>PS%</th>
-                        <th>BRK</th>
-                        <th>BRK%</th>
-                        <th>MIN</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr class="no-bg statline">
-                        <td>{{ g_gp }}</td>
-                        <td>TBD</td>
-                        <td>TBD</td>
-                        <td>TBD</td>
-                        <td>{{ g_ga }}</td>
-                        <td>{{ g_sha }}</td>
-                        <td>{{ g_svp }}</td>
-                        <td>TBD</td>
-                        <td>TBD</td>
-                        <td>{{ g_ps_sh }}</td>
-                        <td>{{ g_ps_perc }}</td>
-                        <td>{{ g_br_sh }}</td>
-                        <td>{{ g_br_perc }}</td>
-                        <td>TBD</td>
-                    </tr>
-                    <tr class="descriptor">
-                        <td>games played</td>
-                        <td>wins</td>
-                        <td>losses</td>
-                        <td>overtime losses</td>
-                        <td>goals against</td>
-                        <td>shots against</td>
-                        <td>save percentage</td>
-                        <td>goals against average</td>
-                        <td>shutouts</td>
-                        <td>penalty shots</td>
-                        <td>penalty shot %</td>
-                        <td>breakaways</td>
-                        <td>breakaway %</td>
-                        <td>minutes played</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        {% endif %}
     </center></div>
 </center>
 {% endblock %}
