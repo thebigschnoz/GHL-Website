@@ -3,23 +3,9 @@ from django.db import models
 class Seasons(models.Model):
     season_num = models.AutoField(primary_key=True)
     season_text = models.CharField(max_length=50)
-    isPlayoff = models.BooleanField()
+    isPlayoff = models.BooleanField(default=0)
     def __str__(self):
         return self.season_text
-
-class Games(models.Model):
-    game_num = models.AutoField(primary_key=True)
-    season_num = models.ForeignKey(Seasons, on_delete=models.PROTECT)
-    game_length = models.PositiveIntegerField()
-    def __str__(self):
-        return str(self.game_num)
-
-class AwardsList(models.Model):
-    award_num = models.IntegerField(primary_key=True)
-    award_Name = models.CharField(max_length=50)
-    award_Desc = models.TextField(blank=True)
-    def __str__(self):
-        return self.award_Name
 
 class TeamList(models.Model):
     ea_club_num = models.IntegerField(primary_key=True)
@@ -28,7 +14,28 @@ class TeamList(models.Model):
     club_location = models.CharField(max_length=25)
     team_logo_link = models.TextField(blank=True, null=True)
     def __str__(self):
-        return self.club_full_name
+        return self.club_abbr
+
+class Games(models.Model):
+    game_num = models.AutoField(primary_key=True)
+    season_num = models.ForeignKey(Seasons, on_delete=models.CASCADE)
+    game_length = models.PositiveIntegerField(verbose_name="Game Length in seconds", default="3600", blank=True, null=True)
+    expected_time = models.DateTimeField(verbose_name="Expected Game Time", blank=True, null=True)
+    played_time = models.DateTimeField(verbose_name="Actual Game Time", blank=True, null=True)
+    dnf = models.BooleanField(default=False, verbose_name="DNF", blank=True, null=True)
+    a_team_num = models.IntegerField(verbose_name="Away Team", default="0")
+    h_team_num = models.IntegerField(verbose_name="Home Team", default="0")
+    a_team_gf = models.IntegerField(verbose_name="Away Score", default="0", blank=True)
+    h_team_gf = models.IntegerField(verbose_name="Home Score", default="0", blank=True)
+    def __str__(self):
+        return f"{self.a_team_num} @ {self.h_team_num},  {self.expected_time}"
+
+class AwardsList(models.Model):
+    award_num = models.IntegerField(primary_key=True)
+    award_Name = models.CharField(max_length=50)
+    award_Desc = models.TextField(blank=True)
+    def __str__(self):
+        return self.award_Name
 
 class PlayerList(models.Model):
     ea_player_num = models.IntegerField(primary_key=True)
@@ -88,7 +95,7 @@ class SkaterRecords(models.Model):
     fow = models.PositiveSmallIntegerField(default="0")
     fol = models.PositiveSmallIntegerField(default="0")
     def __str__(self):
-        return str(self.ea_player_num) + " Game " + str(self.game_num)
+        return f"{self.ea_player_num} Game {self.game_num}"
 
 class GoalieRecords(models.Model):
     ea_player_num = models.ForeignKey(PlayerList, on_delete = models.CASCADE)
@@ -96,10 +103,23 @@ class GoalieRecords(models.Model):
     ea_club_num = models.ForeignKey(TeamList, on_delete = models.CASCADE)
     shots_against = models.PositiveSmallIntegerField(default="0")
     saves = models.PositiveSmallIntegerField(default="0")
+    shutout = models.BooleanField(default="0")
     breakaway_shots = models.PositiveSmallIntegerField(default="0")
     breakaway_saves = models.PositiveSmallIntegerField(default="0")
     ps_shots = models.PositiveSmallIntegerField(default="0")
     ps_saves = models.PositiveSmallIntegerField(default="0")
+
+    @property
+    def shutoutcalc(self):
+        if self.shots_against == self.saves:
+            return 1
+        else:
+            return 0
+    
+    def save(self, *args, **kwargs):
+        self.shutout = self.shutoutcalc
+        super(GoalieRecords, self).save(*args, **kwargs)
+
     def __str__(self):
         return str(self.ea_player_num) + " Game " + str(self.game_num)
 
