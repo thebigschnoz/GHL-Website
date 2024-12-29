@@ -35,7 +35,9 @@ class Games(models.Model):
         if self.game_length <= "3600":
             if self.a_team_gf > self.h_team_gf:
                 new_a_team_points = "2"
+                new_h_team_points = "0"
             else:
+                new_a_team_points = "0"
                 new_h_team_points = "2"
         else:
             if self.a_team_gf > self.h_team_gf:
