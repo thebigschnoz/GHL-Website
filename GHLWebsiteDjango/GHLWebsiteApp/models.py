@@ -74,6 +74,7 @@ class SkaterRecords(models.Model):
     build = models.ForeignKey(Builds, on_delete = models.CASCADE)
     goals = models.PositiveSmallIntegerField(default="0")
     assists = models.PositiveSmallIntegerField(default="0")
+    points = models.PositiveSmallIntegerField(default="0")
     hits = models.PositiveSmallIntegerField(default="0")
     plus_minus = models.SmallIntegerField(default="0")
     sog = models.PositiveSmallIntegerField(default="0")
@@ -94,6 +95,16 @@ class SkaterRecords(models.Model):
     poss_time = models.PositiveSmallIntegerField(default="0")
     fow = models.PositiveSmallIntegerField(default="0")
     fol = models.PositiveSmallIntegerField(default="0")
+
+    @property
+    def pointscalc(self):
+        totalpoints = self.goals + self.assists
+        return totalpoints
+    
+    def save(self, *args, **kwargs):
+        self.points = self.pointscalc
+        super(SkaterRecords, self).save(*args, **kwargs)
+
     def __str__(self):
         return f"{self.ea_player_num} Game {self.game_num}"
 
@@ -121,7 +132,7 @@ class GoalieRecords(models.Model):
         super(GoalieRecords, self).save(*args, **kwargs)
 
     def __str__(self):
-        return str(self.ea_player_num) + " Game " + str(self.game_num)
+        return f"{self.ea_player_num} Game {self.game_num}"
 
 class TeamRecords(models.Model):
     game_num = models.ForeignKey(Games, on_delete = models.CASCADE)

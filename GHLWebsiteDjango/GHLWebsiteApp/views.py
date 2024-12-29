@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from GHLWebsiteApp.models import *
-from django.db.models import Sum, Count, Case, When
+from django.db.models import Sum, Count, Case, When, Avg
 from django.db.models.functions import Cast
 
 seasonSetting = 1 # Current season in GHL
@@ -39,7 +39,20 @@ def leaders(request):
     return render(request, "GHLWebsiteApp/leaders.html", context)
 
 def skaters(request):
-    return render(request, "GHLWebsiteApp/skaters.html")
+    all_skaters = SkaterRecords.objects.values("ea_player_num").annotate(
+        skatersgoals=Sum("goals"),
+        skatersassists=Sum("assists"),
+        skatersplusminus=Sum("plus_minus"),
+        skaterspims=Sum("pims"),
+        skaterssog=Sum("sog"),
+        skatersposs=Avg("poss_time"),
+        skatersppg=Sum("ppg"),
+        skatersshg=Sum("shg"),
+    ).order_by("ea_player_num")
+    context = {
+        "all_skaters": all_skaters
+    }
+    return render(request, "GHLWebsiteApp/skaters.html", context)
 
 def goalies(request):
     return render(request, "GHLWebsiteApp/goalies.html")
