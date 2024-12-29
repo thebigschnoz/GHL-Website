@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from GHLWebsiteApp.models import *
-from django.db.models import Sum, Count, Q
+from django.db.models import Sum, Count, Case, When
 from django.db.models.functions import Cast
 
 # Create your views here.
@@ -16,7 +16,12 @@ def leaders(request):
     leaders_points = SkaterRecords.objects.annotate(numpoints=(Sum("goals")+Sum("assists"))).order_by("-numpoints")[:10]
     leaders_shooting = SkaterRecords.objects.annotate(shootperc=(Cast(Sum("goals"), models.FloatField())/Cast(Sum("sog"), models.FloatField()))*100).order_by("-shootperc")[:10]
     leaders_svp = GoalieRecords.objects.annotate(savepercsum=(Cast(Sum("saves"), models.FloatField())/Cast(Sum("shots_against"), models.FloatField()))*100).order_by("-savepercsum")[:10]
-    leaders_shutouts = GoalieRecords.objects.annotate(shutoutsum=Count("ea_player_num", filter=Q(shutout=True))).order_by("-shutoutsum")[:10]
+    leaders_shutouts = GoalieRecords.objects.annotate(
+        true_count=Sum(Case(
+        When(shutout=True, then=1),
+        default=0,
+        output_field=models.IntegerField()
+    ))).order_by("-true_count")[:10]
     leaders_wins = {0}
     leaders_gaa = {0}
     context = {
