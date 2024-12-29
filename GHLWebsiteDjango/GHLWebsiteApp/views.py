@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from GHLWebsiteApp.models import *
-from django.db.models import Avg, Sum, Count
+from django.db.models import Sum, Count, Q
+from django.db.models.functions import Cast
 
 # Create your views here.
 def index(request):
@@ -10,7 +11,25 @@ def standings(request):
     return render(request, "GHLWebsiteApp/standings.html")
 
 def leaders(request):
-    return render(request, "GHLWebsiteApp/leaders.html")
+    leaders_goals = SkaterRecords.objects.annotate(numgoals=Sum("goals")).order_by("-numgoals")[:10]
+    leaders_assists = SkaterRecords.objects.annotate(numassists=Sum("assists")).order_by("-numassists")[:10]
+    leaders_points = SkaterRecords.objects.annotate(numpoints=(Sum("goals")+Sum("assists"))).order_by("-numpoints")[:10]
+    leaders_shooting = SkaterRecords.objects.annotate(shootperc=(Cast(Sum("goals"), models.FloatField())/Cast(Sum("sog"), models.FloatField()))*100).order_by("-shootperc")[:10]
+    leaders_svp = GoalieRecords.objects.annotate(savepercsum=(Cast(Sum("saves"), models.FloatField())/Cast(Sum("shots_against"), models.FloatField()))*100).order_by("-savepercsum")[:10]
+    leaders_shutouts = GoalieRecords.objects.annotate(shutoutsum=Count("ea_player_num", filter=Q(shutout=True))).order_by("-shutoutsum")[:10]
+    leaders_wins = {0}
+    leaders_gaa = {0}
+    context = {
+        "leaders_goals": leaders_goals,
+        "leaders_assists": leaders_assists,
+        "leaders_points": leaders_points,
+        "leaders_shooting": leaders_shooting,
+        "leaders_svp": leaders_svp,
+        "leaders_shutouts": leaders_shutouts,
+        "leaders_wins": leaders_wins,
+        "leaders_gaa": leaders_gaa,
+    }
+    return render(request, "GHLWebsiteApp/leaders.html", context)
 
 def skaters(request):
     return render(request, "GHLWebsiteApp/skaters.html")
@@ -61,7 +80,7 @@ def player(request, player):
 
     allgoaliegames = playernum.goalierecords_set.all()
     if not allgoaliegames:
-        g_gp = g_sha = g_sav = g_br_sh = g_br_sa = g_ps_sh = g_ps_sa = g_ga =  g_svp = 0
+        g_gp = g_sha = g_sav = g_br_sh = g_br_sa = g_ps_sh = g_ps_sa = g_ga =  g_svp = g_br_perc = g_ps_perc = 0
     else:
         g_gp = allgoaliegames.aggregate(Count("game_num"))["game_num__count"]
         g_sha = allgoaliegames.aggregate(Sum("shots_against"))["shots_against__sum"]
@@ -82,6 +101,7 @@ def player(request, player):
             g_ps_perc = "n/a"
 
     sk_p = sk_g + sk_a
+    sk_team_num = playernum.current_team.ea_club_num
     context = {
         "playernum": playernum, 
         "sk_gp": sk_gp, 
@@ -113,6 +133,7 @@ def player(request, player):
         "g_ps_sh": g_ps_sh,
         "g_br_perc": g_br_perc,
         "g_ps_perc": g_ps_perc,
+        "sk_team_num": sk_team_num,
         }
     return render(request, "GHLWebsiteApp/player.html", context)
 

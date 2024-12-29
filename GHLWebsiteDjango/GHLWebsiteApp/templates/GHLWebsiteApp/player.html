@@ -27,7 +27,7 @@
                         </center>
                     </td>
                     <td>
-                        <img src="{{ playernum.current_team.team_logo_link }}" width=220 height=220 />
+                        <a href="{% url 'team' sk_team_num %}"><img src="{{ playernum.current_team.team_logo_link }}" width=220 height=220 /></a>
                     </td>
                 </tr>
             </table>

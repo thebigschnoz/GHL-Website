@@ -21,36 +21,18 @@
                                 <tr>
                                     <th colspan=4>Points</th>
                                 </tr>
+                                {% for player in leaders_points %}
                                 <tr>
-                                    <td>1</td>
-                                    <td>JBrewer23</td>
-                                    <td>ATL</td>
-                                    <td class="points">153</td>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ player.ea_player_num }}</td>
+                                    <td>TEAM</td>
+                                    <td class="points">{{ player.numpoints }}</td>
                                 </tr>
+                                {% empty %}
                                 <tr>
-                                    <td>2</td>
-                                    <td>FloppyWha1eMeat</td>
-                                    <td>PHI</td>
-                                    <td class="points">150</td>
+                                    <td colspan="4">No points recorded.</td>
                                 </tr>
-                                <tr>
-                                    <td>3</td>
-                                    <td>OG LarryBird</td>
-                                    <td>TOR</td>
-                                    <td class="points">137</td>
-                                </tr>
-                                <tr>
-                                    <td>4</td>
-                                    <td>Zev</td>
-                                    <td>TOR</td>
-                                    <td class="points">132</td>
-                                </tr>
-                                <tr>
-                                    <td>5</td>
-                                    <td>MikeV</td>
-                                    <td>PHI</td>
-                                    <td class="points">132</td>
-                                </tr>
+                                {% endfor %}
                             </table></center>
                         </div>
                         <div class="subsection-container">
@@ -60,38 +42,20 @@
                                 <col style="width: 50px;">
                                 <col style="width: 50px;">
                                 <tr>
-                                    <th colspan=4>Assists</th>
+                                    <th colspan=4>Wins</th>
                                 </tr>
+                                {% for player in leaders_wins %}
                                 <tr>
-                                    <td>1</td>
-                                    <td>JBrewer23</td>
-                                    <td>ATL</td>
-                                    <td class="points">91</td>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ player.ea_player_num }}</td>
+                                    <td>TEAM</td>
+                                    <td class="points">0</td>
                                 </tr>
+                                {% empty %}
                                 <tr>
-                                    <td>2</td>
-                                    <td>tehFroster</td>
-                                    <td>TOR</td>
-                                    <td class="points">82</td>
+                                    <td colspan="4">No wins recorded.</td>
                                 </tr>
-                                <tr>
-                                    <td>3</td>
-                                    <td>Dizybone24</td>
-                                    <td>DET</td>
-                                    <td class="points">79</td>
-                                </tr>
-                                <tr>
-                                    <td>4</td>
-                                    <td>MikeV</td>
-                                    <td>PHI</td>
-                                    <td class="points">78</td>
-                                </tr>
-                                <tr>
-                                    <td>5</td>
-                                    <td>Zev</td>
-                                    <td>TOR</td>
-                                    <td class="points">71</td>
-                                </tr>
+                                {% endfor %}
                             </table></center>
                         </div>
                     </td>
@@ -105,36 +69,18 @@
                                 <tr>
                                     <th colspan=4>Goals</th>
                                 </tr>
+                                {% for player in leaders_goals %}
                                 <tr>
-                                    <td>1</td>
-                                    <td>FloppyWha1eMeat</td>
-                                    <td>PHI</td>
-                                    <td class="points">86</td>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ player.ea_player_num }}</td>
+                                    <td>TEAM</td>
+                                    <td class="points">{{ player.numgoals }}</td>
                                 </tr>
+                                {% empty %}
                                 <tr>
-                                    <td>2</td>
-                                    <td>OG LarryBird</td>
-                                    <td>TOR</td>
-                                    <td class="points">85</td>
+                                    <td colspan="4">No goals recorded.</td>
                                 </tr>
-                                <tr>
-                                    <td>3</td>
-                                    <td>Jehtie</td>
-                                    <td>UTA</td>
-                                    <td class="points">62</td>
-                                </tr>
-                                <tr>
-                                    <td>4</td>
-                                    <td>JBrewer23</td>
-                                    <td>ATL</td>
-                                    <td class="points">62</td>
-                                </tr>
-                                <tr>
-                                    <td>5</td>
-                                    <td>Zev</td>
-                                    <td>PHI</td>
-                                    <td class="points">61</td>
-                                </tr>
+                                {% endfor %}
                             </table></center>
                         </div>
                         <div class="subsection-container">
@@ -144,83 +90,24 @@
                                 <col style="width: 50px;">
                                 <col style="width: 50px;">
                                 <tr>
-                                    <th colspan=4>Shooting %</th>
+                                    <th colspan=4>Save %</th>
                                 </tr>
+                                {% for player in leaders_svp %}
                                 <tr>
-                                    <td>1</td>
-                                    <td>JBrewer23</td>
-                                    <td>ATL</td>
-                                    <td class="points">99.9%</td>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ player.ea_player_num }}</td>
+                                    <td>TEAM</td>
+                                    <td class="points">{{ player.savepercsum|floatformat:1 }}</td>
                                 </tr>
+                                {% empty %}
                                 <tr>
-                                    <td>2</td>
-                                    <td>tehFroster</td>
-                                    <td>TOR</td>
-                                    <td class="points">82.7%</td>
+                                    <td colspan="4">No saves recorded.</td>
                                 </tr>
-                                <tr>
-                                    <td>3</td>
-                                    <td>Dizybone24</td>
-                                    <td>DET</td>
-                                    <td class="points">79.5%</td>
-                                </tr>
-                                <tr>
-                                    <td>4</td>
-                                    <td>MikeV</td>
-                                    <td>PHI</td>
-                                    <td class="points">78.2%</td>
-                                </tr>
-                                <tr>
-                                    <td>5</td>
-                                    <td>Zev</td>
-                                    <td>TOR</td>
-                                    <td class="points">71.7%</td>
-                                </tr>
+                                {% endfor %}
                             </table></center>
                         </div>
                     </td>
                     <td>
-                        <div class="subsection-container">
-                            <center><table class="standingstable">
-                                <col style="width: 50px;">
-                                <col style="width: 150px;">
-                                <col style="width: 50px;">
-                                <col style="width: 50px;">
-                                <tr>
-                                    <th colspan=4>Points</th>
-                                </tr>
-                                <tr>
-                                    <td>1</td>
-                                    <td>JBrewer23</td>
-                                    <td>ATL</td>
-                                    <td class="points">153</td>
-                                </tr>
-                                <tr>
-                                    <td>2</td>
-                                    <td>FloppyWha1eMeat</td>
-                                    <td>PHI</td>
-                                    <td class="points">150</td>
-                                </tr>
-                                <tr>
-                                    <td>3</td>
-                                    <td>OG LarryBird</td>
-                                    <td>TOR</td>
-                                    <td class="points">137</td>
-                                </tr>
-                                <tr>
-                                    <td>4</td>
-                                    <td>Zev</td>
-                                    <td>TOR</td>
-                                    <td class="points">132</td>
-                                </tr>
-                                <tr>
-                                    <td>5</td>
-                                    <td>MikeV</td>
-                                    <td>PHI</td>
-                                    <td class="points">132</td>
-                                </tr>
-                            </table></center>
-                        </div>
                         <div class="subsection-container">
                             <center><table class="standingstable">
                                 <col style="width: 50px;">
@@ -231,35 +118,41 @@
                                     <th colspan=4>Assists</th>
                                 </tr>
                                 <tr>
-                                    <td>1</td>
-                                    <td>JBrewer23</td>
-                                    <td>ATL</td>
-                                    <td class="points">91</td>
-                                </tr>
+                                    {% for player in leaders_assists %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ player.ea_player_num }}</td>
+                                        <td>TEAM</td>
+                                        <td class="points">{{ player.numassists }}</td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="4">No assists recorded.</td>
+                                    </tr>
+                                    {% endfor %}
+                            </table></center>
+                        </div>
+                        <div class="subsection-container">
+                            <center><table class="standingstable">
+                                <col style="width: 50px;">
+                                <col style="width: 150px;">
+                                <col style="width: 50px;">
+                                <col style="width: 50px;">
                                 <tr>
-                                    <td>2</td>
-                                    <td>tehFroster</td>
-                                    <td>TOR</td>
-                                    <td class="points">82</td>
+                                    <th colspan=4>GAA</th>
                                 </tr>
+                                {% for player in leaders_gaa %}
                                 <tr>
-                                    <td>3</td>
-                                    <td>Dizybone24</td>
-                                    <td>DET</td>
-                                    <td class="points">79</td>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ player.ea_player_num }}</td>
+                                    <td>TEAM</td>
+                                    <td class="points">0</td>
                                 </tr>
+                                {% empty %}
                                 <tr>
-                                    <td>4</td>
-                                    <td>MikeV</td>
-                                    <td>PHI</td>
-                                    <td class="points">78</td>
+                                    <td colspan="4">No games recorded.</td>
                                 </tr>
-                                <tr>
-                                    <td>5</td>
-                                    <td>Zev</td>
-                                    <td>TOR</td>
-                                    <td class="points">71</td>
-                                </tr>
+                                {% endfor %}
                             </table></center>
                         </div>
                     </td>
@@ -271,38 +164,20 @@
                                 <col style="width: 50px;">
                                 <col style="width: 50px;">
                                 <tr>
-                                    <th colspan=4>Goals</th>
+                                    <th colspan=4>Shooting %</th>
                                 </tr>
+                                {% for player in leaders_shooting %}
                                 <tr>
-                                    <td>1</td>
-                                    <td>FloppyWha1eMeat</td>
-                                    <td>PHI</td>
-                                    <td class="points">86</td>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ player.ea_player_num }}</td>
+                                    <td>TEAM</td>
+                                    <td class="points">{{ player.shootperc|floatformat:1 }}</td>
                                 </tr>
+                                {% empty %}
                                 <tr>
-                                    <td>2</td>
-                                    <td>OG LarryBird</td>
-                                    <td>TOR</td>
-                                    <td class="points">85</td>
+                                    <td colspan="4">No shots recorded.</td>
                                 </tr>
-                                <tr>
-                                    <td>3</td>
-                                    <td>Jehtie</td>
-                                    <td>UTA</td>
-                                    <td class="points">62</td>
-                                </tr>
-                                <tr>
-                                    <td>4</td>
-                                    <td>JBrewer23</td>
-                                    <td>ATL</td>
-                                    <td class="points">62</td>
-                                </tr>
-                                <tr>
-                                    <td>5</td>
-                                    <td>Zev</td>
-                                    <td>PHI</td>
-                                    <td class="points">61</td>
-                                </tr>
+                                {% endfor %}
                             </table></center>
                         </div>
                         <div class="subsection-container">
@@ -312,38 +187,20 @@
                                 <col style="width: 50px;">
                                 <col style="width: 50px;">
                                 <tr>
-                                    <th colspan=4>Shooting %</th>
+                                    <th colspan=4>Shutouts</th>
                                 </tr>
+                                {% for player in leaders_shutouts %}
                                 <tr>
-                                    <td>1</td>
-                                    <td>JBrewer23</td>
-                                    <td>ATL</td>
-                                    <td class="points">99.9%</td>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ player.ea_player_num }}</td>
+                                    <td>TEAM</td>
+                                    <td class="points">{{ player.shutout }}</td>
                                 </tr>
+                                {% empty %}
                                 <tr>
-                                    <td>2</td>
-                                    <td>tehFroster</td>
-                                    <td>TOR</td>
-                                    <td class="points">82.7%</td>
+                                    <td colspan="4">No shutouts recorded.</td>
                                 </tr>
-                                <tr>
-                                    <td>3</td>
-                                    <td>Dizybone24</td>
-                                    <td>DET</td>
-                                    <td class="points">79.5%</td>
-                                </tr>
-                                <tr>
-                                    <td>4</td>
-                                    <td>MikeV</td>
-                                    <td>PHI</td>
-                                    <td class="points">78.2%</td>
-                                </tr>
-                                <tr>
-                                    <td>5</td>
-                                    <td>Zev</td>
-                                    <td>TOR</td>
-                                    <td class="points">71.7%</td>
-                                </tr>
+                                {% endfor %}
                             </table></center>
                         </div>
                     </td>

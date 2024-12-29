@@ -23,8 +23,8 @@ class Games(models.Model):
     expected_time = models.DateTimeField(verbose_name="Expected Game Time", blank=True, null=True)
     played_time = models.DateTimeField(verbose_name="Actual Game Time", blank=True, null=True)
     dnf = models.BooleanField(default=False, verbose_name="DNF", blank=True, null=True)
-    a_team_num = models.IntegerField(verbose_name="Away Team", default="0")
-    h_team_num = models.IntegerField(verbose_name="Home Team", default="0")
+    a_team_num = models.ForeignKey(TeamList, on_delete=models.CASCADE, related_name="a_team")
+    h_team_num = models.ForeignKey(TeamList, on_delete=models.CASCADE, related_name="h_team")
     a_team_gf = models.IntegerField(verbose_name="Away Score", default="0", blank=True)
     h_team_gf = models.IntegerField(verbose_name="Home Score", default="0", blank=True)
     def __str__(self):
@@ -64,7 +64,7 @@ class Awards(models.Model):
     award_type = models.ForeignKey(AwardsList, on_delete = models.CASCADE)
     season_num = models.ForeignKey(Seasons, on_delete = models.CASCADE)
     def __str__(self):
-        return str(self.award_type) + " Season ID " + str(self.season_num)
+        return f"{self.award_type} Season {self.season_num}"
 
 class SkaterRecords(models.Model):
     ea_player_num = models.ForeignKey(PlayerList, on_delete = models.CASCADE)
