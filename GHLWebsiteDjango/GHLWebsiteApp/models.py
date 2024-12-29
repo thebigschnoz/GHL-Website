@@ -154,4 +154,4 @@ class TeamRecords(models.Model):
     shg_team = models.PositiveSmallIntegerField(default="0")
     shot_att_team = models.PositiveSmallIntegerField(default="0")
     def __str__(self):
-        return "Club " + str(self.ea_club_num) + " Game " + str(self.game_num)
+        return f"Club {self.ea_club_num} Game {self.game_num}"
