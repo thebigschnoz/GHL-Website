@@ -3,6 +3,8 @@ from GHLWebsiteApp.models import *
 from django.db.models import Sum, Count, Case, When
 from django.db.models.functions import Cast
 
+seasonSetting = 1 # Current season in GHL
+
 # Create your views here.
 def index(request):
     return render(request, "GHLWebsiteApp/index.html")
