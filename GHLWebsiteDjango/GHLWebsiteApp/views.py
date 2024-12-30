@@ -32,7 +32,8 @@ def leaders(request):
     ))).order_by("-wincount")[:10]
     leaders_gaa = GoalieRecords.objects.filter(game_num__season_num=seasonSetting).annotate(gaatotal=((Cast(Sum("shots_against"), models.FloatField())-Cast(Sum("saves"), models.FloatField()))/Cast(Sum("game_num__gamelength"), models.FloatField()))*3600).order_by("gaatotal")[:10]
     #for player in leaders_goals, leaders_assists, leaders_points, leaders_shooting, leaders_svp, leaders_shutouts, leaders_wins, leaders_gaa:
-        #teamabbr = PlayerList.objects.get(pk=player)
+        #playerobj = PlayerList.objects.get(pk=player)
+        #teamabbr = playerobj.club_abbr
         #player.append({"teamabbr": teamabbr})
     context = {
         "leaders_goals": leaders_goals,
@@ -47,13 +48,17 @@ def leaders(request):
     return render(request, "GHLWebsiteApp/leaders.html", context)
 
 def skaters(request):
-    all_skaters = SkaterRecords.objects.filter(game_num__season_num=seasonSetting).values("ea_player_num").annotate(
+    all_skaters = SkaterRecords.objects.filter(game_num__season_num=seasonSetting).annotate(
+        skatersgp=Count("game_num"),
         skatersgoals=Sum("goals"),
         skatersassists=Sum("assists"),
+        skaterspoints=Sum("points"),
         skatersplusminus=Sum("plus_minus"),
+        skatershits=Sum("hits"),
         skaterspims=Sum("pims"),
         skaterssog=Sum("sog"),
         skatersposs=Avg("poss_time"),
+        skatersbs=Avg("blocked_shots"),
         skatersppg=Sum("ppg"),
         skatersshg=Sum("shg"),
     ).order_by("ea_player_num")
@@ -63,7 +68,22 @@ def skaters(request):
     return render(request, "GHLWebsiteApp/skaters.html", context)
 
 def goalies(request):
-    return render(request, "GHLWebsiteApp/goalies.html")
+    all_goalies = GoalieRecords.objects.filter(game_num__season_num=seasonSetting).annotate(
+        goaliesgp=Count("game_num"),
+        goaliesshots=Sum("shots_against"),
+        goaliesga=(Sum("shots_against")-Sum("saves")),
+        goaliessaves=Sum("saves"),
+        goaliessvp=(Cast(Sum("saves"), models.FloatField())/Cast(Sum("shots_against"), models.FloatField()))*100,
+        goaliesgaa=((Cast(Sum("shots_against"), models.FloatField())-Cast(Sum("saves"), models.FloatField()))/Cast(Sum("game_num__gamelength"), models.FloatField()))*3600,
+        #goaliesshutouts
+        #goalieswins
+        #goalieslosses
+        #goaliesotlosses
+    ).order_by("ea_player_num")
+    context = {
+        "all_goalies": all_goalies
+    }
+    return render(request, "GHLWebsiteApp/goalies.html", context)
 
 def team(request, team):
     teamnum = get_object_or_404(TeamList, pk=team)

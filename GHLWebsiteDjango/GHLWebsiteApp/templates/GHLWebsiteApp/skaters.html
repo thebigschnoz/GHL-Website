@@ -21,7 +21,6 @@
         <col style="width: 80px;">
         <col style="width: 80px;">
         <col style="width: 80px;">
-        <col style="width: 80px;">
         <tr>
           <th>Pos</th>
           <th>Player</th>
@@ -34,102 +33,34 @@
           <th>PIM</th>
           <th>+/-</th>
           <th>HIT</th>
-          <th>FO%</th>
+          <th>TOP</th>
           <th>BS</th>
-          <th>INT</th>
-          <th>GV</th>
-          <th>TK</th>
+          <th>PPG</th>
+          <th>SHG</th>
         </tr>
+        {% for player in all_skaters %}
         <tr>
-          <td>1</td>
-          <td>JBrewer23</td>
-          <td>ATL</td>
-          <td>49</td>
-          <td>62</td>
-          <td>91</td>
-          <td>153</td>
-          <td>214</td>
-          <td>37</td>
-          <td>+45</td>
-          <td>187</td>
-          <td>45%</td>
-          <td>49</td>
-          <td>355</td>
-          <td>522</td>
-          <td>177</td>
+          <td>{{ forloop.counter }}</td>
+          <td>{{ player.ea_player_num }}</td>
+          <td>TEAM</td>
+          <td>{{ player.skatersgp }}</td>
+          <td>{{ player.skatersgoals }}</td>
+          <td>{{ player.skatersassists }}</td>
+          <td>{{ player.skaterspoints }}</td>
+          <td>{{ player.skaterssog }}</td>
+          <td>{{ player.skaterspims }}</td>
+          <td>{{ player.skatersplusminus }}</td>
+          <td>{{ player.skatershits }}</td>
+          <td>{{ player.skatersposs|floatformat:1 }}</td>
+          <td>{{ player.skatersbs|floatformat:1 }}</td>
+          <td>{{ player.skatersppg }}</td>
+          <td>{{ player.skatersshg }}</td>
         </tr>
+        {% empty %}
         <tr>
-          <td>2</td>
-          <td>FloppyWha1eMeat</td>
-          <td>PHI</td>
-          <td>33</td>
-          <td>86</td>
-          <td>64</td>
-          <td>150</td>
-          <td>198</td>
-          <td>10</td>
-          <td>+114</td>
-          <td>81</td>
-          <td>53%</td>
-          <td>25</td>
-          <td>136</td>
-          <td>317</td>
-          <td>60</td>
+          <td colspan=15>No games recorded.</td>
         </tr>
-        <tr>
-          <td>3</td>
-          <td>OG LarryBird</td>
-          <td>TOR</td>
-          <td>49</td>
-          <td>62</td>
-          <td>91</td>
-          <td>153</td>
-          <td>214</td>
-          <td>37</td>
-          <td>+45</td>
-          <td>187</td>
-          <td>45%</td>
-          <td>49</td>
-          <td>355</td>
-          <td>522</td>
-          <td>177</td>
-        </tr>
-        <tr>
-          <td>4</td>
-          <td>Zev</td>
-          <td>TOR</td>
-          <td>49</td>
-          <td>62</td>
-          <td>91</td>
-          <td>153</td>
-          <td>214</td>
-          <td>37</td>
-          <td>+45</td>
-          <td>187</td>
-          <td>45%</td>
-          <td>49</td>
-          <td>355</td>
-          <td>522</td>
-          <td>177</td>
-        </tr>
-        <tr>
-          <td>5</td>
-          <td>MikeV</td>
-          <td>PHI</td>
-          <td>49</td>
-          <td>62</td>
-          <td>91</td>
-          <td>153</td>
-          <td>214</td>
-          <td>37</td>
-          <td>+45</td>
-          <td>187</td>
-          <td>45%</td>
-          <td>49</td>
-          <td>355</td>
-          <td>522</td>
-          <td>177</td>
-        </tr>
+        {% endfor %}
       </table>
       </center>
     </div>
