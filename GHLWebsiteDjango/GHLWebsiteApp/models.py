@@ -13,13 +13,14 @@ class TeamList(models.Model):
     club_abbr = models.CharField(max_length=3)
     club_location = models.CharField(max_length=25)
     team_logo_link = models.TextField(blank=True, null=True)
+    isActive = models.BooleanField(default=True)
     def __str__(self):
         return self.club_abbr
 
 class Games(models.Model):
     game_num = models.AutoField(primary_key=True)
     season_num = models.ForeignKey(Seasons, on_delete=models.CASCADE)
-    game_length = models.PositiveIntegerField(verbose_name="Game Length in seconds", default="3600", blank=True, null=True)
+    gamelength = models.PositiveIntegerField(verbose_name="Game Length in seconds", default="3600", blank=True, null=True)
     expected_time = models.DateTimeField(verbose_name="Expected Game Time", blank=True, null=True)
     played_time = models.DateTimeField(verbose_name="Actual Game Time", blank=True, null=True)
     dnf = models.BooleanField(default=False, verbose_name="DNF", blank=True, null=True)
