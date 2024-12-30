@@ -1,13 +1,13 @@
 from django.db import models
 
-class Seasons(models.Model):
+class Season(models.Model):
     season_num = models.AutoField(primary_key=True)
     season_text = models.CharField(max_length=50)
     isPlayoff = models.BooleanField(default=0)
     def __str__(self):
         return self.season_text
 
-class TeamList(models.Model):
+class Team(models.Model):
     ea_club_num = models.IntegerField(primary_key=True)
     club_full_name = models.CharField(max_length=50)
     club_abbr = models.CharField(max_length=3)
@@ -17,63 +17,63 @@ class TeamList(models.Model):
     def __str__(self):
         return self.club_abbr
 
-class Games(models.Model):
+class Game(models.Model):
     game_num = models.AutoField(primary_key=True)
-    season_num = models.ForeignKey(Seasons, on_delete=models.CASCADE)
+    season_num = models.ForeignKey(Season, on_delete=models.CASCADE)
     gamelength = models.PositiveIntegerField(verbose_name="Game Length in seconds", default="3600", blank=True, null=True)
     expected_time = models.DateTimeField(verbose_name="Expected Game Time", blank=True, null=True)
     played_time = models.DateTimeField(verbose_name="Actual Game Time", blank=True, null=True)
     dnf = models.BooleanField(default=False, verbose_name="DNF", blank=True, null=True)
-    a_team_num = models.ForeignKey(TeamList, on_delete=models.CASCADE, related_name="a_team")
-    h_team_num = models.ForeignKey(TeamList, on_delete=models.CASCADE, related_name="h_team")
+    a_team_num = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="a_team")
+    h_team_num = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="h_team")
     a_team_gf = models.IntegerField(verbose_name="Away Score", default="0", blank=True)
     h_team_gf = models.IntegerField(verbose_name="Home Score", default="0", blank=True)
 
     def __str__(self):
         return f"{self.a_team_num} @ {self.h_team_num},  {self.expected_time}"
 
-class AwardsList(models.Model):
+class AwardTitle(models.Model):
     award_num = models.IntegerField(primary_key=True)
     award_Name = models.CharField(max_length=50)
     award_Desc = models.TextField(blank=True)
     def __str__(self):
         return self.award_Name
 
-class PlayerList(models.Model):
+class Player(models.Model):
     ea_player_num = models.IntegerField(primary_key=True)
     username = models.CharField(max_length=16)
-    current_team = models.ForeignKey(TeamList, on_delete = models.CASCADE, blank=True, null=True)
+    current_team = models.ForeignKey(Team, on_delete = models.CASCADE, blank=True, null=True)
     def __str__(self):
         return self.username
 
-class Positions(models.Model):
+class Position(models.Model):
     ea_pos = models.IntegerField(primary_key=True)
     position = models.CharField(max_length=20)
     positionShort = models.CharField(max_length=2)
     def __str__(self):
         return self.positionShort
 
-class Builds(models.Model):
+class Build(models.Model):
     ea_build = models.IntegerField(primary_key=True)
     build = models.CharField(max_length=25)
     buildShort = models.CharField(max_length=3)
     def __str__(self):
         return self.buildShort
 
-class Awards(models.Model):
+class AwardAssign(models.Model):
     award_num = models.AutoField(primary_key=True)
-    ea_player_num = models.ForeignKey(PlayerList, on_delete = models.CASCADE)
-    award_type = models.ForeignKey(AwardsList, on_delete = models.CASCADE)
-    season_num = models.ForeignKey(Seasons, on_delete = models.CASCADE)
+    ea_player_num = models.ForeignKey(Player, on_delete = models.CASCADE)
+    award_type = models.ForeignKey(AwardTitle, on_delete = models.CASCADE)
+    season_num = models.ForeignKey(Season, on_delete = models.CASCADE)
     def __str__(self):
         return f"{self.award_type} Season {self.season_num}"
 
-class SkaterRecords(models.Model):
-    ea_player_num = models.ForeignKey(PlayerList, on_delete = models.CASCADE)
-    game_num = models.ForeignKey(Games, on_delete = models.CASCADE)
-    ea_club_num = models.ForeignKey(TeamList, on_delete = models.CASCADE)
-    position = models.ForeignKey(Positions, on_delete = models.CASCADE)
-    build = models.ForeignKey(Builds, on_delete = models.CASCADE)
+class SkaterRecord(models.Model):
+    ea_player_num = models.ForeignKey(Player, on_delete = models.CASCADE)
+    game_num = models.ForeignKey(Game, on_delete = models.CASCADE)
+    ea_club_num = models.ForeignKey(Team, on_delete = models.CASCADE)
+    position = models.ForeignKey(Position, on_delete = models.CASCADE)
+    build = models.ForeignKey(Build, on_delete = models.CASCADE)
     goals = models.PositiveSmallIntegerField(default="0")
     assists = models.PositiveSmallIntegerField(default="0")
     points = models.PositiveSmallIntegerField(default="0")
@@ -105,15 +105,15 @@ class SkaterRecords(models.Model):
     
     def save(self, *args, **kwargs):
         self.points = self.pointscalc
-        super(SkaterRecords, self).save(*args, **kwargs)
+        super(SkaterRecord, self).save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.ea_player_num} Game {self.game_num}"
 
-class GoalieRecords(models.Model):
-    ea_player_num = models.ForeignKey(PlayerList, on_delete = models.CASCADE)
-    game_num = models.ForeignKey(Games, on_delete = models.CASCADE)
-    ea_club_num = models.ForeignKey(TeamList, on_delete = models.CASCADE)
+class GoalieRecord(models.Model):
+    ea_player_num = models.ForeignKey(Player, on_delete = models.CASCADE)
+    game_num = models.ForeignKey(Game, on_delete = models.CASCADE)
+    ea_club_num = models.ForeignKey(Team, on_delete = models.CASCADE)
     shots_against = models.PositiveSmallIntegerField(default="0")
     saves = models.PositiveSmallIntegerField(default="0")
     win = models.BooleanField(default="0")
@@ -146,14 +146,14 @@ class GoalieRecords(models.Model):
     def save(self, *args, **kwargs):
         self.win = self.wincalc
         self.shutout = self.shutoutcalc
-        super(GoalieRecords, self).save(*args, **kwargs)
+        super(GoalieRecord, self).save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.ea_player_num} Game {self.game_num}"
 
-class TeamRecords(models.Model):
-    game_num = models.ForeignKey(Games, on_delete = models.CASCADE)
-    ea_club_num = models.ForeignKey(TeamList, on_delete = models.CASCADE)
+class TeamRecord(models.Model):
+    game_num = models.ForeignKey(Game, on_delete = models.CASCADE)
+    ea_club_num = models.ForeignKey(Team, on_delete = models.CASCADE)
     home_away = models.BooleanField()
     goals_for = models.PositiveSmallIntegerField(default="0")
     goals_against = models.PositiveSmallIntegerField(default="0")

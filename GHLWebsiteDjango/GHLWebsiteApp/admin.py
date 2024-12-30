@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Seasons, Games, AwardsList, TeamList, PlayerList, Positions, Builds, Awards, SkaterRecords, GoalieRecords, TeamRecords
+from .models import *
 
 # Register your models here.
 class TeamListAdmin(admin.ModelAdmin):
@@ -15,14 +15,14 @@ class PlayerListAdmin(admin.ModelAdmin):
 class SeasonsAdmin(admin.ModelAdmin):
     list_display = ("season_text", "season_num", "isPlayoff")
 
-admin.site.register(Seasons, SeasonsAdmin)
-admin.site.register(Games)
-admin.site.register(AwardsList)
-admin.site.register(TeamList, TeamListAdmin)
-admin.site.register(PlayerList, PlayerListAdmin)
-admin.site.register(Positions)
-admin.site.register(Builds, BuildsAdmin)
-admin.site.register(Awards)
-admin.site.register(SkaterRecords)
-admin.site.register(GoalieRecords)
-admin.site.register(TeamRecords)
+admin.site.register(Season, SeasonsAdmin)
+admin.site.register(Game)
+admin.site.register(AwardTitle)
+admin.site.register(Team, TeamListAdmin)
+admin.site.register(Player, PlayerListAdmin)
+admin.site.register(Position)
+admin.site.register(Build, BuildsAdmin)
+admin.site.register(AwardAssign)
+admin.site.register(SkaterRecord)
+admin.site.register(GoalieRecord)
+admin.site.register(TeamRecord)
