@@ -27,31 +27,6 @@ class Games(models.Model):
     h_team_num = models.ForeignKey(TeamList, on_delete=models.CASCADE, related_name="h_team")
     a_team_gf = models.IntegerField(verbose_name="Away Score", default="0", blank=True)
     h_team_gf = models.IntegerField(verbose_name="Home Score", default="0", blank=True)
-    a_team_points = models.PositiveSmallIntegerField(default="0", verbose_name="Away Team's Standings Points")
-    h_team_points = models.PositiveSmallIntegerField(default="0", verbose_name="Home Team's Standings Points")
-
-    @property
-    def pointscalc(self):
-        if self.game_length <= "3600":
-            if self.a_team_gf > self.h_team_gf:
-                new_a_team_points = "2"
-                new_h_team_points = "0"
-            else:
-                new_a_team_points = "0"
-                new_h_team_points = "2"
-        else:
-            if self.a_team_gf > self.h_team_gf:
-                new_a_team_points = "2"
-                new_h_team_points = "1"
-            else:
-                new_a_team_points = "1"
-                new_h_team_points = "2"
-        return new_a_team_points, new_h_team_points
-
-    def save(self, *args, **kwargs):
-        self.a_team_points = self.pointscalc[0]
-        self.h_team_points = self.pointscalc[1]
-        super(Games, self).save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.a_team_num} @ {self.h_team_num},  {self.expected_time}"
