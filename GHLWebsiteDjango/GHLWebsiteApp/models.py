@@ -116,11 +116,25 @@ class GoalieRecords(models.Model):
     ea_club_num = models.ForeignKey(TeamList, on_delete = models.CASCADE)
     shots_against = models.PositiveSmallIntegerField(default="0")
     saves = models.PositiveSmallIntegerField(default="0")
+    win = models.BooleanField(default="0")
     shutout = models.BooleanField(default="0")
     breakaway_shots = models.PositiveSmallIntegerField(default="0")
     breakaway_saves = models.PositiveSmallIntegerField(default="0")
     ps_shots = models.PositiveSmallIntegerField(default="0")
     ps_saves = models.PositiveSmallIntegerField(default="0")
+
+    @property
+    def wincalc(self):
+        if self.ea_club_num == self.game_num.a_team_num:
+            if self.game_num.a_team_gf > self.game_num.h_team_gf:
+                return 1
+            else:
+                return 0
+        else:
+            if self.game_num.h_team_gf > self.game_num.a_team_gf:
+                return 1
+            else:
+                return 0
 
     @property
     def shutoutcalc(self):
@@ -130,6 +144,7 @@ class GoalieRecords(models.Model):
             return 0
     
     def save(self, *args, **kwargs):
+        self.win = self.wincalc
         self.shutout = self.shutoutcalc
         super(GoalieRecords, self).save(*args, **kwargs)
 

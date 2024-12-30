@@ -1,9 +1,9 @@
 from django.shortcuts import render, get_object_or_404
 from GHLWebsiteApp.models import *
-from django.db.models import Sum, Count, Case, When, Avg, F, Q
+from django.db.models import Sum, Count, Case, When, Avg, F
 from django.db.models.functions import Cast
 
-seasonSetting = 2 # Current season in GHL
+seasonSetting = 1 # Current season in GHL
 
 # Create your views here.
 def index(request):
@@ -19,13 +19,21 @@ def leaders(request):
     leaders_shooting = SkaterRecords.objects.filter(game_num__season_num=seasonSetting).annotate(shootperc=(Cast(Sum("goals"), models.FloatField())/Cast(Sum("sog"), models.FloatField()))*100).order_by("-shootperc")[:10]
     leaders_svp = GoalieRecords.objects.filter(game_num__season_num=seasonSetting).annotate(savepercsum=(Cast(Sum("saves"), models.FloatField())/Cast(Sum("shots_against"), models.FloatField()))*100).order_by("-savepercsum")[:10]
     leaders_shutouts = GoalieRecords.objects.filter(game_num__season_num=seasonSetting).annotate(
-        true_count=Sum(Case(
+        shutoutcount=Sum(Case(
         When(shutout=True, then=1),
         default=0,
         output_field=models.IntegerField()
-    ))).order_by("-true_count")[:10]
-    leaders_wins = {0}
-    leaders_gaa = {0}
+    ))).order_by("-shutoutcount")[:10]
+    leaders_wins = GoalieRecords.objects.filter(game_num__season_num=seasonSetting).annotate(
+        wincount=Sum(Case(
+        When(win=True, then=1),
+        default=0,
+        output_field=models.IntegerField()
+    ))).order_by("-wincount")[:10]
+    leaders_gaa = GoalieRecords.objects.filter(game_num__season_num=seasonSetting).annotate(gaatotal=((Cast(Sum("shots_against"), models.FloatField())-Cast(Sum("saves"), models.FloatField()))/Cast(Sum("game_num__gamelength"), models.FloatField()))*3600).order_by("gaatotal")[:10]
+    #for player in leaders_goals, leaders_assists, leaders_points, leaders_shooting, leaders_svp, leaders_shutouts, leaders_wins, leaders_gaa:
+        #teamabbr = PlayerList.objects.get(pk=player)
+        #player.append({"teamabbr": teamabbr})
     context = {
         "leaders_goals": leaders_goals,
         "leaders_assists": leaders_assists,
