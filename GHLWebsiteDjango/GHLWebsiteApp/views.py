@@ -15,7 +15,7 @@ def standings(request):
 def leaders(request):
     leaders_goals = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).annotate(numgoals=Sum("goals")).order_by("-numgoals")[:10]
     leaders_assists = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).annotate(numassists=Sum("assists")).order_by("-numassists")[:10]
-    leaders_points = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).annotate(numpoints=(Sum("goals")+Sum("assists"))).order_by("-numpoints")[:10]
+    leaders_points = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).annotate(numpoints=Sum("points")).order_by("-numpoints")[:10]
     leaders_shooting = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).annotate(shootperc=(Cast(Sum("goals"), models.FloatField())/Cast(Sum("sog"), models.FloatField()))*100).order_by("-shootperc")[:10]
     leaders_svp = GoalieRecord.objects.filter(game_num__season_num=seasonSetting).annotate(savepercsum=(Cast(Sum("saves"), models.FloatField())/Cast(Sum("shots_against"), models.FloatField()))*100).order_by("-savepercsum")[:10]
     leaders_shutouts = GoalieRecord.objects.filter(game_num__season_num=seasonSetting).annotate(
@@ -32,8 +32,7 @@ def leaders(request):
     ))).order_by("-wincount")[:10]
     leaders_gaa = GoalieRecord.objects.filter(game_num__season_num=seasonSetting).annotate(gaatotal=((Cast(Sum("shots_against"), models.FloatField())-Cast(Sum("saves"), models.FloatField()))/Cast(Sum("game_num__gamelength"), models.FloatField()))*3600).order_by("gaatotal")[:10]
     #for player in leaders_goals, leaders_assists, leaders_points, leaders_shooting, leaders_svp, leaders_shutouts, leaders_wins, leaders_gaa:
-        #playerobj = PlayerList.objects.get(pk=player)
-        #teamabbr = playerobj.club_abbr
+        #teamabbr = player__ea_player_num__current_team__club_abbr
         #player.append({"teamabbr": teamabbr})
     context = {
         "leaders_goals": leaders_goals,
@@ -92,7 +91,7 @@ def team(request, team):
 
 def player(request, player):
     playernum = get_object_or_404(Player, pk=player)
-    allskatergames = playernum.skaterrecords_set.filter(season_num = seasonSetting)
+    allskatergames = playernum.skaterrecord_set.filter(game_num__season_num=seasonSetting)
     if not allskatergames:
         sk_gp = sk_g = sk_a = sk_hits = sk_plus_minus = sk_sog = sk_shot_att = sk_ppg = sk_shg = sk_pass_att = sk_pass_comp = sk_bs = sk_tk = sk_int = sk_gva = sk_pens_drawn = sk_pims = sk_pk_clears = sk_poss_time = sk_sht_perc = sk_sht_eff = sk_pass_perc = sk_fo_perc = sk_fow = sk_fol = 0
     else:
@@ -125,7 +124,7 @@ def player(request, player):
         else:
             sk_fo_perc = "n/a"
 
-    allgoaliegames = playernum.goalierecords_set.all()
+    allgoaliegames = playernum.goalierecord_set.all()
     if not allgoaliegames:
         g_gp = g_sha = g_sav = g_br_sh = g_br_sa = g_ps_sh = g_ps_sa = g_ga =  g_svp = g_br_perc = g_ps_perc = 0
     else:
@@ -148,7 +147,10 @@ def player(request, player):
             g_ps_perc = "n/a"
 
     sk_p = sk_g + sk_a
-    sk_team_num = playernum.current_team.ea_club_num
+    if not playernum.current_team:
+        sk_team_num = 0
+    else:
+        sk_team_num = playernum.current_team.ea_club_num
     context = {
         "playernum": playernum, 
         "sk_gp": sk_gp, 
