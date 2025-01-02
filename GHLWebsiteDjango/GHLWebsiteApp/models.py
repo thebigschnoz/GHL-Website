@@ -117,6 +117,8 @@ class GoalieRecord(models.Model):
     shots_against = models.PositiveSmallIntegerField(default="0")
     saves = models.PositiveSmallIntegerField(default="0")
     win = models.BooleanField(default="0")
+    loss = models.BooleanField(default="0")
+    otloss = models.BooleanField(default="0")
     shutout = models.BooleanField(default="0")
     breakaway_shots = models.PositiveSmallIntegerField(default="0")
     breakaway_saves = models.PositiveSmallIntegerField(default="0")
@@ -135,6 +137,38 @@ class GoalieRecord(models.Model):
                 return 1
             else:
                 return 0
+            
+    @property
+    def losscalc(self):
+        if self.game_num.played_time == 3600:
+            if self.ea_club_num == self.game_num.a_team_num:
+                if self.game_num.a_team_gf < self.game_num.h_team_gf:
+                    return 1
+                else:
+                    return 0
+            else:
+                if self.game_num.h_team_gf < self.game_num.a_team_gf:
+                    return 1
+                else:
+                    return 0
+        else:
+            return 0
+        
+    @property
+    def otlosscalc(self):
+        if self.game_num.played_time > 3600:
+            if self.ea_club_num == self.game_num.a_team_num:
+                if self.game_num.a_team_gf < self.game_num.h_team_gf:
+                    return 1
+                else:
+                    return 0
+            else:
+                if self.game_num.h_team_gf < self.game_num.a_team_gf:
+                    return 1
+                else:
+                    return 0
+        else:
+            return 0
 
     @property
     def shutoutcalc(self):
@@ -145,6 +179,8 @@ class GoalieRecord(models.Model):
     
     def save(self, *args, **kwargs):
         self.win = self.wincalc
+        self.loss = self.losscalc
+        self.otloss = self.otlosscalc
         self.shutout = self.shutoutcalc
         super(GoalieRecord, self).save(*args, **kwargs)
 
