@@ -68,16 +68,32 @@ def skaters(request):
 
 def goalies(request):
     all_goalies = GoalieRecord.objects.filter(game_num__season_num=seasonSetting).annotate(
-        goaliesgp=Count("game_num"),
-        goaliesshots=Sum("shots_against"),
-        goaliesga=(Sum("shots_against")-Sum("saves")),
-        goaliessaves=Sum("saves"),
-        goaliessvp=(Cast(Sum("saves"), models.FloatField())/Cast(Sum("shots_against"), models.FloatField()))*100,
-        goaliesgaa=((Cast(Sum("shots_against"), models.FloatField())-Cast(Sum("saves"), models.FloatField()))/Cast(Sum("game_num__gamelength"), models.FloatField()))*3600,
-        #goaliesshutouts
-        #goalieswins
-        #goalieslosses
-        #goaliesotlosses
+        goaliesgp = Count("game_num"),
+        goaliesshots = Sum("shots_against"),
+        goaliesga = (Sum("shots_against")-Sum("saves")),
+        goaliessaves = Sum("saves"),
+        goaliessvp = (Cast(Sum("saves"), models.FloatField())/Cast(Sum("shots_against"), models.FloatField()))*100,
+        goaliesgaa = ((Cast(Sum("shots_against"), models.FloatField())-Cast(Sum("saves"), models.FloatField()))/Cast(Sum("game_num__gamelength"), models.FloatField()))*3600,
+        goaliesshutouts =Sum(Case(
+            When(shutout=True, then=1),
+            default=0,
+            output_field=models.IntegerField()
+        )),
+        goalieswins = Sum(Case(
+            When(win=True, then=1),
+            default=0,
+            output_field=models.IntegerField()
+        )),
+        goalieslosses = Sum(Case(
+            When(loss=True, then=1),
+            default=0,
+            output_field=models.IntegerField()
+        )),
+        goaliesotlosses = Sum(Case(
+            When(otloss=True, then=1),
+            default=0,
+            output_field=models.IntegerField()
+        )),
     ).order_by("ea_player_num")
     context = {
         "all_goalies": all_goalies

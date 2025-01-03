@@ -140,7 +140,7 @@ class GoalieRecord(models.Model):
             
     @property
     def losscalc(self):
-        if self.game_num.played_time == 3600:
+        if self.game_num.gamelength == 3600:
             if self.ea_club_num == self.game_num.a_team_num:
                 if self.game_num.a_team_gf < self.game_num.h_team_gf:
                     return 1
@@ -156,7 +156,7 @@ class GoalieRecord(models.Model):
         
     @property
     def otlosscalc(self):
-        if self.game_num.played_time > 3600:
+        if self.game_num.gamelength > 3600:
             if self.ea_club_num == self.game_num.a_team_num:
                 if self.game_num.a_team_gf < self.game_num.h_team_gf:
                     return 1
