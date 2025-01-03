@@ -54,12 +54,12 @@
           <td>{{ standing.wins }}</td>
           <td>{{ standing.losses }}</td>
           <td>{{ standing.otlosses }}</td>
-          <td>PCT</td>
+          <td>{{ standing.winperc|floatformat:3 }}</td>
           <td>{{ standing.goalsfor }}</td>
           <td>{{ standing.goalsagainst }}</td>
           <td>PP%</td>
           <td>PK%</td>
-          <td>L10</td>
+          <td>{{ standing.lastten }}</td>
           <td>Str</td>
           <td class="points">{{ standing.points }}</td>
         </tr>

@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from GHLWebsiteApp.models import *
-from django.db.models import Sum, Count, Case, When, Avg, F
+from django.db.models import Sum, Count, Case, When, Avg, F, Q
 from django.db.models.functions import Cast
 
 seasonSetting = 1 # Current season in GHL
@@ -14,16 +14,26 @@ def calculate_standings():
     for team in teams:
         gamelist = Game.objects.filter(season_num=seasonSetting, a_team_num=team).count() + Game.objects.filter(season_num=seasonSetting, h_team_num=team).count()
         if not gamelist:
-            standing, created = Standing.objects.update_or_create(team=team, season=Season.objects.get(season_num=seasonSetting), defaults={"wins":0, "losses":0, "otlosses":0, "points":0, "goalsfor":0, "goalsagainst":0})
+            standing, created = Standing.objects.update_or_create(team=team, season=Season.objects.get(season_num=seasonSetting), defaults={"wins":0, "losses":0, "otlosses":0, "points":0, "goalsfor":0, "goalsagainst":0, "gp":0})
         else:
             wins = Game.objects.filter(season_num=seasonSetting, a_team_num=team, a_team_gf__gt=F("h_team_gf")).count() + Game.objects.filter(season_num=seasonSetting, h_team_num=team, h_team_gf__gt=F("a_team_gf")).count()
             losses = Game.objects.filter(season_num=seasonSetting, a_team_num=team, gamelength__lte=3600, a_team_gf__lt=F("h_team_gf")).count() + Game.objects.filter(season_num=seasonSetting, h_team_num=team, gamelength__lte=3600, h_team_gf__lt=F("a_team_gf")).count()
-            otlosses = Game.objects.filter(season_num=seasonSetting, a_team_num=team, gamelength__gt=3600, a_team_gf__lt=F("h_team_gf")).count() + Game.objects.filter(season_num=seasonSetting, h_team_num=team, gamelength__lte=3600, h_team_gf__lt=F("a_team_gf")).count()
+            otlosses = Game.objects.filter(season_num=seasonSetting, a_team_num=team, gamelength__gt=3600, a_team_gf__lt=F("h_team_gf")).count() + Game.objects.filter(season_num=seasonSetting, h_team_num=team, gamelength__gt=3600, h_team_gf__lt=F("a_team_gf")).count()
             points = wins * 2 + otlosses
             goalsfor = Game.objects.filter(season_num=seasonSetting, a_team_num=team).aggregate(Sum("a_team_gf"))["a_team_gf__sum"] + Game.objects.filter(season_num=seasonSetting, h_team_num=team).aggregate(Sum("h_team_gf"))["h_team_gf__sum"]
             goalsagainst = Game.objects.filter(season_num=seasonSetting, a_team_num=team).aggregate(Sum("h_team_gf"))["h_team_gf__sum"] + Game.objects.filter(season_num=seasonSetting, h_team_num=team).aggregate(Sum("a_team_gf"))["a_team_gf__sum"]
-            gp = wins + losses + otlosses
-            standing, created = Standing.objects.update_or_create(team=team, season=Season.objects.get(season_num=seasonSetting), defaults={'wins': wins, 'losses': losses, 'otlosses': otlosses, 'points': points, 'goalsfor': goalsfor, 'goalsagainst': goalsagainst})
+            gp = gamelist
+            winperc = round(points/(gp*2), 3)
+            #ppperc
+            #pkperc
+            #lasttengames = Game.objects.filter(season_num=seasonSetting).filter(Q(a_team_num=team) | Q(h_team_num=team)).order_by("-game_num")[:10:-1]
+                # totally forgot that I made TeamRecord as a model. Schnoz, you idiot
+            l10w = l10l = l10otl = 0
+            #for game in lasttengames:
+            #    if game.gamelength == 3600:
+            lastten = f"{l10w}-{l10l}-{l10otl}"
+            #streak
+            standing, created = Standing.objects.update_or_create(team=team, season=Season.objects.get(season_num=seasonSetting), defaults={'wins': wins, 'losses': losses, 'otlosses': otlosses, 'points': points, 'goalsfor': goalsfor, 'goalsagainst': goalsagainst, "gp": gp, "winperc": winperc, "lastten": lastten})
 
 def standings(request):
     calculate_standings()
