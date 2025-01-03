@@ -208,3 +208,16 @@ class TeamRecord(models.Model):
     shot_att_team = models.PositiveSmallIntegerField(default="0")
     def __str__(self):
         return f"Club {self.ea_club_num} Game {self.game_num}"
+    
+class Standing(models.Model):
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    season = models.ForeignKey(Season, on_delete=models.CASCADE)
+    wins = models.IntegerField(default=0)
+    losses = models.IntegerField(default=0)
+    otlosses = models.IntegerField(default=0)
+    points = models.IntegerField(default=0)
+    goalsfor = models.IntegerField(default=0)
+    goalsagainst = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ['-points', '-wins', '-goalsfor', 'goalsagainst']

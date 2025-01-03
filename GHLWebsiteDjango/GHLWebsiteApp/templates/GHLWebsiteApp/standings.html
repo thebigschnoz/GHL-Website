@@ -24,8 +24,8 @@
         <col style="width: 80px;">
         <tr>
           <th>Pos</th>
-          <th>&nbsp;</th>
-          <th>&nbsp;</th>
+          <th>&nbsp;</th> <!-- playoff clinch status: class="clinched" -->
+          <th>&nbsp;</th> <!-- team logo-->
           <th>Team</th>
           <th>GP</th>
           <th>W</th>
@@ -40,78 +40,34 @@
           <th>Str</th>
           <th>Pts</th>
         </tr>
+        {% for standing in standings %}
         <tr>
-          <td>1</td>
-          <td class="clinched">p</td>
+          <td>{{ forloop.counter }}</td>
           <td>&nbsp;</td>
-          <td>Philadelphia Flyers</td>
-          <td>53</td>
-          <td>48</td>
-          <td>4</td>
-          <td>1</td>
-          <td>.915</td>
-          <td>286</td>
-          <td>116</td>
-          <td>32.5%</td>
-          <td>89.3%</td>
-          <td>8-1-1</td>
-          <td>L1</td>
-          <td class="points">97</td>
+          {% if standing.team.team_logo_link %}
+          <td><img src="{{ standing.team.team_logo_link }}" height=24 width=24></img></td>
+          {% else %}
+          <td>&nbsp;</td>
+          {% endif %}
+          <td><a href="{% url 'team' standing.team.ea_club_num %}">{{ standing.team.club_full_name }}</a></td>
+          <td>{{ standing.gp }}</td>
+          <td>{{ standing.wins }}</td>
+          <td>{{ standing.losses }}</td>
+          <td>{{ standing.otlosses }}</td>
+          <td>PCT</td>
+          <td>{{ standing.goalsfor }}</td>
+          <td>{{ standing.goalsagainst }}</td>
+          <td>PP%</td>
+          <td>PK%</td>
+          <td>L10</td>
+          <td>Str</td>
+          <td class="points">{{ standing.points }}</td>
         </tr>
+        {% empty %}
         <tr>
-          <td>2</td>
-          <td class="clinched">y</td>
-          <td>&nbsp;</td>
-          <td>Toronto Maple Leafs</td>
-          <td>54</td>
-          <td>43</td>
-          <td>10</td>
-          <td>1</td>
-          <td>.806</td>
-          <td>279</td>
-          <td>145</td>
-          <td>27.8%</td>
-          <td>87.4%</td>
-          <td>8-2-0</td>
-          <td>W4</td>
-          <td class="points">87</td>
+          <td colspan="16">No games recorded.</td>
         </tr>
-        <tr>
-          <td>3</td>
-          <td class="clinched">x</td>
-          <td>&nbsp;</td>
-          <td>Atlanta Thrashers</td>
-          <td>52</td>
-          <td>34</td>
-          <td>14</td>
-          <td>4</td>
-          <td>.692</td>
-          <td>232</td>
-          <td>167</td>
-          <td>26.5%</td>
-          <td>86.1%</td>
-          <td>5-4-1</td>
-          <td>L2</td>
-          <td class="points">72</td>
-        </tr>
-        <tr>
-          <td>4</td>
-          <td>&nbsp;</td>
-          <td>&nbsp;</td>
-          <td>Utah Hockey Club</td>
-          <td>51</td>
-          <td>28</td>
-          <td>18</td>
-          <td>5</td>
-          <td>.598</td>
-          <td>191</td>
-          <td>166</td>
-          <td>28.9%</td>
-          <td>83.7%</td>
-          <td>5-3-2</td>
-          <td>W1</td>
-          <td class="points">61</td>
-        </tr>
+        {% endfor %}
       </table>
       <div id="playoffInfo">
         x - clinched Playoff spot<br />

@@ -9,8 +9,26 @@ seasonSetting = 1 # Current season in GHL
 def index(request):
     return render(request, "GHLWebsiteApp/index.html")
 
+def calculate_standings():
+    teams = Team.objects.filter(isActive=True)
+    for team in teams:
+        gamelist = Game.objects.filter(season_num=seasonSetting, a_team_num=team).count() + Game.objects.filter(season_num=seasonSetting, h_team_num=team).count()
+        if not gamelist:
+            standing, created = Standing.objects.update_or_create(team=team, season=Season.objects.get(season_num=seasonSetting), defaults={"wins":0, "losses":0, "otlosses":0, "points":0, "goalsfor":0, "goalsagainst":0})
+        else:
+            wins = Game.objects.filter(season_num=seasonSetting, a_team_num=team, a_team_gf__gt=F("h_team_gf")).count() + Game.objects.filter(season_num=seasonSetting, h_team_num=team, h_team_gf__gt=F("a_team_gf")).count()
+            losses = Game.objects.filter(season_num=seasonSetting, a_team_num=team, gamelength__lte=3600, a_team_gf__lt=F("h_team_gf")).count() + Game.objects.filter(season_num=seasonSetting, h_team_num=team, gamelength__lte=3600, h_team_gf__lt=F("a_team_gf")).count()
+            otlosses = Game.objects.filter(season_num=seasonSetting, a_team_num=team, gamelength__gt=3600, a_team_gf__lt=F("h_team_gf")).count() + Game.objects.filter(season_num=seasonSetting, h_team_num=team, gamelength__lte=3600, h_team_gf__lt=F("a_team_gf")).count()
+            points = wins * 2 + otlosses
+            goalsfor = Game.objects.filter(season_num=seasonSetting, a_team_num=team).aggregate(Sum("a_team_gf"))["a_team_gf__sum"] + Game.objects.filter(season_num=seasonSetting, h_team_num=team).aggregate(Sum("h_team_gf"))["h_team_gf__sum"]
+            goalsagainst = Game.objects.filter(season_num=seasonSetting, a_team_num=team).aggregate(Sum("h_team_gf"))["h_team_gf__sum"] + Game.objects.filter(season_num=seasonSetting, h_team_num=team).aggregate(Sum("a_team_gf"))["a_team_gf__sum"]
+            gp = wins + losses + otlosses
+            standing, created = Standing.objects.update_or_create(team=team, season=Season.objects.get(season_num=seasonSetting), defaults={'wins': wins, 'losses': losses, 'otlosses': otlosses, 'points': points, 'goalsfor': goalsfor, 'goalsagainst': goalsagainst})
+
 def standings(request):
-    return render(request, "GHLWebsiteApp/standings.html")
+    calculate_standings()
+    standings = Standing.objects.filter(season=seasonSetting).order_by('-points', '-wins', '-goalsfor', 'goalsagainst')
+    return render(request, "GHLWebsiteApp/standings.html", {"standings": standings})
 
 def leaders(request):
     leaders_goals = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).annotate(numgoals=Sum("goals")).filter(numgoals__gt=0).order_by("-numgoals")[:10]
@@ -209,14 +227,3 @@ def awards(request, awardnum):
     award = get_object_or_404(AwardTitle, pk=awardnum)
     return render(request, "GHLWebsiteApp/awards.html", {"award": award})
 
-def calculate_standings(Season):
-    teams = Team.objects.filter(isActive=True)
-    standings = []
-    for team in teams:
-        wins = Game.objects.filter(season_num=seasonSetting, a_team_num=team, a_team_gf__gt=F("h_team_gf")).count() + Game.objects.filter(h_team_num=team, h_team_gf__gt=F("a_team_gf")).count()
-        losses = Game.objects.filter(season_num=seasonSetting, a_team_num=team, gamelength__lte=3600, a_team_gf__lt=F('h_team_gf')).count() + Game.objects.filter(team2=team, h_team_gf__lt=F('a_team_gf')).count()
-        otlosses = Game.objects.filter(season_num=seasonSetting, a_team_num=team, gamelength__gt=3600, a_team_gf=F('h_team_gf')).count() + Game.objects.filter(team2=team, h_team_gf=F('a_team_gf')).count()
-        points = wins * 2 + otlosses
-        standings.append({"team": team.name, "wins": wins, "losses": losses, "otlosses": otlosses, "points": points})
-    standings = sorted(standings, key=lambda x: x["points"], reverse=True)
-    return standings
