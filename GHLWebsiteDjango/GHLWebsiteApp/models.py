@@ -38,20 +38,23 @@ class AwardTitle(models.Model):
     award_Desc = models.TextField(blank=True)
     def __str__(self):
         return self.award_Name
-
-class Player(models.Model):
-    ea_player_num = models.IntegerField(primary_key=True)
-    username = models.CharField(max_length=16)
-    current_team = models.ForeignKey(Team, on_delete = models.CASCADE, blank=True, null=True)
-    def __str__(self):
-        return self.username
-
+    
 class Position(models.Model):
     ea_pos = models.IntegerField(primary_key=True)
     position = models.CharField(max_length=20)
     positionShort = models.CharField(max_length=2)
     def __str__(self):
         return self.positionShort
+
+class Player(models.Model):
+    ea_player_num = models.IntegerField(primary_key=True)
+    username = models.CharField(max_length=16)
+    current_team = models.ForeignKey(Team, on_delete = models.CASCADE, blank=True, null=True)
+    primarypos = models.ForeignKey(Position, on_delete = models.CASCADE, related_name="primary", blank=True, null=True)
+    secondarypos = models.ManyToManyField(Position, related_name="secondary", blank=True)
+    playerpic = models.TextField(blank=True, null=True)
+    def __str__(self):
+        return self.username
 
 class Build(models.Model):
     ea_build = models.IntegerField(primary_key=True)
