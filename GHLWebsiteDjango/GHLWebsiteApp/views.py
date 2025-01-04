@@ -1,37 +1,43 @@
 from django.shortcuts import render, get_object_or_404
 from GHLWebsiteApp.models import *
-from django.db.models import Sum, Count, Case, When, Avg, F, Q
+from django.db.models import Sum, Count, Case, When, Avg, F
 from django.db.models.functions import Cast
 import random
 
 seasonSetting = 1 # Current season in GHL
 
-# Create your views here.
-def index(request):
-    allgames = SkaterRecord.objects.filter(game_num__season_num=seasonSetting)
-    if not allgames:
-        if not SkaterRecord.objects.all():
-            randomplayer = gp = goals = assists = plusminus = pims = "(No GP yet)"
-            thisseason = 0
-        else:
-            randomplayer = random.choice(Player.objects.all())
-            gp = SkaterRecord.objects.filter(ea_player_num=randomplayer).count()
-            goals = SkaterRecord.objects.filter(ea_player_num=randomplayer).aggregate(Sum("goals"))["goals__sum"]
-            assists = SkaterRecord.objects.filter(ea_player_num=randomplayer).aggregate(Sum("assists"))["assists__sum"]
-            plusminus = SkaterRecord.objects.filter(ea_player_num=randomplayer).aggregate(Sum("plus_minus"))["plus_minus__sum"]
-            pims = SkaterRecord.objects.filter(ea_player_num=randomplayer).aggregate(Sum("pims"))["pims__sum"]
-            thisseason = 0
-    else:
-        randomgame = random.choice(allgames)
-        randomplayer = randomgame.ea_player_num
-        gp = SkaterRecord.objects.filter(game_num__season_num=seasonSetting, ea_player_num=randomplayer).count()
-        goals = SkaterRecord.objects.filter(game_num__season_num=seasonSetting, ea_player_num=randomplayer).aggregate(Sum("goals"))["goals__sum"]
-        assists = SkaterRecord.objects.filter(game_num__season_num=seasonSetting, ea_player_num=randomplayer).aggregate(Sum("assists"))["assists__sum"]
-        plusminus = SkaterRecord.objects.filter(game_num__season_num=seasonSetting, ea_player_num=randomplayer).aggregate(Sum("plus_minus"))["plus_minus__sum"]
-        pims = SkaterRecord.objects.filter(game_num__season_num=seasonSetting, ea_player_num=randomplayer).aggregate(Sum("pims"))["pims__sum"]
-        thisseason = 1
-    context = {"thisseason": thisseason, "randomplayer":randomplayer, "gp": gp, "goals": goals, "assists": assists, "plusminus": plusminus, "pims": pims}
-    return render(request, "GHLWebsiteApp/index.html", context)
+def calculate_leaders():
+    Leader.objects.all().delete()
+    leaders_goals = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).annotate(numgoals=Sum("goals")).filter(numgoals__gt=0).order_by("-numgoals")[:1]
+    leaders_assists = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).annotate(numassists=Sum("assists")).filter(numassists__gt=0).order_by("-numassists")[:1]
+    leaders_points = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).annotate(numpoints=Sum("points")).filter(numpoints__gt=0).order_by("-numpoints")[:1]
+    leaders_shooting = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).annotate(shootperc=(Cast(Sum("goals"), models.FloatField())/Cast(Sum("sog"), models.FloatField()))*100).filter(shootperc__gt=0).order_by("-shootperc")[:1]
+    leaders_svp = GoalieRecord.objects.filter(game_num__season_num=seasonSetting).annotate(savepercsum=(Cast(Sum("saves"), models.FloatField())/Cast(Sum("shots_against"), models.FloatField()))*100).order_by("-savepercsum")[:1]
+    leaders_shutouts = GoalieRecord.objects.filter(game_num__season_num=seasonSetting).annotate(
+        shutoutcount=Sum(Case(
+        When(shutout=True, then=1),
+        default=0,
+        output_field=models.IntegerField()
+    ))).filter(shutoutcount__gte=1).order_by("-shutoutcount")[:1]
+    leaders_wins = GoalieRecord.objects.filter(game_num__season_num=seasonSetting).annotate(
+        wincount=Sum(Case(
+        When(win=True, then=1),
+        default=0,
+        output_field=models.IntegerField()
+    ))).filter(wincount__gte=1).order_by("-wincount")[:1]
+    leaders_gaa = GoalieRecord.objects.filter(game_num__season_num=seasonSetting).annotate(gaatotal=((Cast(Sum("shots_against"), models.FloatField())-Cast(Sum("saves"), models.FloatField()))/Cast(Sum("game_num__gamelength"), models.FloatField()))*3600).order_by("gaatotal")[:1]
+    Leader.objects.bulk_create(
+        [
+            Leader(attribute="Pts", player=leaders_points[0].ea_player_num, stat=leaders_points[0].numpoints),
+            Leader(attribute="G", player=leaders_goals[0].ea_player_num, stat=leaders_goals[0].numgoals),
+            Leader(attribute="A", player=leaders_assists[0].ea_player_num, stat=leaders_assists[0].numassists),
+            Leader(attribute="SH%", player=leaders_shooting[0].ea_player_num, stat=leaders_shooting[0].shootperc),
+            Leader(attribute="GAA", player=leaders_gaa[0].ea_player_num, stat=leaders_gaa[0].gaatotal),
+            Leader(attribute="SV%", player=leaders_svp[0].ea_player_num, stat=leaders_svp[0].savepercsum),
+            Leader(attribute="W", player=leaders_wins[0].ea_player_num, stat=leaders_wins[0].wincount),
+            Leader(attribute="SO", player=leaders_shutouts[0].ea_player_num, stat=leaders_shutouts[0].shutoutcount),
+        ]
+    )
 
 def calculate_standings():
     teams = Team.objects.filter(isActive=True)
@@ -67,6 +73,36 @@ def calculate_standings():
             lastten = f"{l10w}-{l10l}-{l10otl}"
             #streak =
             standing, created = Standing.objects.update_or_create(team=team, season=Season.objects.get(season_num=seasonSetting), defaults={'wins': wins, 'losses': losses, 'otlosses': otlosses, 'points': points, 'goalsfor': goalsfor, 'goalsagainst': goalsagainst, "gp": gp, "winperc": winperc, "ppperc": ppperc, "lastten": lastten})
+
+def index(request):
+    calculate_leaders()
+    calculate_standings()
+    allgames = SkaterRecord.objects.filter(game_num__season_num=seasonSetting)
+    if not allgames:
+        if not SkaterRecord.objects.all():
+            randomplayer = gp = goals = assists = plusminus = pims = "(No GP yet)"
+            thisseason = 0
+        else:
+            randomplayer = random.choice(Player.objects.all())
+            gp = SkaterRecord.objects.filter(ea_player_num=randomplayer).count()
+            goals = SkaterRecord.objects.filter(ea_player_num=randomplayer).aggregate(Sum("goals"))["goals__sum"]
+            assists = SkaterRecord.objects.filter(ea_player_num=randomplayer).aggregate(Sum("assists"))["assists__sum"]
+            plusminus = SkaterRecord.objects.filter(ea_player_num=randomplayer).aggregate(Sum("plus_minus"))["plus_minus__sum"]
+            pims = SkaterRecord.objects.filter(ea_player_num=randomplayer).aggregate(Sum("pims"))["pims__sum"]
+            thisseason = 0
+    else:
+        randomgame = random.choice(allgames)
+        randomplayer = randomgame.ea_player_num
+        gp = SkaterRecord.objects.filter(game_num__season_num=seasonSetting, ea_player_num=randomplayer).count()
+        goals = SkaterRecord.objects.filter(game_num__season_num=seasonSetting, ea_player_num=randomplayer).aggregate(Sum("goals"))["goals__sum"]
+        assists = SkaterRecord.objects.filter(game_num__season_num=seasonSetting, ea_player_num=randomplayer).aggregate(Sum("assists"))["assists__sum"]
+        plusminus = SkaterRecord.objects.filter(game_num__season_num=seasonSetting, ea_player_num=randomplayer).aggregate(Sum("plus_minus"))["plus_minus__sum"]
+        pims = SkaterRecord.objects.filter(game_num__season_num=seasonSetting, ea_player_num=randomplayer).aggregate(Sum("pims"))["pims__sum"]
+        thisseason = 1
+    standings = Standing.objects.filter(season=seasonSetting).order_by('-points', '-wins', '-goalsfor', 'goalsagainst')
+    leaders = Leader.objects.all()
+    context = {"standings": standings, "leaders": leaders, "thisseason": thisseason, "randomplayer":randomplayer, "gp": gp, "goals": goals, "assists": assists, "plusminus": plusminus, "pims": pims}
+    return render(request, "GHLWebsiteApp/index.html", context)
 
 def standings(request):
     calculate_standings()
@@ -269,4 +305,3 @@ def awardsDef(request):
 def awards(request, awardnum):
     award = get_object_or_404(AwardTitle, pk=awardnum)
     return render(request, "GHLWebsiteApp/awards.html", {"award": award})
-

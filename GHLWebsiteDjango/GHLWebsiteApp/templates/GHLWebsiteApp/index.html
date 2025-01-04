@@ -9,140 +9,60 @@
                     <center>
                         <div class="header">Current Standings</div>
                         <table class="standingstable">
-                            <tr>
-                                <th>Team</th>
-                                <th>GP</th>
-                                <th>W</th>
-                                <th>L</th>
-                                <th>OTL</th>
-                                <th>PTS</th>
-                            </tr>
-                            <tr>
-                                <td>PHI</td>
-                                <td>52</td>
-                                <td>47</td>
-                                <td>4</td>
-                                <td>1</td>
-                                <td class="points">95</td>
-                            </tr>
-                            <tr class="odd">
-                                <td>TOR</td>
-                                <td>54</td>
-                                <td>43</td>
-                                <td>10</td>
-                                <td>1</td>
-                                <td class="points">87</td>
-                            </tr>
-                            <tr>
-                                <td>ATL</td>
-                                <td>52</td>
-                                <td>34</td>
-                                <td>14</td>
-                                <td>4</td>
-                                <td class="points">72</td>
-                            </tr>
-                            <tr class="odd">
-                                <td>UTA</td>
-                                <td>51</td>
-                                <td>28</td>
-                                <td>18</td>
-                                <td>5</td>
-                                <td class="points">61</td>
-                            </tr>
-                            <tr>
-                                <td>CBJ</td>
-                                <td>53</td>
-                                <td>23</td>
-                                <td>29</td>
-                                <td>1</td>
-                                <td class="points">47</td>
-                            </tr>
-                            <tr class="odd">
-                                <td>DET</td>
-                                <td>54</td>
-                                <td>20</td>
-                                <td>28</td>
-                                <td>6</td>
-                                <td class="points">46</td>
-                            </tr>
-                            <tr>
-                                <td>NYR</td>
-                                <td>53</td>
-                                <td>19</td>
-                                <td>29</td>
-                                <td>5</td>
-                                <td class="points">43</td>
-                            </tr>
-                            <tr class="odd">
-                                <td>TBL</td>
-                                <td>53</td>
-                                <td>20</td>
-                                <td>31</td>
-                                <td>2</td>
-                                <td class="points">42</td>
-                            </tr>
-                            <tr>
-                                <td>BUF</td>
-                                <td>52</td>
-                                <td>17</td>
-                                <td>30</td>
-                                <td>5</td>
-                                <td class="points">39</td>
-                            </tr>
-                            <tr class="odd">
-                                <td>CGY</td>
-                                <td>52</td>
-                                <td>12</td>
-                                <td>36</td>
-                                <td>4</td>
-                                <td class="points">28</td>
-                            </tr>
+                            <colgroup>
+                                <col style="width: 60px">
+                                <col style="width: 35px">
+                                <col style="width: 35px">
+                                <col style="width: 35px">
+                                <col style="width: 35px">
+                                <col style="width: 35px">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th>Team</th>
+                                    <th>GP</th>
+                                    <th>W</th>
+                                    <th>L</th>
+                                    <th>OTL</th>
+                                    <th>PTS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for standing in standings %}
+                                <tr>
+                                    <td>{{ standing.team.club_abbr }}</td>
+                                    <td>{{ standing.gp }}</td>
+                                    <td>{{ standing.wins }}</td>
+                                    <td>{{ standing.losses }}</td>
+                                    <td>{{ standing.otlosses }}</td>
+                                    <td class="points">{{ standing.points }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
                         </table>
                     </center>
                 </div>
                 <div class="section">
                     <div class="header">Player Leaders</div>
                     <center><table class="standingstable">
+                        <colgroup>
+                            <col style="width: 45px">
+                            <col style="width: 160px">
+                            <col style="width: 60px">
+                        </colgroup>
+                        {% for leader in leaders %}
                         <tr>
-                            <td>Pts</td>
-                            <td class="points">JBrewer23</td>
-                            <td>153</td>
+                            <td>{{ leader.attribute }}</td>
+                            <td class="points">{{ leader.player }}</td>
+                            {% if leader.attribute == "SV%" or leader.attribute == "SH%" %}
+                            <td>{{ leader.stat|floatformat:1 }}%</td>
+                            {% elif leader.attribute == "GAA" %}
+                            <td>{{ leader.stat|floatformat:2 }}</td>
+                            {% else %}
+                            <td>{{ leader.stat|floatformat:0 }}</td>
+                            {% endif %}
                         </tr>
-                        <tr class="odd">
-                            <td>G</td>
-                            <td class="points">OGLarryBird</td>
-                            <td>85</td>
-                        </tr>
-                        <tr>
-                            <td>A</td>
-                            <td class="points">JBrewer23</td>
-                            <td>91</td>
-                        </tr>
-                        <tr class="odd">
-                            <td>+/-</td>
-                            <td class="points">FloppyWha1eMeat</td>
-                            <td>+109</td>
-                        </tr>
-                        <tr>
-                            <td>GAA</td>
-                            <td class="points">USSR Pepino</td>
-                            <td>2.00</td>
-                        </tr>
-                        <tr class="odd">
-                            <td>SV%</td>
-                            <td class="points">GroomedChampion</td>
-                            <td>90.8%</td>
-                        </tr>
-                        <tr>
-                            <td>W</td>
-                            <td class="points">BigDaddyOdin</td>
-                            <td>44</td>
-                        </tr>
-                        <tr class="odd">
-                            <td>SO</td>
-                            <td class="points">BigDaddyOdin</td>
-                            <td>7</td>
-                        </tr>
+                        {% endfor %}
                     </table></center>
                 </div>
             </td>

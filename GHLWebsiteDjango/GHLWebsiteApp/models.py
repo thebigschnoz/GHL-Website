@@ -230,3 +230,8 @@ class Standing(models.Model):
 
     class Meta:
         ordering = ['-points', '-wins', '-goalsfor', 'goalsagainst']
+
+class Leader(models.Model):
+    attribute = models.CharField(max_length=3)
+    player = models.ForeignKey(Player, on_delete=models.CASCADE)
+    stat = models.DecimalField(max_digits=5, decimal_places=2, default=0)
