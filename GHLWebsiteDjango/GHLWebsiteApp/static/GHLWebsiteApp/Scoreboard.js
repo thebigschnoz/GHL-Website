@@ -1,12 +1,10 @@
 import React from 'react';
+import ReactDOM from 'react-dom/client'
 
 class ESPN extends React.Component {
     render() {
       return (
-        <main>
           <ScoreBoard />
-          <Navigation />
-        </main>
       );
     }
   }
@@ -174,25 +172,5 @@ class ESPN extends React.Component {
     }
   }
   
-  class Navigation extends React.Component {  
-    render() {
-      const logo = "";
-      
-      return (
-        <nav className="nav__container">
-          <div className="nav__content">
-            <div className="logo__container">
-              <img src={logo} />
-            </div>
-            <ul className="nav__items">
-              <li>Home</li>
-              <li>Standings</li>
-              <li>Player Leaders</li>
-            </ul>
-          </div>
-        </nav>
-      );
-    }
-  }
   
-  ReactDOM.render(<ESPN />, document.getElementById("sup"));
+  ReactDOM.render(<ESPN />, document.getElementById("fakescoreboard"));
