@@ -236,7 +236,7 @@ class Standing(models.Model):
 
 class Leader(models.Model):
     attribute = models.CharField(max_length=3)
-    player = models.ForeignKey(Player, blank=True, on_delete=models.CASCADE)
+    player = models.ForeignKey(Player, blank=True, null=True, on_delete=models.CASCADE)
     stat = models.DecimalField(max_digits=5, decimal_places=2, default=0)
 
     def __str__(self):
