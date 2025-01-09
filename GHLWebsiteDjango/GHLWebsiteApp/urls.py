@@ -13,4 +13,5 @@ urlpatterns = [
     path('awards/', views.awardsDef, name="awardsDef"),
     path('awards/<int:award>/', views.awards, name="awards"),
     path('draft/', views.draft, name="draft"),
+    path('gameapi/', views.GamesRequest, name="gamesrequest"),
 ]
