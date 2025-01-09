@@ -229,9 +229,15 @@ class Standing(models.Model):
     streak = models.CharField(max_length=4, default="n/a")
 
     class Meta:
-        ordering = ['-points', '-wins', '-goalsfor', 'goalsagainst']
+        ordering = ['-points', '-wins', '-goalsfor', 'goalsagainst', 'team__club_full_name']
+
+    def __str__(self):
+        return f"{self.team}: {self.season}"
 
 class Leader(models.Model):
     attribute = models.CharField(max_length=3)
-    player = models.ForeignKey(Player, on_delete=models.CASCADE)
+    player = models.ForeignKey(Player, blank=True, on_delete=models.CASCADE)
     stat = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+
+    def __str__(self):
+        return f"{self.attribute}: {self.player}"
