@@ -384,10 +384,11 @@ td.points {
 
 .game__top-bar {
   display: flex;
+  color: #3b3c3d;
 }
 .game__top-bar .game__channel {
   margin-left: auto;
-  color: #6d6e70;
+  color: #3b3c3d;
 }
 
 .game__time {
@@ -409,6 +410,7 @@ td.points {
 }
 
 .team {
+  color: black;
   display: flex;
   align-items: center;
   height: 1.5rem;

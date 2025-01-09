@@ -91,6 +91,15 @@ def calculate_standings():
             #streak =
             standing, created = Standing.objects.update_or_create(team=team, season=Season.objects.get(season_num=seasonSetting), defaults={'wins': wins, 'losses': losses, 'otlosses': otlosses, 'points': points, 'goalsfor': goalsfor, 'goalsagainst': goalsagainst, "gp": gp, "winperc": winperc, "ppperc": ppperc, "lastten": lastten})
 
+def get_scoreboard():
+    data = Game.objects.filter(season_num=seasonSetting).order_by("-played_time")[:15]
+    return data
+
+def GamesRequest(request):
+    data = Game.objects.filter(season_num=seasonSetting).values("game_num", "gamelength", "played_time", "a_team_num__club_abbr", "h_team_num__club_abbr", "a_team_num__team_logo_link", "h_team_num__team_logo_link" "a_team_gf", "h_team_gf").order_by("-played_time")[:15]
+    response = JsonResponse(dict(gamelist=list(data)), safe=False)
+    return response
+
 def index(request):
     calculate_leaders()
     calculate_standings()
@@ -118,13 +127,14 @@ def index(request):
         thisseason = 1
     standings = Standing.objects.filter(season=seasonSetting).order_by('-points', '-wins', '-goalsfor', 'goalsagainst', 'team__club_full_name')
     leaders = Leader.objects.all()
-    context = {"standings": standings, "leaders": leaders, "thisseason": thisseason, "randomplayer":randomplayer, "gp": gp, "goals": goals, "assists": assists, "plusminus": plusminus, "pims": pims}
+    scoreboard = get_scoreboard()
+    context = {"standings": standings, "leaders": leaders, "thisseason": thisseason, "randomplayer":randomplayer, "gp": gp, "goals": goals, "assists": assists, "plusminus": plusminus, "pims": pims, "scoreboard": scoreboard}
     return render(request, "GHLWebsiteApp/index.html", context)
 
 def standings(request):
     calculate_standings()
     standings = Standing.objects.filter(season=seasonSetting).order_by('-points', '-wins', '-goalsfor', 'goalsagainst', 'team__club_full_name')
-    return render(request, "GHLWebsiteApp/standings.html", {"standings": standings})
+    return render(request, "GHLWebsiteApp/standings.html", {"standings": standings, "scoreboard": get_scoreboard()})
 
 def leaders(request):
     leaders_goals = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).annotate(numgoals=Sum("goals")).filter(numgoals__gt=0).order_by("-numgoals")[:10]
@@ -154,6 +164,7 @@ def leaders(request):
         "leaders_shutouts": leaders_shutouts,
         "leaders_wins": leaders_wins,
         "leaders_gaa": leaders_gaa,
+        "scoreboard": get_scoreboard()
     }
     return render(request, "GHLWebsiteApp/leaders.html", context)
 
@@ -173,7 +184,7 @@ def skaters(request):
         skatersshg=Sum("shg"),
     ).order_by("ea_player_num")
     context = {
-        "all_skaters": all_skaters
+        "all_skaters": all_skaters, "scoreboard": get_scoreboard()
     }
     return render(request, "GHLWebsiteApp/skaters.html", context)
 
@@ -207,13 +218,13 @@ def goalies(request):
         )),
     ).order_by("ea_player_num")
     context = {
-        "all_goalies": all_goalies
+        "all_goalies": all_goalies, "scoreboard": get_scoreboard()
     }
     return render(request, "GHLWebsiteApp/goalies.html", context)
 
 def team(request, team):
     teamnum = get_object_or_404(Team, pk=team)
-    context = {"team": teamnum}
+    context = {"team": teamnum, "scoreboard": get_scoreboard()}
     return render(request, "GHLWebsiteApp/team.html", context)
 
 def player(request, player):
@@ -310,6 +321,7 @@ def player(request, player):
         "g_br_perc": g_br_perc,
         "g_ps_perc": g_ps_perc,
         "sk_team_num": sk_team_num,
+        "scoreboard": get_scoreboard()
         }
     return render(request, "GHLWebsiteApp/player.html", context)
 
@@ -321,9 +333,4 @@ def awardsDef(request):
 
 def awards(request, awardnum):
     award = get_object_or_404(AwardTitle, pk=awardnum)
-    return render(request, "GHLWebsiteApp/awards.html", {"award": award})
-
-def GamesRequest(request):
-    data = Game.objects.filter(season_num=seasonSetting).values("game_num", "gamelength", "played_time", "a_team_num__club_abbr", "h_team_num__club_abbr", "a_team_gf", "h_team_gf").order_by("-played_time")[:15]
-    response = JsonResponse(dict(gamelist=list(data)), safe=False)
-    return response
+    return render(request, "GHLWebsiteApp/awards.html", {"award": award, "scoreboard": get_scoreboard()})

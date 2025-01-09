@@ -10,28 +10,64 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
 	<link href="{% static 'GHLWebsiteApp/mainstyle.css' %}" rel="stylesheet" type="text/css" />
+	<!-- <script src="{% static "GHLWebsiteApp/SchnozBoard.js" %}"></script> -->
 	<script src="{% static 'GHLWebsiteApp/sortable.js'  %}"></script>
 </head>
 
 <body>
-	<main>
-		<div id="fakescoreboard"><!-- TODO: Scoreboard and Navigation will go here --><center>FUTURE SCOREBOARD</center></div>
-		<center>
-			<div id="menu">
-				<a href="{% url 'index' %}">Home</a> | 
-				<a href="{% url 'standings' %}">Standings</a> | 
-				<a href="{% url 'leaders' %}">League Leaders</a> | 
-				<a href="{% url 'skaters' %}">Skater Stats</a> | 
-				<a href="{% url 'goalies' %}">Goalie Stats</a> | 
-				<!-- <a href="{% url 'draft' %}">Draft</a> | -->
-				<a href="{% url 'awardsDef' %}">Awards</a>
+	<main><center>
+		{% for game in scoreboard %}
+		{% if forloop.first %}
+		<div class="scoreboard__container">
+		{% endif %}
+			<div class="game__container">
+				<div class="game__top-bar">
+					<span class="game__time">{{ game.expected_time|date:"D M j" }}, {{ game.expected_time|time:"g:i" }}</span>
+				</div>
+				<div class="info-split">
+					<div class="team__container">
+						{% if game.a_team_gf > game.h_team_gf %}
+						<div class="team">
+						{% else%}
+						<div class="team losing-team">
+						{% endif %}
+							<img class="team__logo" src="{{ game.a_team_num.team_logo_link }}" />
+							<p class="team__name">{{ game.a_team_num.club_abbr }}</p>
+							<p class="team__score">{{ game.a_team_gf }}</p>
+						</div>
+						{% if game.h_team_gf > game.a_team_gf %}
+						<div class="team">
+						{% else %}
+						<div class="team losing-team">
+						{% endif %}
+							<img class="team__logo" src="{{ game.h_team_num.team_logo_link }}" />
+							<p class="team__name">{{ game.h_team_num.club_abbr }}</p>
+							<p class="team__score">{{ game.h_team_gf }}</p>
+						</div>
+					</div>
+				</div>
 			</div>
+		{% if forloop.last %}
+		</div>
+		{% endif %}
+		{% empty %}
+		<div class="fakescoreboard">
+			No games played yet this season.
+		</div>
+		{% endfor %}
+		<div id="menu">
+			<a href="{% url 'index' %}">Home</a> | 
+			<a href="{% url 'standings' %}">Standings</a> | 
+			<a href="{% url 'leaders' %}">League Leaders</a> | 
+			<a href="{% url 'skaters' %}">Skater Stats</a> | 
+			<a href="{% url 'goalies' %}">Goalie Stats</a> | 
+			<!-- <a href="{% url 'draft' %}">Draft</a> | -->
+			<a href="{% url 'awardsDef' %}">Awards</a>
+		</div>
 		</center>
 		<div id="divider"></div>
-		
 		{% block body %}
-		{% endblock %}
-				
+		{% endblock %}	
 	</main>
 </body>
 <footer>
