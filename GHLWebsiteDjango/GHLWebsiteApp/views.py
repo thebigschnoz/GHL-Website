@@ -91,8 +91,28 @@ def calculate_standings():
                 else:
                     l10l += 1
             lastten = f"{l10w}-{l10l}-{l10otl}"
-            #streak =
-            standing, created = Standing.objects.update_or_create(team=team, season=Season.objects.get(season_num=seasonSetting), defaults={'wins': wins, 'losses': losses, 'otlosses': otlosses, 'points': points, 'goalsfor': goalsfor, 'goalsagainst': goalsagainst, "gp": gp, "winperc": winperc, "ppperc": ppperc, "lastten": lastten})
+
+            recent_games = TeamRecord.objects.filter(game_num__season_num=seasonSetting, ea_club_num=team).order_by("-game_num")
+            streak_type = None
+            streak_count = 0
+            if not recent_games:
+                streak = "n/a"
+            else:
+                for game in recent_games:
+                    if streak_type is None:
+                        if game.goals_for > game.goals_against:
+                            streak_type = "W"
+                            streak_count = 1
+                        else:
+                            streak_type = "L"
+                            streak_count = 1
+                    else:
+                        if (streak_type == "W" and game.goals_for > game.goals_against) or (streak_type == "L" and game.goals_for < game.goals_against):
+                            streak_count += 1
+                        else:
+                            break
+                streak = f"{streak_type}{streak_count}"
+            standing, created = Standing.objects.update_or_create(team=team, season=Season.objects.get(season_num=seasonSetting), defaults={'wins': wins, 'losses': losses, 'otlosses': otlosses, 'points': points, 'goalsfor': goalsfor, 'goalsagainst': goalsagainst, "gp": gp, "winperc": winperc, "ppperc": ppperc, "lastten": lastten, "streak": streak})
 
 def get_scoreboard():
     data = Game.objects.filter(season_num=seasonSetting).order_by("-played_time")[:15]
