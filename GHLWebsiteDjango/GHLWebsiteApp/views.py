@@ -8,6 +8,9 @@ import random, json
 
 seasonSetting = 1 # Current season in GHL
 
+def get_seasonSetting():
+    return seasonSetting
+
 def calculate_leaders():
     Leader.objects.all().delete()
     skatergames = SkaterRecord.objects.filter(game_num__season_num=seasonSetting)
