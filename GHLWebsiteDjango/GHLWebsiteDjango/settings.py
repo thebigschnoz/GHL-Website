@@ -135,3 +135,6 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ]
 }
+
+DATETIME_FORMAT = "U"
+DATETIME_INPUT_FORMATS = ("%s",)
