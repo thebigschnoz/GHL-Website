@@ -1,6 +1,3 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client'
-
 class ESPN extends React.Component {
     render() {
       return (
