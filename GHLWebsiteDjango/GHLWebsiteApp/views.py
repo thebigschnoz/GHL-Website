@@ -260,7 +260,28 @@ def game(request, game):
     h_team_standing = Standing.objects.filter(team=gamenum.h_team_num.ea_club_num, season=seasonSetting)
     a_team_record = TeamRecord.objects.filter(game_num=gamenum.game_num, ea_club_num=gamenum.a_team_num.ea_club_num)
     h_team_record = TeamRecord.objects.filter(game_num=gamenum.game_num, ea_club_num=gamenum.h_team_num.ea_club_num)
-    context = {"game": gamenum, "a_skater_records": a_skater_records, "h_skater_records": h_skater_records, "a_goalie_records": a_goalie_records, "h_goalie_records": h_goalie_records, "a_team_standing": a_team_standing, "h_team_standing": h_team_standing, "a_team_record": a_team_record, "h_team_record": h_team_record, "scoreboard": get_scoreboard()}
+    a_team_toa_formatted = h_team_toa_formatted = "0:00"
+    if a_team_record:
+        a_team_min = a_team_record[0].toa_team // 60
+        a_team_sec = a_team_record[0].toa_team % 60
+        a_team_toa_formatted = f"{a_team_min}:{a_team_sec:02d}"
+    if h_team_record:
+        h_team_min = h_team_record[0].toa_team // 60
+        h_team_sec = h_team_record[0].toa_team % 60
+        h_team_toa_formatted = f"{h_team_min}:{h_team_sec:02d}"
+    print(a_team_record)
+    context = {"game": gamenum,
+               "a_skater_records": a_skater_records,
+               "h_skater_records": h_skater_records,
+               "a_goalie_records": a_goalie_records,
+               "h_goalie_records": h_goalie_records,
+               "a_team_standing": a_team_standing,
+               "h_team_standing": h_team_standing,
+               "a_team_record": a_team_record,
+               "h_team_record": h_team_record,
+               "a_team_toa": a_team_toa_formatted,
+               "h_team_toa": h_team_toa_formatted,
+               "scoreboard": get_scoreboard()}
     return render(request, "GHLWebsiteApp/game.html", context)
 
 def player(request, player):

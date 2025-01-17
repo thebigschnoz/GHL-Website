@@ -64,45 +64,45 @@
         <div style="display:table;margin:0 auto;width:30%; margin-bottom: 20px;">
 
             <div style="display: table-row;">
-                <div style="display:table-cell;text-align:right;width:15%;"><strong>{{ a_team_record.sog_team }}</strong></div>
+                <div style="display:table-cell;text-align:right;width:15%;"><strong>{{ a_team_record.first.sog_team }}</strong></div>
                 <div style="display:table-cell;text-align:center;width:70%;"><strong>SHOTS</strong></div>
-                <div style="display:table-cell;text-align:left;width:15%;"><strong>{{ h_team_record.sog_team }}</strong></div>
+                <div style="display:table-cell;text-align:left;width:15%;"><strong>{{ h_team_record.first.sog_team }}</strong></div>
             </div>
 
             <div style="display: table-row;">
-                <div style="display:table-cell;text-align:right;width:15%;"><strong>{{ a_team_record.hits_team }}</strong></div>
+                <div style="display:table-cell;text-align:right;width:15%;"><strong>{{ a_team_record.first.hits_team }}</strong></div>
                 <div style="display:table-cell;text-align:center;width:70%;"><strong>HITS</strong></div>
-                <div style="display:table-cell;text-align:left;width:15%;"><strong>{{ h_team_record.hits_team }}</strong></div>
+                <div style="display:table-cell;text-align:left;width:15%;"><strong>{{ h_team_record.first.hits_team }}</strong></div>
             </div>
         
             <div style="display: table-row;">
-                <div style="display:table-cell;text-align:right;width:15%;"><strong>{{ a_team_record.toa_team|time:"i:s" }}</strong></div>
+                <div style="display:table-cell;text-align:right;width:15%;"><strong>{{ a_team_toa }}</strong></div>
                 <div style="display:table-cell;text-align:center;width:70%;"><strong>TIME ON ATTACK</strong></div>
-                <div style="display:table-cell;text-align:left;width:15%;"><strong>{{ h_team_record.toa_team|time:"i:s" }}</strong></div>
+                <div style="display:table-cell;text-align:left;width:15%;"><strong>{{ h_team_toa }}</strong></div>
             </div>
             
             <div style="display: table-row;">
-                <div style="display:table-cell;text-align:right;width:15%;"><strong><span title="" data-original-title="0%">{{ a_team_record.pass_comp_team }} / {{ a_team_record.pass_att_team }}</span></strong></div>
+                <div style="display:table-cell;text-align:right;width:15%;"><strong><span title="" data-original-title="0%">{{ a_team_record.first.pass_comp_team }} / {{ a_team_record.first.pass_att_team }}</span></strong></div>
                 <div style="display:table-cell;text-align:center;width:70%;"><strong>PASSING</strong></div>
-                <div style="display:table-cell;text-align:left;width:15%;"><strong><span title="" data-original-title="100%">{{ h_team_record.pass_comp_team }} / {{ h_team_record.pass_att_team }}</span></strong></div>
+                <div style="display:table-cell;text-align:left;width:15%;"><strong><span title="" data-original-title="100%">{{ h_team_record.first.pass_comp_team }} / {{ h_team_record.first.pass_att_team }}</span></strong></div>
             </div>
 
             <div style="display: table-row;">
-                <div style="display:table-cell;text-align:right;width:15%;"><strong>{{ a_team_record.fow_team }}</strong></div>
+                <div style="display:table-cell;text-align:right;width:15%;"><strong>{{ a_team_record.first.fow_team }}</strong></div>
                 <div style="display:table-cell;text-align:center;width:70%;"><strong>FACEOFFS</strong></div>
-                <div style="display:table-cell;text-align:left;width:15%;"><strong>{{ h_team_record.fow_team }}</strong></div>
+                <div style="display:table-cell;text-align:left;width:15%;"><strong>{{ h_team_record.first.fow_team }}</strong></div>
             </div>
 
             <div style="display: table-row;">
-                <div style="display:table-cell;text-align:right;width:15%;"><strong>{{ a_team_record.pims_team }}</strong></div>
+                <div style="display:table-cell;text-align:right;width:15%;"><strong>{{ a_team_record.first.pims_team }}</strong></div>
                 <div style="display:table-cell;text-align:center;width:70%;"><strong>PENALTY MINUTES</strong></div>
-                <div style="display:table-cell;text-align:left;width:15%;"><strong>{{ h_team_record.pims_team }}</strong></div>
+                <div style="display:table-cell;text-align:left;width:15%;"><strong>{{ h_team_record.first.pims_team }}</strong></div>
             </div>
 
             <div style="display: table-row;">
-                <div style="display:table-cell;text-align:right;width:15%;"><strong><span title="" data-original-title="0%">{{ a_team_record.ppg_team }} / {{ a_team_record.ppo_team }}</span></strong></div>
+                <div style="display:table-cell;text-align:right;width:15%;"><strong><span title="" data-original-title="0%">{{ a_team_record.first.ppg_team }} / {{ a_team_record.first.ppo_team }}</span></strong></div>
                 <div style="display:table-cell;text-align:center;width:70%;"><strong>POWERPLAYS</strong></div>
-                <div style="display:table-cell;text-align:left;width:15%;"><strong><span title="" data-original-title="100%">{{ h_team_record.ppg_team }} / {{ h_team_record.ppo_team }}</span></strong></div>
+                <div style="display:table-cell;text-align:left;width:15%;"><strong><span title="" data-original-title="100%">{{ h_team_record.first.ppg_team }} / {{ h_team_record.first.ppo_team }}</span></strong></div>
             </div>
     
 
