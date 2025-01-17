@@ -250,9 +250,22 @@ def team(request, team):
     context = {"team": teamnum, "scoreboard": get_scoreboard()}
     return render(request, "GHLWebsiteApp/team.html", context)
 
+def game(request, game):
+    gamenum = get_object_or_404(Game, pk=game)
+    a_skater_records = SkaterRecord.objects.filter(game_num=gamenum.game_num, ea_club_num=gamenum.a_team_num.ea_club_num).exclude(position="0")
+    h_skater_records = SkaterRecord.objects.filter(game_num=gamenum.game_num, ea_club_num=gamenum.h_team_num.ea_club_num).exclude(position="0")
+    a_goalie_records = GoalieRecord.objects.filter(game_num=gamenum.game_num, ea_club_num=gamenum.a_team_num.ea_club_num)
+    h_goalie_records = GoalieRecord.objects.filter(game_num=gamenum.game_num, ea_club_num=gamenum.h_team_num.ea_club_num)
+    a_team_standing = Standing.objects.filter(team=gamenum.a_team_num.ea_club_num, season=seasonSetting)
+    h_team_standing = Standing.objects.filter(team=gamenum.h_team_num.ea_club_num, season=seasonSetting)
+    a_team_record = TeamRecord.objects.filter(game_num=gamenum.game_num, ea_club_num=gamenum.a_team_num.ea_club_num)
+    h_team_record = TeamRecord.objects.filter(game_num=gamenum.game_num, ea_club_num=gamenum.h_team_num.ea_club_num)
+    context = {"game": gamenum, "a_skater_records": a_skater_records, "h_skater_records": h_skater_records, "a_goalie_records": a_goalie_records, "h_goalie_records": h_goalie_records, "a_team_standing": a_team_standing, "h_team_standing": h_team_standing, "a_team_record": a_team_record, "h_team_record": h_team_record, "scoreboard": get_scoreboard()}
+    return render(request, "GHLWebsiteApp/game.html", context)
+
 def player(request, player):
     playernum = get_object_or_404(Player, pk=player)
-    allskatergames = playernum.skaterrecord_set.filter(game_num__season_num=seasonSetting)
+    allskatergames = playernum.skaterrecord_set.filter(game_num__season_num=seasonSetting).exclude(position="0")
     if not allskatergames:
         sk_gp = sk_g = sk_a = sk_hits = sk_plus_minus = sk_sog = sk_shot_att = sk_ppg = sk_shg = sk_pass_att = sk_pass_comp = sk_bs = sk_tk = sk_int = sk_gva = sk_pens_drawn = sk_pims = sk_pk_clears = sk_poss_time = sk_sht_perc = sk_sht_eff = sk_pass_perc = sk_fo_perc = sk_fow = sk_fol = 0
     else:

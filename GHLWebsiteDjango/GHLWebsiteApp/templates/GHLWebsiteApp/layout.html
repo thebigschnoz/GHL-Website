@@ -20,33 +20,35 @@
 		{% if forloop.first %}
 		<div class="scoreboard__container">
 		{% endif %}
-			<div class="game__container">
-				<div class="game__top-bar">
-					<span class="game__time">{{ game.expected_time|date:"D M j" }}, {{ game.expected_time|time:"g:i" }}</span>
-				</div>
-				<div class="info-split">
-					<div class="team__container">
-						{% if game.a_team_gf > game.h_team_gf %}
-						<div class="team">
-						{% else%}
-						<div class="team losing-team">
-						{% endif %}
-							<img class="team__logo" src="{{ game.a_team_num.team_logo_link }}" />
-							<p class="team__name">{{ game.a_team_num.club_abbr }}</p>
-							<p class="team__score">{{ game.a_team_gf }}</p>
-						</div>
-						{% if game.h_team_gf > game.a_team_gf %}
-						<div class="team">
-						{% else %}
-						<div class="team losing-team">
-						{% endif %}
-							<img class="team__logo" src="{{ game.h_team_num.team_logo_link }}" />
-							<p class="team__name">{{ game.h_team_num.club_abbr }}</p>
-							<p class="team__score">{{ game.h_team_gf }}</p>
+			<a href="{% url 'game' game.game_num %}">
+				<div class="game__container">
+					<div class="game__top-bar">
+						<span class="game__time">{{ game.expected_time|date:"D M j" }}, {{ game.expected_time|time:"g:i" }}</span>
+					</div>
+					<div class="info-split">
+						<div class="team__container">
+							{% if game.a_team_gf > game.h_team_gf %}
+							<div class="team">
+							{% else%}
+							<div class="team losing-team">
+							{% endif %}
+								<img class="team__logo" src="{{ game.a_team_num.team_logo_link }}" />
+								<p class="team__name">{{ game.a_team_num.club_abbr }}</p>
+								<p class="team__score">{{ game.a_team_gf }}</p>
+							</div>
+							{% if game.h_team_gf > game.a_team_gf %}
+							<div class="team">
+							{% else %}
+							<div class="team losing-team">
+							{% endif %}
+								<img class="team__logo" src="{{ game.h_team_num.team_logo_link }}" />
+								<p class="team__name">{{ game.h_team_num.club_abbr }}</p>
+								<p class="team__score">{{ game.h_team_gf }}</p>
+							</div>
 						</div>
 					</div>
 				</div>
-			</div>
+			</a>
 		{% if forloop.last %}
 		</div>
 		{% endif %}

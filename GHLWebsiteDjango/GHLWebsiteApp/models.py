@@ -1,4 +1,5 @@
 from django.db import models
+from decimal import *
 
 class Season(models.Model):
     season_num = models.AutoField(primary_key=True)
@@ -100,14 +101,44 @@ class SkaterRecord(models.Model):
     poss_time = models.PositiveSmallIntegerField(default="0")
     fow = models.PositiveSmallIntegerField(default="0")
     fol = models.PositiveSmallIntegerField(default="0")
+    shot_pct = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    shot_eff = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    pass_pct = models.DecimalField(max_digits=5, decimal_places=2, default=0)
 
     @property
     def pointscalc(self):
         totalpoints = self.goals + self.assists
         return totalpoints
     
+    @property
+    def shotpctcalc(self):
+        if self.shot_attempts > 0:
+            shotpct = (self.goals / self.shot_attempts) * 100
+            return shotpct
+        else:
+            return Decimal("0")
+        
+    @property
+    def shoteffcalc(self):
+        if self.shot_attempts > 0:
+            shoteff = (self.sog / self.shot_attempts) * 100
+            return shoteff
+        else:
+            return Decimal("0")
+        
+    @property
+    def passpctcalc(self):
+        if self.pass_att > 0:
+            passpct = (self.pass_comp / self.pass_att) * 100
+            return passpct
+        else:
+            return Decimal("0")
+    
     def save(self, *args, **kwargs):
         self.points = self.pointscalc
+        self.shot_pct = self.shotpctcalc
+        self.shot_eff = self.shoteffcalc
+        self.pass_pct = self.passpctcalc
         super(SkaterRecord, self).save(*args, **kwargs)
 
     def __str__(self):
@@ -119,6 +150,8 @@ class GoalieRecord(models.Model):
     ea_club_num = models.ForeignKey(Team, on_delete = models.CASCADE)
     shots_against = models.PositiveSmallIntegerField(default="0")
     saves = models.PositiveSmallIntegerField(default="0")
+    save_pct = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    gaa = models.DecimalField(max_digits=4, decimal_places=2, default=0)
     win = models.BooleanField(default="0")
     loss = models.BooleanField(default="0")
     otloss = models.BooleanField(default="0")
@@ -179,12 +212,30 @@ class GoalieRecord(models.Model):
             return 1
         else:
             return 0
+        
+    @property
+    def savepctcalc(self):
+        if self.shots_against > 0:
+            savepct = (self.saves / self.shots_against) * 100
+            return savepct
+        else:
+            return 0
+    
+    @property
+    def gaacalc(self):
+        if self.shots_against > 0:
+            gaa = Decimal(((self.shots_against - self.saves) * 3600) / self.game_num.gamelength)
+            return gaa
+        else:
+            return 0
     
     def save(self, *args, **kwargs):
         self.win = self.wincalc
         self.loss = self.losscalc
         self.otloss = self.otlosscalc
         self.shutout = self.shutoutcalc
+        self.save_pct = self.savepctcalc
+        self.gaa = self.gaacalc
         super(GoalieRecord, self).save(*args, **kwargs)
 
     def __str__(self):

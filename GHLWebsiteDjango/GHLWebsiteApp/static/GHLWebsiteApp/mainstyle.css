@@ -70,6 +70,10 @@ table.statsbar tr.statline td {
   padding-top: 6px;
 }
 
+table.betweenrows tr {
+  border: 1px solid white;
+}
+
 table {
   border-width: 0px;
   border-spacing: 15px;

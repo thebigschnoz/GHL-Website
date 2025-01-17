@@ -1,0 +1,411 @@
+{% extends "GHLWebsiteApp/layout.html" %}
+{% load static %}
+{% block body %}
+<center>
+    <div class="section section_lg"><center>
+        <div>
+            <table width=50%>
+                <colgroup>
+                    <col style="width: 50%;">
+                    <col style="margin:0 20px;">
+                    <col style="width: 50%;">
+                </colgroup>
+                <tr class="no-bg">
+                    <td><center>
+                        <img src="{{ game.a_team_num.team_logo_link }}" width=120 height=120 />
+                        <div style="display:table-cell;vertical-align:top;width:70%;align-self: right;">
+                            <spanstyle="color:#777777;"><i>Away</i></span>
+                            <div style="height:15px; font-size:12px;">{{ game.a_team_num.club_abbr }}</div>
+                            <a href="{% url 'team' game.a_team_num.ea_club_num %}"><span style="font-size: 28px; white-space: nowrap;">{{ game.a_team_num.club_full_name }}</span></a><br>
+                            {% if not a_team_standing %}
+                            <span>(0-0-0)</span>
+                            {% else %}
+                            <span>({{a_team_standing.first.wins}}-{{a_team_standing.first.losses}}-{{a_team_standing.first.otlosses}})</span>
+                            {% endif %}
+                        </div>
+                    </center></td>
+                    <td>
+                        <center>
+                            {% if game.gamelength > 3600 %}
+                            <span style="font-weight: 400; font-size: 32px">Final/OT</span>
+                            {% else %}
+                            <span style="font-weight: 400; font-size: 32px">Final</span>
+                            {% endif %}
+                            <div style="width: 100%; display: table;">
+                                <div style="display:table-cell;text-align:right;width:37%; font-size:32px">
+                                    <strong>{{ game.a_team_gf }}</strong>
+                                </div>
+            
+                                <div style="display:table-cell;text-align:center;width:26%; font-size:32px">
+                                    <strong>-</strong>
+                                </div>
+                                <div style="display:table-cell;text-align:left;width:37%; font-size:32px">
+                                    <strong>{{ game.h_team_gf }}</strong>
+                                </div>
+                            </div>
+                        </center>
+                    </td>
+                    <td><center>
+                        <img src="{{ game.h_team_num.team_logo_link }}" width=120 height=120 />
+                        <div style="display:table-cell;vertical-align:top;width:70%;">
+                            <spanstyle="color:#777777;"><i>Home</i></span>
+                            <div style="height:15px; font-size:12px;">{{ game.h_team_num.club_abbr }}</div>
+                            <a href="{% url 'team' game.h_team_num.ea_club_num %}"><span style="font-size: 28px; white-space: nowrap;">{{ game.h_team_num.club_full_name }}</span></a><br>
+                            {% if not h_team_standing %}
+                            <span>(0-0-0)</span>
+                            {% else %}
+                            <span>({{h_team_standing.first.wins}}-{{h_team_standing.first.losses}}-{{h_team_standing.first.otlosses}})</span>
+                            {% endif %}
+                        </div>
+                    </center></td>
+                </tr>
+            </table>
+        </div>
+        <div style="display:table;margin:0 auto;width:30%; margin-bottom: 20px;">
+
+            <div style="display: table-row;">
+                <div style="display:table-cell;text-align:right;width:15%;"><strong>{{ a_team_record.sog_team }}</strong></div>
+                <div style="display:table-cell;text-align:center;width:70%;"><strong>SHOTS</strong></div>
+                <div style="display:table-cell;text-align:left;width:15%;"><strong>{{ h_team_record.sog_team }}</strong></div>
+            </div>
+
+            <div style="display: table-row;">
+                <div style="display:table-cell;text-align:right;width:15%;"><strong>{{ a_team_record.hits_team }}</strong></div>
+                <div style="display:table-cell;text-align:center;width:70%;"><strong>HITS</strong></div>
+                <div style="display:table-cell;text-align:left;width:15%;"><strong>{{ h_team_record.hits_team }}</strong></div>
+            </div>
+        
+            <div style="display: table-row;">
+                <div style="display:table-cell;text-align:right;width:15%;"><strong>{{ a_team_record.toa_team|time:"i:s" }}</strong></div>
+                <div style="display:table-cell;text-align:center;width:70%;"><strong>TIME ON ATTACK</strong></div>
+                <div style="display:table-cell;text-align:left;width:15%;"><strong>{{ h_team_record.toa_team|time:"i:s" }}</strong></div>
+            </div>
+            
+            <div style="display: table-row;">
+                <div style="display:table-cell;text-align:right;width:15%;"><strong><span title="" data-original-title="0%">{{ a_team_record.pass_comp_team }} / {{ a_team_record.pass_att_team }}</span></strong></div>
+                <div style="display:table-cell;text-align:center;width:70%;"><strong>PASSING</strong></div>
+                <div style="display:table-cell;text-align:left;width:15%;"><strong><span title="" data-original-title="100%">{{ h_team_record.pass_comp_team }} / {{ h_team_record.pass_att_team }}</span></strong></div>
+            </div>
+
+            <div style="display: table-row;">
+                <div style="display:table-cell;text-align:right;width:15%;"><strong>{{ a_team_record.fow_team }}</strong></div>
+                <div style="display:table-cell;text-align:center;width:70%;"><strong>FACEOFFS</strong></div>
+                <div style="display:table-cell;text-align:left;width:15%;"><strong>{{ h_team_record.fow_team }}</strong></div>
+            </div>
+
+            <div style="display: table-row;">
+                <div style="display:table-cell;text-align:right;width:15%;"><strong>{{ a_team_record.pims_team }}</strong></div>
+                <div style="display:table-cell;text-align:center;width:70%;"><strong>PENALTY MINUTES</strong></div>
+                <div style="display:table-cell;text-align:left;width:15%;"><strong>{{ h_team_record.pims_team }}</strong></div>
+            </div>
+
+            <div style="display: table-row;">
+                <div style="display:table-cell;text-align:right;width:15%;"><strong><span title="" data-original-title="0%">{{ a_team_record.ppg_team }} / {{ a_team_record.ppo_team }}</span></strong></div>
+                <div style="display:table-cell;text-align:center;width:70%;"><strong>POWERPLAYS</strong></div>
+                <div style="display:table-cell;text-align:left;width:15%;"><strong><span title="" data-original-title="100%">{{ h_team_record.ppg_team }} / {{ h_team_record.ppo_team }}</span></strong></div>
+            </div>
+    
+
+    
+        </div>
+        <div id="divider"></div>
+        <div class="header">{{ game.a_team_num.club_full_name }}</div>
+        <div class="section_lg" style="align-items: auto; width: 90%; overflow: scroll; margin-bottom: 10px;"><center>
+            <table class="statsbar betweenrows">
+                <col style="width: 240px;"><!-- Player -->
+                <col style="width: 80px;"><!-- Pos -->
+                <col style="width: 80px;"><!-- Build -->
+                <col style="width: 80px;"><!-- G -->
+                <col style="width: 80px;"><!-- A -->
+                <col style="width: 80px;"><!-- PTS -->
+                <col style="width: 80px;"><!-- S -->
+                <col style="width: 80px;"><!-- S% -->
+                <col style="width: 80px;"><!-- Shot Eff -->
+                <col style="width: 80px;"><!-- Deflections -->
+                <col style="width: 80px;"><!-- PIM -->
+                <col style="width: 80px;"><!-- +/- -->
+                <col style="width: 80px;"><!-- HITS -->
+                <col style="width: 80px;"><!-- FOW -->
+                <col style="width: 80px;"><!-- FOL -->
+                <col style="width: 80px;"><!-- BS -->
+                <col style="width: 80px;"><!-- INT -->
+                <col style="width: 80px;"><!-- GVA -->
+                <col style="width: 80px;"><!-- TKA -->
+                <col style="width: 80px;"><!-- Pens Drawn -->
+                <col style="width: 80px;"><!-- PK Clears -->
+                <col style="width: 80px;"><!-- PPG -->
+                <col style="width: 80px;"><!-- SHG -->
+                <col style="width: 80px;"><!-- Pass% -->
+                <col style="width: 80px;"><!-- Poss Time -->
+                <thead>
+                    <tr>
+                        <th>Player</th>
+                        <th>Pos</th>
+                        <th>Build</th>
+                        <th>G</th>
+                        <th>A</th>
+                        <th>PTS</th>
+                        <th>S</th>
+                        <th>S%</th>
+                        <th>Shot Eff</th>
+                        <th>Dflct</th>
+                        <th>PIM</th>
+                        <th>+/-</th>
+                        <th>HITS</th>
+                        <th>FOW</th>
+                        <th>FOL</th>
+                        <th>BS</th>
+                        <th>INT</th>
+                        <th>GVA</th>
+                        <th>TKA</th>
+                        <th>Pens Drawn</th>
+                        <th>PK Clears</th>
+                        <th>PPG</th>
+                        <th>SHG</th>
+                        <th>Pass%</th>
+                        <th>Poss (sec)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for player in a_skater_records %}
+                    <tr class="no-bg">
+                        <td><a href="{% url 'player' player.ea_player_num.ea_player_num %}">{{ player.ea_player_num }}</a></td>
+                        <td>{{player.position}}</td>
+                        <td>{{player.build}}</td>
+                        <td>{{player.goals}}</td>
+                        <td>{{player.assists}}</td>
+                        <td>{{player.points}}</td>
+                        <td>{{player.sog}}</td>
+                        <td>{{player.shot_pct|floatformat:1}}%</td><!-- needs calculation -->
+                        <td>{{player.shot_eff|floatformat:1}}%</td><!-- needs calculation -->
+                        <td>{{player.deflections}}</td>
+                        <td>{{player.pims}}</td>
+                        <td>{{player.plus_minus}}</td>
+                        <td>{{player.hits}}</td>
+                        <td>{{player.fow}}</td>
+                        <td>{{player.fol}}</td>
+                        <td>{{player.blocked_shots}}</td>
+                        <td>{{player.interceptions}}</td>
+                        <td>{{player.giveaways}}</td>
+                        <td>{{player.takeaways}}</td>
+                        <td>{{player.pens_drawn}}</td>
+                        <td>{{player.pk_clears}}</td>
+                        <td>{{player.ppg}}</td>
+                        <td>{{player.shg}}</td>
+                        <td>{{player.pass_pct|floatformat:1}}%</td><!-- needs calculation -->
+                        <td>{{player.poss_time}}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan=25>No skater stats recorded. This shouldn't happen. Please contact the administrator.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </center></div>
+        <div class="section_lg" style="align-items: auto; width: 90%; overflow: scroll; margin-bottom: 10px;"><center>
+            <table class="statsbar betweenrows">
+                <col style="width: 240px;"><!-- Player -->
+                <col style="width: 80px;"><!-- Shots Against -->
+                <col style="width: 80px;"><!-- Saves -->
+                <col style="width: 80px;"><!-- SV% -->
+                <col style="width: 80px;"><!-- GAA -->
+                <col style="width: 80px;"><!-- Shutout -->
+                <col style="width: 80px;"><!-- Win -->
+                <col style="width: 80px;"><!-- Loss -->
+                <col style="width: 80px;"><!-- Breakaway Shots Against -->
+                <col style="width: 80px;"><!-- Breakaway Saves -->
+                <col style="width: 80px;"><!-- Penalty Shots Against -->
+                <col style="width: 80px;"><!-- Penalty Shot Saves -->
+                <thead>
+                    <tr>
+                        <th>Goalie</th>
+                        <th>Shots Against</th>
+                        <th>Saves</th>
+                        <th>SV%</th>
+                        <th>GAA</th>
+                        <th>Shutout</th>
+                        <th>Win</th>
+                        <th>Loss</th>
+                        <th>Breakaway SA</th>
+                        <th>Breakaway SV</th>
+                        <th>PS SA</th>
+                        <th>PS SV</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for player in a_goalie_records %}
+                    <tr class="no-bg">
+                        <td><a href="{% url 'player' player.ea_player_num.ea_player_num %}">{{ player.ea_player_num }}</a></td>
+                        <td>{{player.shots_against}}</td>
+                        <td>{{player.saves}}</td>
+                        <td>{{player.save_pct|floatformat:1}}%</td>
+                        <td>{{player.gaa|floatformat:2}}</td>
+                        <td>{{player.shutout}}</td><!-- needs calculation -->
+                        <td>{{player.win}}</td><!-- needs calculation -->
+                        <td>{{player.loss}}</td>
+                        <td>{{player.breakaway_shots}}</td>
+                        <td>{{player.breakaway_saves}}</td>
+                        <td>{{player.ps_shots}}</td>
+                        <td>{{player.ps_saves}}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan=25>No goalie stats recorded. This shouldn't happen. Please contact the administrator.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </center></div>
+        <div id="divider"></div>
+        <div class="header">{{ game.h_team_num.club_full_name }}</div>
+        <div class="section_lg" style="align-items: auto; width: 90%; overflow: scroll; margin-bottom: 10px;"><center>
+            <table class="statsbar betweenrows">
+                <col style="width: 240px;"><!-- Player -->
+                <col style="width: 80px;"><!-- Pos -->
+                <col style="width: 80px;"><!-- Build -->
+                <col style="width: 80px;"><!-- G -->
+                <col style="width: 80px;"><!-- A -->
+                <col style="width: 80px;"><!-- PTS -->
+                <col style="width: 80px;"><!-- S -->
+                <col style="width: 80px;"><!-- S% -->
+                <col style="width: 80px;"><!-- Shot Eff -->
+                <col style="width: 80px;"><!-- Deflections -->
+                <col style="width: 80px;"><!-- PIM -->
+                <col style="width: 80px;"><!-- +/- -->
+                <col style="width: 80px;"><!-- HITS -->
+                <col style="width: 80px;"><!-- FOW -->
+                <col style="width: 80px;"><!-- FOL -->
+                <col style="width: 80px;"><!-- BS -->
+                <col style="width: 80px;"><!-- INT -->
+                <col style="width: 80px;"><!-- GVA -->
+                <col style="width: 80px;"><!-- TKA -->
+                <col style="width: 80px;"><!-- Pens Drawn -->
+                <col style="width: 80px;"><!-- PK Clears -->
+                <col style="width: 80px;"><!-- PPG -->
+                <col style="width: 80px;"><!-- SHG -->
+                <col style="width: 80px;"><!-- Pass% -->
+                <col style="width: 80px;"><!-- Poss Time -->
+                <thead>
+                    <tr>
+                        <th>Player</th>
+                        <th>Pos</th>
+                        <th>Build</th>
+                        <th>G</th>
+                        <th>A</th>
+                        <th>PTS</th>
+                        <th>S</th>
+                        <th>S%</th>
+                        <th>Shot Eff</th>
+                        <th>Dflct</th>
+                        <th>PIM</th>
+                        <th>+/-</th>
+                        <th>HITS</th>
+                        <th>FOW</th>
+                        <th>FOL</th>
+                        <th>BS</th>
+                        <th>INT</th>
+                        <th>GVA</th>
+                        <th>TKA</th>
+                        <th>Pens Drawn</th>
+                        <th>PK Clears</th>
+                        <th>PPG</th>
+                        <th>SHG</th>
+                        <th>Pass%</th>
+                        <th>Poss (sec)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for player in h_skater_records %}
+                    <tr class="no-bg">
+                        <td><a href="{% url 'player' player.ea_player_num.ea_player_num %}">{{ player.ea_player_num }}</a></td>
+                        <td>{{player.position}}</td>
+                        <td>{{player.build}}</td>
+                        <td>{{player.goals}}</td>
+                        <td>{{player.assists}}</td>
+                        <td>{{player.points}}</td>
+                        <td>{{player.sog}}</td>
+                        <td>{{player.shot_pct|floatformat:1}}%</td><!-- needs calculation -->
+                        <td>{{player.shot_eff|floatformat:1}}%</td><!-- needs calculation -->
+                        <td>{{player.deflections}}</td>
+                        <td>{{player.pims}}</td>
+                        <td>{{player.plus_minus}}</td>
+                        <td>{{player.hits}}</td>
+                        <td>{{player.fow}}</td>
+                        <td>{{player.fol}}</td>
+                        <td>{{player.blocked_shots}}</td>
+                        <td>{{player.interceptions}}</td>
+                        <td>{{player.giveaways}}</td>
+                        <td>{{player.takeaways}}</td>
+                        <td>{{player.pens_drawn}}</td>
+                        <td>{{player.pk_clears}}</td>
+                        <td>{{player.ppg}}</td>
+                        <td>{{player.shg}}</td>
+                        <td>{{player.pass_pct|floatformat:1}}%</td><!-- needs calculation -->
+                        <td>{{player.poss_time}}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan=25>No skater stats recorded. This shouldn't happen. Please contact the administrator.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </center></div>
+        <div class="section_lg" style="align-items: auto; width: 90%; overflow: scroll; margin-bottom: 10px;"><center>
+            <table class="statsbar betweenrows">
+                <col style="width: 240px;"><!-- Player -->
+                <col style="width: 80px;"><!-- Shots Against -->
+                <col style="width: 80px;"><!-- Saves -->
+                <col style="width: 80px;"><!-- SV% -->
+                <col style="width: 80px;"><!-- GAA -->
+                <col style="width: 80px;"><!-- Shutout -->
+                <col style="width: 80px;"><!-- Win -->
+                <col style="width: 80px;"><!-- Loss -->
+                <col style="width: 80px;"><!-- Breakaway Shots Against -->
+                <col style="width: 80px;"><!-- Breakaway Saves -->
+                <col style="width: 80px;"><!-- Penalty Shots Against -->
+                <col style="width: 80px;"><!-- Penalty Shot Saves -->
+                <thead>
+                    <tr>
+                        <th>Goalie</th>
+                        <th>Shots Against</th>
+                        <th>Saves</th>
+                        <th>SV%</th>
+                        <th>GAA</th>
+                        <th>Shutout</th>
+                        <th>Win</th>
+                        <th>Loss</th>
+                        <th>Breakaway SA</th>
+                        <th>Breakaway SV</th>
+                        <th>PS SA</th>
+                        <th>PS SV</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for player in h_goalie_records %}
+                    <tr class="no-bg">
+                        <td><a href="{% url 'player' player.ea_player_num.ea_player_num %}">{{ player.ea_player_num }}</a></td>
+                        <td>{{player.shots_against}}</td>
+                        <td>{{player.saves}}</td>
+                        <td>{{player.save_pct|floatformat:1}}%</td>
+                        <td>{{player.gaa|floatformat:2}}</td>
+                        <td>{{player.shutout}}</td><!-- needs calculation -->
+                        <td>{{player.win}}</td><!-- needs calculation -->
+                        <td>{{player.loss}}</td>
+                        <td>{{player.breakaway_shots}}</td>
+                        <td>{{player.breakaway_saves}}</td>
+                        <td>{{player.ps_shots}}</td>
+                        <td>{{player.ps_saves}}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan=25>No goalie stats recorded. This shouldn't happen. Please contact the administrator.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </center></div>
+    </center></div>
+</center>
+{% endblock %}
