@@ -1,6 +1,6 @@
 from .views import get_seasonSetting
 import requests, json
-from .models import Game, TeamRecord, SkaterRecord, GoalieRecord
+from .models import Game, TeamRecord, SkaterRecord, GoalieRecord, Player
 
 BASE_API_URL = "https://proclubs.ea.com/api/nhl/clubs/gamees?gameType=club_private&platform=common-gen5&clubIds="
 SEASON_SETTING = get_seasonSetting()
@@ -24,7 +24,7 @@ def fetch_and_process_games(team_id):
                 print(f"Skipping game {game['gameId']} due to invalid Game Type")
                 continue
 
-            game_num = game.get("gameId", 0)
+            game_num = game.get("matchId", 0)
 
             # Check if the match already exists
             if Game.objects.filter(game_num=game_num).exists():
@@ -35,7 +35,7 @@ def fetch_and_process_games(team_id):
 
             # Calculate gamelength (max 'toi' from all players)
             gamelength = max(
-                player_data.get("toi", 0)
+                player_data.get("toiseconds", 0)
                 for team_id, team_players in game["players"].items()
                 for player_id, player_data in team_players.items()
             )
@@ -127,7 +127,7 @@ def fetch_and_process_games(team_id):
                     skfow = player_data.get("skfow", 0)
                     skfol = player_data.get("skfol", 0)
 
-                    player_obj, _ = SkaterRecord.objects.update_or_create(
+                    skater_obj, _ = SkaterRecord.objects.update_or_create(
                         ea_player_num=player_id,
                         game_num=game_obj,
                         ea_club_num=team_id,
@@ -158,6 +158,13 @@ def fetch_and_process_games(team_id):
                             "fol": skfol,
                         }
                     )
+
+                    # Update or create Player
+                    player_obj, _ = Player.objects.update_or_create(
+                        ea_player_num=player_id,
+                        defaults={"username": player_data.get("playername", "Username Not Found"),
+                                  "current_team": team_id
+                    })
 
                     # If pos_sorted is 0, add a GoalieRecord
                     if pos_sorted == 0:
