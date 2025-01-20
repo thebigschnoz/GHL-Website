@@ -247,7 +247,63 @@ def goalies(request):
 
 def team(request, team):
     teamnum = get_object_or_404(Team, pk=team)
-    context = {"team": teamnum, "scoreboard": get_scoreboard()}
+    skaterrecords = SkaterRecord.objects.filter(ea_club_num=teamnum.ea_club_num, game_num__season_num=seasonSetting).exclude(position="0").annotate(
+        skatersgp=Count("game_num"),
+        skatersgoals=Sum("goals"),
+        skatersassists=Sum("assists"),
+        skaterspoints=Sum("points"),
+        skaterssog=Sum("sog"),
+        skatersdeflections=Sum("deflections"),
+        skatersplusminus=Sum("plus_minus"),
+        skatershits=Sum("hits"),
+        skaterspims=Sum("pims"),
+        skatersfow=Sum("fow"),
+        skatersfol=Sum("fol"),
+        skatersposs=Avg("poss_time"),
+        skatersbs=Avg("blocked_shots"),
+        skatersint=Sum("interceptions"),
+        skatersgva=Sum("giveaways"),
+        skaterstakeaways=Sum("takeaways"),
+        skaterspensdrawn=Sum("pens_drawn"),
+        skaterspkclears=Sum("pk_clears"),
+        skatersppg=Sum("ppg"),
+        skatersshg=Sum("shg"),
+        skatersshotperc=Cast(Sum("goals"), models.FloatField())/Cast(Sum("sog"), models.FloatField())*100,
+        skatersshoteffperc=Cast(Sum("sog"), models.FloatField())/Cast(Sum("shot_attempts"), models.FloatField())*100,
+        skaterspassperc=Cast(Sum("pass_comp"), models.FloatField())/Cast(Sum("pass_att"), models.FloatField())*100,
+    ).order_by("ea_player_num")
+    goalierecords = GoalieRecord.objects.filter(ea_club_num=teamnum.ea_club_num, game_num__season_num=seasonSetting).annotate(
+        goaliesgp = Count("game_num"),
+        goaliesshots = Sum("shots_against"),
+        goaliessaves = Sum("saves"),
+        goaliessvp = (Cast(Sum("saves"), models.FloatField())/Cast(Sum("shots_against"), models.FloatField()))*100,
+        goaliesbashots = Sum("breakaway_shots"),
+        goaliesbasaves = Sum("breakaway_saves"),
+        goaliespsshots = Sum("ps_shots"),
+        goaliespssaves = Sum("ps_saves"),
+        goaliesgaa = ((Cast(Sum("shots_against"), models.FloatField())-Cast(Sum("saves"), models.FloatField()))/Cast(Sum("game_num__gamelength"), models.FloatField()))*3600,
+        goaliesshutouts =Sum(Case(
+            When(shutout=True, then=1),
+            default=0,
+            output_field=models.IntegerField()
+        )),
+        goalieswins = Sum(Case(
+            When(win=True, then=1),
+            default=0,
+            output_field=models.IntegerField()
+        )),
+        goalieslosses = Sum(Case(
+            When(loss=True, then=1),
+            default=0,
+            output_field=models.IntegerField()
+        )),
+        goaliesotlosses = Sum(Case(
+            When(otloss=True, then=1),
+            default=0,
+            output_field=models.IntegerField()
+        )),
+    ).order_by("ea_player_num")
+    context = {"team": teamnum, "scoreboard": get_scoreboard(), "skaterrecords": skaterrecords, "goalierecords": goalierecords}  
     return render(request, "GHLWebsiteApp/team.html", context)
 
 def game(request, game):

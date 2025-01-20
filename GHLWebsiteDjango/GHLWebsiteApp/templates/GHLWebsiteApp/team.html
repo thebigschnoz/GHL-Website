@@ -18,7 +18,7 @@
                                 <form>
                                     <select id="seasonSel" name="season">
                                         <optgroup>
-                                            <option selected value="">Season 0</option>
+                                            <option selected value="">Season Dropdown</option>
                                         </optgroup>
                                     </select>
                                 </form>
@@ -29,106 +29,153 @@
                 </tr>
             </table>
         </div>
-        <div class="subsection-container" style="width: 100%;">
-            <table class="statsbar">
-                <colgroup>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                </colgroup>
+        <div class="section_lg" style="align-items: auto; width: 90%; overflow: scroll; margin-bottom: 10px;"><center>
+            <table class="statsbar betweenrows">
+                <col style="width: 240px;"><!-- Player -->
+                <col style="width: 80px;"><!-- GP -->
+                <col style="width: 80px;"><!-- G -->
+                <col style="width: 80px;"><!-- A -->
+                <col style="width: 80px;"><!-- PTS -->
+                <col style="width: 80px;"><!-- S -->
+                <col style="width: 80px;"><!-- S% -->
+                <col style="width: 80px;"><!-- Shot Eff -->
+                <col style="width: 80px;"><!-- Deflections -->
+                <col style="width: 80px;"><!-- PIM -->
+                <col style="width: 80px;"><!-- +/- -->
+                <col style="width: 80px;"><!-- HITS -->
+                <col style="width: 80px;"><!-- FOW -->
+                <col style="width: 80px;"><!-- FOL -->
+                <col style="width: 80px;"><!-- BS -->
+                <col style="width: 80px;"><!-- INT -->
+                <col style="width: 80px;"><!-- GVA -->
+                <col style="width: 80px;"><!-- TKA -->
+                <col style="width: 80px;"><!-- Pens Drawn -->
+                <col style="width: 80px;"><!-- PK Clears -->
+                <col style="width: 80px;"><!-- PPG -->
+                <col style="width: 80px;"><!-- SHG -->
+                <col style="width: 80px;"><!-- Pass% -->
+                <col style="width: 80px;"><!-- Poss Time -->
                 <thead>
                     <tr>
+                        <th>Player</th>
                         <th>GP</th>
                         <th>G</th>
                         <th>A</th>
-                        <th>P</th>
-                        <th>Hits</th>
+                        <th>PTS</th>
+                        <th>SOG</th>
+                        <th>S%</th>
+                        <th>Shot Eff</th>
+                        <th>Dflct</th>
+                        <th>PIM</th>
                         <th>+/-</th>
-                        <th>PIMs</th>
-                        <th>Drawn</th>
-                        <th>PK Clear</th>
-                        <th>S</th>
-                        <th>S %</th>
-                        <th>S Eff</th>
-                        <th>PPG</th>
-                        <th>SHG</th>
-                        <th>Pass %</th>
+                        <th>HITS</th>
+                        <th>FOW</th>
+                        <th>FOL</th>
                         <th>BS</th>
-                        <th>TK</th>
                         <th>INT</th>
                         <th>GVA</th>
-                        <th>TOP</th>
-                        <th>FO%</th>
+                        <th>TKA</th>
+                        <th>Pens Drawn</th>
+                        <th>PK Clears</th>
+                        <th>PPG</th>
+                        <th>SHG</th>
+                        <th>Pass%</th>
+                        <th>Poss (sec)</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr class="no-bg statline">
-                        <td>{{ sk_gp }}</td>
-                        <td>{{ sk_g }}</td>
-                        <td>{{ sk_a }}</td>
-                        <td>{{ sk_p }}</td>
-                        <td>{{ sk_hits }}</td>
-                        <td>{{ sk_plus_minus }}</td>
-                        <td>{{ sk_pims }}</td>
-                        <td>{{ sk_pens_drawn }}</td>
-                        <td>{{ sk_pk_clears }}</td>
-                        <td>{{ sk_sog }}</td>
-                        <td>{{ sk_sht_perc }}</td>
-                        <td>{{ sk_sht_eff }}</td>
-                        <td>{{ sk_ppg }}</td>
-                        <td>{{ sk_shg }}</td>
-                        <td>{{ sk_pass_perc }}</td>
-                        <td>{{ sk_bs }}</td>
-                        <td>{{ sk_tk }}</td>
-                        <td>{{ sk_int }}</td>
-                        <td>{{ sk_gva }}</td>
-                        <td>{{ sk_poss_time }}</td>
-                        <td>{{ sk_fo_perc }}</td>
+                    {% for player in skaterrecords %}
+                    <tr class="no-bg">
+                        <td><a href="{% url 'player' player.ea_player_num.ea_player_num %}">{{ player.ea_player_num }}</a></td>
+                        <td>{{player.skatersgp}}</td>
+                        <td>{{player.skatersgoals}}</td>
+                        <td>{{player.skatersassists}}</td>
+                        <td>{{player.skaterspoints}}</td>
+                        <td>{{player.skaterssog}}</td>
+                        <td>{{player.skatersshotperc|floatformat:1}}%</td><!-- needs calculation -->
+                        <td>{{player.skatersshoteffperc|floatformat:1}}%</td><!-- needs calculation -->
+                        <td>{{player.skatersdeflections}}</td>
+                        <td>{{player.skaterspims}}</td>
+                        <td>{{player.skatersplusminus}}</td>
+                        <td>{{player.skatershits}}</td>
+                        <td>{{player.skatersfow}}</td>
+                        <td>{{player.skatersfol}}</td>
+                        <td>{{player.skatersbs}}</td>
+                        <td>{{player.skatersint}}</td>
+                        <td>{{player.skatersgva}}</td>
+                        <td>{{player.skaterstakeaways}}</td>
+                        <td>{{player.skaterspensdrawn}}</td>
+                        <td>{{player.skaterspkclears}}</td>
+                        <td>{{player.skatersppg}}</td>
+                        <td>{{player.skatersshg}}</td>
+                        <td>{{player.skaterspassperc|floatformat:1}}%</td><!-- needs calculation -->
+                        <td>{{player.skatersposs|floatformat:1}}</td>
                     </tr>
-                    <tr class="descriptor">
-                        <td>games played</td>
-                        <td>goals</td>
-                        <td>assists</td>
-                        <td>points</td>
-                        <td>hits</td>
-                        <td>plus / minus</td>
-                        <td>penalty minutes</td>
-                        <td>penalties drawn</td>
-                        <td>pk clears</td>
-                        <td>shots</td>
-                        <td>shooting percentage</td>
-                        <td>shooting efficiency</td>
-                        <td>powerplay goals</td>
-                        <td>shorthanded goals</td>
-                        <td>passing percentage</td>
-                        <td>blocked shots / game</td>
-                        <td>takeaways / game</td>
-                        <td>interceptions / game</td>
-                        <td>giveaways / game</td>
-                        <td>avg sec of possession</td>
-                        <td>faceoff percentage</td>
+                    {% empty %}
+                    <tr>
+                        <td colspan=25>No skater stats recorded.</td>
                     </tr>
+                    {% endfor %}
                 </tbody>
             </table>
-        </div>
+        </center></div>
+        <div class="section_lg" style="align-items: auto; width: 90%; overflow: scroll; margin-bottom: 10px;"><center>
+            <table class="statsbar betweenrows">
+                <col style="width: 240px;"><!-- Player -->
+                <col style="width: 80px;"><!-- Shots Against -->
+                <col style="width: 80px;"><!-- Saves -->
+                <col style="width: 80px;"><!-- SV% -->
+                <col style="width: 80px;"><!-- GAA -->
+                <col style="width: 80px;"><!-- Shutout -->
+                <col style="width: 80px;"><!-- Win -->
+                <col style="width: 80px;"><!-- Loss -->
+                <col style="width: 80px;"><!-- OTL -->
+                <col style="width: 80px;"><!-- Breakaway Shots Against -->
+                <col style="width: 80px;"><!-- Breakaway Saves -->
+                <col style="width: 80px;"><!-- Penalty Shots Against -->
+                <col style="width: 80px;"><!-- Penalty Shot Saves -->
+                <thead>
+                    <tr>
+                        <th>Goalie</th>
+                        <th>Shots Against</th>
+                        <th>Saves</th>
+                        <th>SV%</th>
+                        <th>GAA</th>
+                        <th>Shutout</th>
+                        <th>Win</th>
+                        <th>Loss</th>
+                        <th>OTL</th>
+                        <th>Breakaway SA</th>
+                        <th>Breakaway SV</th>
+                        <th>PS SA</th>
+                        <th>PS SV</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for player in goalierecords %}
+                    <tr class="no-bg">
+                        <td><a href="{% url 'player' player.ea_player_num.ea_player_num %}">{{ player.ea_player_num }}</a></td>
+                        <td>{{player.goaliesshots}}</td>
+                        <td>{{player.goaliessaves}}</td>
+                        <td>{{player.goaliessvp|floatformat:1}}%</td>
+                        <td>{{player.goaliesgaa|floatformat:2}}</td>
+                        <td>{{player.goaliesshutouts}}</td>
+                        <td>{{player.goalieswins}}</td>
+                        <td>{{player.goalieslosses}}</td>
+                        <td>{{player.goaliesotlosses}}</td>
+                        <td>{{player.goaliesbashots}}</td>
+                        <td>{{player.goaliesbasaves}}</td>
+                        <td>{{player.goaliespsshots}}</td>
+                        <td>{{player.goaliespssaves}}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan=25>No goalie stats recorded.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </center></div>
     </center></div>
 </center>
 {% endblock %}
