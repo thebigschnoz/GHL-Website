@@ -1,10 +1,19 @@
 from ...views import get_seasonSetting, calculate_leaders, calculate_standings
 import requests, json
-from ...models import Game, TeamRecord, SkaterRecord, GoalieRecord, Player
+from ...models import Game, TeamRecord, SkaterRecord, GoalieRecord, Player, Team
 from datetime import datetime, time, timedelta
 import pytz
+from celery import shared_task
 
 BASE_API_URL = "https://proclubs.ea.com/api/nhl/clubs/gamees?gameType=club_private&platform=common-gen5&clubIds="
+
+@shared_task
+def fetch_and_process_games_task():
+
+    # Get active teams
+    active_teams = Team.objects.filter(isActive=True)
+    for team in active_teams:
+        fetch_and_process_games(team.ea_club_num)
 
 def fetch_and_process_games(team_id):
     try:
