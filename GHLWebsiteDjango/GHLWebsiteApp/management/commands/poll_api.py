@@ -30,6 +30,11 @@ def fetch_and_process_games(team_id):
             else:
                 seasonSetting = get_seasonSetting()
 
+            # Extract dnf value
+            dnf = game["clubs"][a_team_num]["dnf"] or game["clubs"][h_team_num]["dnf"]
+            if dnf:
+                seasonSetting = 0
+
             # Make sure it's a private game
             is_private_game = any(
                 club_data.get("cNhlOnlineGameType") == "5"
@@ -57,9 +62,6 @@ def fetch_and_process_games(team_id):
             teamnumbers = iter(game["clubs"].keys())
             a_team_num = next(teamnumbers)
             h_team_num = next(teamnumbers)
-
-            # Extract dnf value
-            dnf = game["clubs"][a_team_num]["dnf"] or game["clubs"][h_team_num]["dnf"]
 
             # Extract gfraw values for a_team_gf and h_team_gf
             a_team_gf = game["clubs"][a_team_num].get("gfraw", 0)
