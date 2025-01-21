@@ -17,7 +17,7 @@ def fetch_and_process_games(team_id):
 
         # Define the time range in EST
         est = pytz.timezone('US/Eastern')
-        start_time = time(21, 10)  # 9:10pm
+        start_time = time(21, 1)  # 9:01pm
         end_time = time(22, 45)    # 10:45pm
         
         # Process the data

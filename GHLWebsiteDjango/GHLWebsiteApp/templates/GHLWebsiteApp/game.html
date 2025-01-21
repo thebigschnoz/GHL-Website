@@ -241,9 +241,21 @@
                         <td>{{player.saves}}</td>
                         <td>{{player.save_pct|floatformat:1}}%</td>
                         <td>{{player.gaa|floatformat:2}}</td>
-                        <td>{{player.shutout}}</td><!-- needs calculation -->
-                        <td>{{player.win}}</td><!-- needs calculation -->
-                        <td>{{player.loss}}</td>
+                        {% if player.shutout %}
+                        <td>X</td>
+                        {% else %}
+                        <td>&nbsp;</td>
+                        {% endif %}
+                        {% if player.win %}
+                        <td>X</td>
+                        {% else %}
+                        <td>&nbsp;</td>
+                        {% endif %}
+                        {% if player.loss %}
+                        <td>X</td>
+                        {% else %}
+                        <td>&nbsp;</td>
+                        {% endif %}
                         <td>{{player.breakaway_shots}}</td>
                         <td>{{player.breakaway_saves}}</td>
                         <td>{{player.ps_shots}}</td>
@@ -390,9 +402,21 @@
                         <td>{{player.saves}}</td>
                         <td>{{player.save_pct|floatformat:1}}%</td>
                         <td>{{player.gaa|floatformat:2}}</td>
-                        <td>{{player.shutout}}</td><!-- needs calculation -->
-                        <td>{{player.win}}</td><!-- needs calculation -->
-                        <td>{{player.loss}}</td>
+                        {% if player.shutout %}
+                        <td>X</td>
+                        {% else %}
+                        <td>&nbsp;</td>
+                        {% endif %}
+                        {% if player.win %}
+                        <td>X</td>
+                        {% else %}
+                        <td>&nbsp;</td>
+                        {% endif %}
+                        {% if player.loss %}
+                        <td>X</td>
+                        {% else %}
+                        <td>&nbsp;</td>
+                        {% endif %}
                         <td>{{player.breakaway_shots}}</td>
                         <td>{{player.breakaway_saves}}</td>
                         <td>{{player.ps_shots}}</td>
