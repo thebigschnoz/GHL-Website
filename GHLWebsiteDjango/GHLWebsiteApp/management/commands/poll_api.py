@@ -1,11 +1,10 @@
-from .views import get_seasonSetting, calculate_leaders, calculate_standings
+from ...views import get_seasonSetting, calculate_leaders, calculate_standings
 import requests, json
-from .models import Game, TeamRecord, SkaterRecord, GoalieRecord, Player
+from ...models import Game, TeamRecord, SkaterRecord, GoalieRecord, Player
 from datetime import datetime, time, timedelta
 import pytz
 
 BASE_API_URL = "https://proclubs.ea.com/api/nhl/clubs/gamees?gameType=club_private&platform=common-gen5&clubIds="
-SEASON_SETTING = get_seasonSetting()
 
 def fetch_and_process_games(team_id):
     try:
@@ -27,7 +26,9 @@ def fetch_and_process_games(team_id):
 
             # Check if the game time is within the desired range
             if not (start_time <= game_time <= end_time):
-                continue
+                seasonSetting = 0
+            else:
+                seasonSetting = get_seasonSetting()
 
             # Make sure it's a private game
             is_private_game = any(
@@ -37,7 +38,7 @@ def fetch_and_process_games(team_id):
             if not is_private_game:
                 print(f"Skipping game {game['gameId']} due to invalid Game Type")
                 continue
-
+            
             game_num = game.get("matchId", 0)
 
             # Check if the match already exists
@@ -67,7 +68,7 @@ def fetch_and_process_games(team_id):
             # Get or create game record
             game_obj, created = Game.objects.get_or_create(
                 game_num=game_num,
-                defaults={"season_num": SEASON_SETTING,
+                defaults={"season_num": seasonSetting,
                           "gamelength": gamelength,
                           "played_time": timestamp,
                           "dnf": dnf,
