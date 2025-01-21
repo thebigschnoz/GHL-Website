@@ -475,8 +475,15 @@ def draft(request):
     return render(request, "GHLWebsiteApp/draft.html")
 
 def awardsDef(request):
-    return render(request, "GHLWebsiteApp/awards.html")
+    return render(request, "GHLWebsiteApp/awards.html", {"scoreboard": get_scoreboard()})
 
 def awards(request, awardnum):
     award = get_object_or_404(AwardTitle, pk=awardnum)
-    return render(request, "GHLWebsiteApp/awards.html", {"award": award, "scoreboard": get_scoreboard()})
+    awardhistory = AwardAssign.objects.filter(award=awardnum).order_by("-season_num")
+    awardvotes = AwardVote.objects.filter(award=awardnum).order_by("-votes_num")[:3]
+    return render(request, "GHLWebsiteApp/awards.html", {
+        "award": award,
+        "awardvotes": awardvotes,
+        "awardhistory": awardhistory,
+        "scoreboard": get_scoreboard()
+    })

@@ -284,6 +284,14 @@ class Standing(models.Model):
 
     def __str__(self):
         return f"{self.team}: {self.season}"
+    
+class AwardVote(models.Model):
+    ea_player_num = models.ForeignKey(Player, on_delete=models.CASCADE)
+    award_num = models.ForeignKey(AwardTitle, on_delete=models.CASCADE)
+    season_num = models.ForeignKey(Season, on_delete=models.CASCADE)
+    votes_num = models.SmallIntegerField(default=0)
+    def __str__(self):
+        return f"{self.ea_player_num}: {self.award_num} Season {self.season_num} (Votes)"
 
 class Leader(models.Model):
     attribute = models.CharField(max_length=3)
