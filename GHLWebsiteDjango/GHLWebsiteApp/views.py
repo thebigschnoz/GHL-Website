@@ -124,8 +124,6 @@ def GamesRequest(request):
     return response
 
 def index(request):
-    calculate_leaders()
-    calculate_standings()
     allgames = SkaterRecord.objects.filter(game_num__season_num=seasonSetting)
     if not allgames:
         if not SkaterRecord.objects.all():
@@ -155,7 +153,6 @@ def index(request):
     return render(request, "GHLWebsiteApp/index.html", context)
 
 def standings(request):
-    calculate_standings()
     standings = Standing.objects.filter(season=seasonSetting).order_by('-points', '-wins', '-goalsfor', 'goalsagainst', 'team__club_full_name')
     return render(request, "GHLWebsiteApp/standings.html", {"standings": standings, "scoreboard": get_scoreboard()})
 

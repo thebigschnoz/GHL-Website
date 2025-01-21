@@ -1,4 +1,4 @@
-from .views import get_seasonSetting
+from .views import get_seasonSetting, calculate_leaders, calculate_standings
 import requests, json
 from .models import Game, TeamRecord, SkaterRecord, GoalieRecord, Player
 from datetime import datetime, time, timedelta
@@ -200,6 +200,8 @@ def fetch_and_process_games(team_id):
                                 "ps_saves": ps_saves,
                             }
                         )
+        calculate_standings()
+        calculate_leaders()
     
     except requests.exceptions.RequestException as e:
         print(f"Error fetching data for team {team_id}: {e}")
