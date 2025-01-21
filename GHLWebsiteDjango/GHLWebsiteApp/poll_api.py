@@ -160,7 +160,7 @@ def fetch_and_process_games(team_id):
                     )
 
                     # Update or create Player
-                    player_obj, _ = Player.objects.update_or_create(
+                    player_obj, created = Player.objects.get_or_create(
                         ea_player_num=player_id,
                         defaults={"username": player_data.get("playername", "Username Not Found"),
                                   "current_team": team_id
