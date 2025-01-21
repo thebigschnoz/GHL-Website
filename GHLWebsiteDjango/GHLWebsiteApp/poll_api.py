@@ -1,6 +1,8 @@
 from .views import get_seasonSetting
 import requests, json
 from .models import Game, TeamRecord, SkaterRecord, GoalieRecord, Player
+from datetime import datetime, time, timedelta
+import pytz
 
 BASE_API_URL = "https://proclubs.ea.com/api/nhl/clubs/gamees?gameType=club_private&platform=common-gen5&clubIds="
 SEASON_SETTING = get_seasonSetting()
@@ -12,9 +14,21 @@ def fetch_and_process_games(team_id):
         response = requests.get(url)
         response.raise_for_status()
         data = response.json()  # Parse JSON
+
+        # Define the time range in EST
+        est = pytz.timezone('US/Eastern')
+        start_time = time(21, 10)  # 9:10pm
+        end_time = time(22, 45)    # 10:45pm
         
         # Process the data
         for game in data:
+            timestamp = game.get("timestamp", 0)
+            game_time = datetime.fromtimestamp(timestamp, est).time()
+
+            # Check if the game time is within the desired range
+            if not (start_time <= game_time <= end_time):
+                continue
+
             # Make sure it's a private game
             is_private_game = any(
                 club_data.get("cNhlOnlineGameType") == "5"
@@ -30,8 +44,6 @@ def fetch_and_process_games(team_id):
             if Game.objects.filter(game_num=game_num).exists():
                 print(f"Skipping match {game_num} as it already exists in the database.")
                 continue
-
-            timestamp = game.get("timestamp", 0)
 
             # Calculate gamelength (max 'toi' from all players)
             gamelength = max(
