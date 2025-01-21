@@ -174,19 +174,19 @@
                 <tbody>
                     <tr class="no-bg statline">
                         <td>{{ g_gp }}</td>
-                        <td>TBD</td>
-                        <td>TBD</td>
-                        <td>TBD</td>
+                        <td>{{ g_wins }}</td>
+                        <td>{{ g_losses }}</td>
+                        <td>{{ g_otlosses }}</td>
                         <td>{{ g_ga }}</td>
                         <td>{{ g_sha }}</td>
-                        <td>{{ g_svp }}</td>
-                        <td>TBD</td>
-                        <td>TBD</td>
+                        <td>{{ g_svp|floatformat:1 }}</td>
+                        <td>{{ g_gaa|floatformat:2 }}</td>
+                        <td>{{ g_so }}</td>
                         <td>{{ g_ps_sh }}</td>
                         <td>{{ g_ps_perc }}</td>
                         <td>{{ g_br_sh }}</td>
                         <td>{{ g_br_perc }}</td>
-                        <td>TBD</td>
+                        <td>{{ g_toi }}</td>
                     </tr>
                     <tr class="descriptor">
                         <td>games played</td>

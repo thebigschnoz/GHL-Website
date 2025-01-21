@@ -367,17 +367,24 @@ def player(request, player):
         sk_poss_time = round((allskatergames.aggregate(Sum("poss_time"))["poss_time__sum"])/sk_gp, 1)
         sk_fow = allskatergames.aggregate(Sum("fow"))["fow__sum"]
         sk_fol = allskatergames.aggregate(Sum("fol"))["fol__sum"]
-        sk_sht_perc = round((sk_g / sk_sog)*100, 1)
-        sk_sht_eff = round(sk_sog / sk_shot_att, 3)*100
+        if sk_shot_att > 0:
+            if sk_sog > 0:
+                sk_sht_perc = round((sk_g / sk_sog)*100, 1)
+            else:
+                sk_sht_perc = "-"
+            sk_sht_eff = round(sk_sog / sk_shot_att, 3)*100
+        else:
+            sk_sht_perc = sk_sht_eff = "-"
+
         sk_pass_perc = round((sk_pass_comp / sk_pass_att)*100, 1)
         if sk_fol + sk_fow > 0:
             sk_fo_perc = round((sk_fow / (sk_fow + sk_fol))* 100, 1) 
         else:
-            sk_fo_perc = "n/a"
+            sk_fo_perc = "-"
 
     allgoaliegames = playernum.goalierecord_set.all()
     if not allgoaliegames:
-        g_gp = g_sha = g_sav = g_br_sh = g_br_sa = g_ps_sh = g_ps_sa = g_ga =  g_svp = g_br_perc = g_ps_perc = 0
+        g_gp = g_so = g_wins = g_losses = g_otlosses = g_toi = g_sha = g_sav = g_gaa = g_br_sh = g_br_sa = g_ps_sh = g_ps_sa = g_ga =  g_svp = g_br_perc = g_ps_perc = 0
     else:
         g_gp = allgoaliegames.aggregate(Count("game_num"))["game_num__count"]
         g_sha = allgoaliegames.aggregate(Sum("shots_against"))["shots_against__sum"]
@@ -396,6 +403,28 @@ def player(request, player):
             g_ps_perc = round((g_ps_sa / g_ps_sh)*100,1)
         else:
             g_ps_perc = "n/a"
+        g_so = allgoaliegames.aggregate(g_so=Sum(Case(
+            When(shutout=True, then=1),
+            default=0,
+            output_field=models.IntegerField()
+        )))["g_so"]
+        g_wins = allgoaliegames.aggregate(g_wins=Sum(Case(
+            When(win=True, then=1),
+            default=0,
+            output_field=models.IntegerField()
+        )))["g_wins"]
+        g_losses = allgoaliegames.aggregate(g_losses=Sum(Case(
+            When(loss=True, then=1),
+            default=0,
+            output_field=models.IntegerField()
+        )))["g_losses"]
+        g_otlosses = allgoaliegames.aggregate(g_otlosses=Sum(Case(
+            When(otloss=True, then=1),
+            default=0,
+            output_field=models.IntegerField()
+        )))["g_otlosses"]
+        g_gaa = allgoaliegames.aggregate(g_gaa=((Cast(Sum("shots_against"), models.FloatField())-Cast(Sum("saves"), models.FloatField()))/Cast(Sum("game_num__gamelength"), models.FloatField()))*3600)["g_gaa"]
+        g_toi = allgoaliegames.aggregate(g_toi=Sum("game_num__gamelength")/60)["g_toi"]
 
     sk_p = sk_g + sk_a
     if not playernum.current_team:
@@ -433,6 +462,12 @@ def player(request, player):
         "g_ps_sh": g_ps_sh,
         "g_br_perc": g_br_perc,
         "g_ps_perc": g_ps_perc,
+        "g_so": g_so,
+        "g_wins": g_wins,
+        "g_losses": g_losses,
+        "g_otlosses": g_otlosses,
+        "g_gaa": g_gaa,
+        "g_toi": g_toi,
         "sk_team_num": sk_team_num,
         "scoreboard": get_scoreboard()
         }
