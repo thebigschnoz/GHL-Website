@@ -300,7 +300,8 @@ def team(request, team):
             output_field=models.IntegerField()
         )),
     ).order_by("ea_player_num")
-    context = {"team": teamnum, "scoreboard": get_scoreboard(), "skaterrecords": skaterrecords, "goalierecords": goalierecords}  
+    teamgames = Game.objects.filter(season_num=seasonSetting, a_team_num=teamnum) | Game.objects.filter(season_num=seasonSetting, h_team_num=teamnum)
+    context = {"team": teamnum, "scoreboard": get_scoreboard(), "skaterrecords": skaterrecords, "goalierecords": goalierecords, "teamgames": teamgames}  
     return render(request, "GHLWebsiteApp/team.html", context)
 
 def game(request, game):
