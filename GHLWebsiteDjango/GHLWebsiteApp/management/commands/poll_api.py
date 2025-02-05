@@ -32,12 +32,18 @@ def fetch_and_process_games(team_id):
         for game in data:
             timestamp = game.get("timestamp", 0)
             game_time = datetime.fromtimestamp(timestamp, est).time()
+            game_date = datetime.fromtimestamp(timestamp, est).date()
 
             # Check if the game time is within the desired range
             if not (start_time <= game_time <= end_time):
                 seasonSetting = 0
             else:
                 seasonSetting = get_seasonSetting()
+
+            # Extract team numbers
+            teamnumbers = iter(game["clubs"].keys())
+            a_team_num = next(teamnumbers)
+            h_team_num = next(teamnumbers)
 
             # Extract dnf value
             dnf = game["clubs"][a_team_num]["dnf"] or game["clubs"][h_team_num]["dnf"]
@@ -67,28 +73,40 @@ def fetch_and_process_games(team_id):
                 for player_id, player_data in team_players.items()
             )
 
-            # Extract team numbers
-            teamnumbers = iter(game["clubs"].keys())
-            a_team_num = next(teamnumbers)
-            h_team_num = next(teamnumbers)
-
             # Extract gfraw values for a_team_gf and h_team_gf
             a_team_gf = game["clubs"][a_team_num].get("gfraw", 0)
             h_team_gf = game["clubs"][h_team_num].get("gfraw", 0)
     
-            # Get or create game record
-            game_obj, created = Game.objects.get_or_create(
-                game_num=game_num,
-                defaults={"season_num": seasonSetting,
-                          "gamelength": gamelength,
-                          "played_time": timestamp,
-                          "dnf": dnf,
-                          "a_team_num": a_team_num,
-                          "h_team_num": h_team_num,
-                          "a_team_gf": a_team_gf,
-                          "h_team_gf": h_team_gf
-                          }
+            # Find the matching game by date and team numbers
+            matching_games = Game.objects.filter(
+                a_team_num=a_team_num,
+                h_team_num=h_team_num,
+                expected_time__date=game_date
             )
+
+            # Get or create game record
+            if matching_games.exists():
+                game_obj = matching_games.first()
+                game_obj.played_time = datetime.fromtimestamp(timestamp, est)
+                game_obj.dnf = dnf
+                game_obj.gamelength = gamelength
+                game_obj.a_team_gf = a_team_gf
+                game_obj.h_team_gf = h_team_gf
+                game_obj.save()
+            else:
+                # If no matching game is found, create a new game record
+                game_obj, created = Game.objects.get_or_create(
+                    game_num=game_num,
+                    defaults={"season_num": seasonSetting,
+                              "gamelength": gamelength,
+                              "played_time": timestamp,
+                              "dnf": dnf,
+                              "a_team_num": a_team_num,
+                              "h_team_num": h_team_num,
+                              "a_team_gf": a_team_gf,
+                              "h_team_gf": h_team_gf
+                              }
+                )
             
             # Parse team stats
             for club_id, club_data in game["clubs"].items():
