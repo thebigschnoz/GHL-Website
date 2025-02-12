@@ -1,7 +1,7 @@
 from ..GHLWebsiteApp.views import get_seasonSetting, calculate_leaders, calculate_standings
-import requests, json
+import requests
 from ..GHLWebsiteApp.models import Game, TeamRecord, SkaterRecord, GoalieRecord, Player, Team
-from datetime import datetime, time, timedelta
+from datetime import datetime, time
 import pytz
 from celery import shared_task
 
