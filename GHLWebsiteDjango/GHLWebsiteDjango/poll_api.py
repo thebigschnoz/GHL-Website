@@ -1,6 +1,6 @@
-from GHLWebsiteDjango.GHLWebsiteApp.views import get_seasonSetting, calculate_leaders, calculate_standings
+from GHLWebsiteApp.views import get_seasonSetting, calculate_leaders, calculate_standings
 import requests
-from GHLWebsiteDjango.GHLWebsiteApp.models import Game, TeamRecord, SkaterRecord, GoalieRecord, Player, Team
+from GHLWebsiteApp.models import Game, TeamRecord, SkaterRecord, GoalieRecord, Player, Team
 from datetime import datetime, time
 import pytz
 from celery import shared_task
