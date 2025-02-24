@@ -1,1 +1,2 @@
 from __future__ import absolute_import, unicode_literals
+from GHLWebsiteDjango.poll_api import fetch_and_process_games_task
