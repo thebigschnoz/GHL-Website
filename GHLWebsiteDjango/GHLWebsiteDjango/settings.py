@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 from os.path import dirname, join
+from celery import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -149,3 +150,9 @@ CELERY_BROKER_URL = 'redis://localhost:6380/0'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'US/Eastern'
+CELERY_BEAT_SCHEDULE = {
+    'fetch-and-process-games-task': {
+        'task': 'GHLWebsiteDjango.poll_api.fetch_and_process_games_task',
+        'schedule': crontab(minute='*/5', hour='21-22', day_of_week='sun,mon,tue,wed,thu'),
+    }
+}
