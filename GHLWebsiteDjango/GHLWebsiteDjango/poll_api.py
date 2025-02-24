@@ -7,7 +7,7 @@ from celery import Celery, shared_task
 
 BASE_API_URL = "https://proclubs.ea.com/api/nhl/clubs/gamees?gameType=club_private&platform=common-gen5&clubIds="
 
-app = Celery('poll_api', broker='redis://localhost:6379/0')
+app = Celery('GHLWebsiteDjango', broker='redis://localhost:6379/0')
 app.conf.enable_utc = False
 @shared_task
 def fetch_and_process_games_task():
