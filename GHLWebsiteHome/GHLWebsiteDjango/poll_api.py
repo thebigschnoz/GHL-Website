@@ -3,7 +3,7 @@ import requests
 from GHLWebsiteApp.models import Game, TeamRecord, SkaterRecord, GoalieRecord, Player, Team
 from datetime import datetime, time
 import pytz
-from celeryy import app
+from GHLWebsiteHome.celery import app
 
 BASE_API_URL = "https://proclubs.ea.com/api/nhl/clubs/gamees?gameType=club_private&platform=common-gen5&clubIds="
 
