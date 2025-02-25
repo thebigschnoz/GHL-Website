@@ -4,6 +4,6 @@ from celery import Celery
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'GHLWebsiteHome.GHLWebsiteDjango.settings')
 
-app = Celery('GHLWebsiteDjango', broker='redis://localhost:6379/0', include=['GHLWebsiteDjango.poll_api'])
+app = Celery('GHLWebsiteDjango', broker='redis://localhost:6379/0')
 app.conf.enable_utc = False
 app.autodiscover_tasks()
