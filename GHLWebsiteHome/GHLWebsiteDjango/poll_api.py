@@ -5,7 +5,7 @@ from datetime import datetime, time
 import pytz
 from GHLWebsiteHome.celery_app import app
 
-BASE_API_URL = "https://proclubs.ea.com/api/nhl/clubs/gamees?gameType=club_private&platform=common-gen5&clubIds="
+BASE_API_URL = "https://proclubs.ea.com/api/nhl/clubs/matches?matchType=club_private&platform=common-gen5&clubIds="
 
 @app.task
 def fetch_and_process_games_task():
