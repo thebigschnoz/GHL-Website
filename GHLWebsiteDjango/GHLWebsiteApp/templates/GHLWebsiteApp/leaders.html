@@ -117,19 +117,18 @@
                                 <tr>
                                     <th colspan=4>Assists</th>
                                 </tr>
+                                {% for skater in leaders_assists %}
                                 <tr>
-                                    {% for skater in leaders_assists %}
-                                    <tr>
-                                        <td>{{ forloop.counter }}</td>
-                                        <td><a href="{% url 'player' skater.ea_player_num.ea_player_num %}">{{ skater.ea_player_num }}</a></td>
-                                        <td>{{ skater.ea_player_num.current_team }}</td>
-                                        <td class="points">{{ skater.numassists }}</td>
-                                    </tr>
-                                    {% empty %}
-                                    <tr>
-                                        <td colspan="4">No assists recorded.</td>
-                                    </tr>
-                                    {% endfor %}
+                                    <td>{{ forloop.counter }}</td>
+                                    <td><a href="{% url 'player' skater.ea_player_num.ea_player_num %}">{{ skater.ea_player_num }}</a></td>
+                                    <td>{{ skater.ea_player_num.current_team }}</td>
+                                    <td class="points">{{ skater.numassists }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4">No assists recorded.</td>
+                                </tr>
+                                {% endfor %}
                             </table></center>
                         </div>
                         <div class="subsection-container">
