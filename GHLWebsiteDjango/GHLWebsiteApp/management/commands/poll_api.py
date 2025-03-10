@@ -18,7 +18,7 @@ class Command(BaseCommand):
             # Construct the URL with the team ID
             url = f"{BASE_API_URL}{team_id}"
             self.stdout.write(f"Fetching data from {url}...")
-            response = requests.get(url, timeout=15, allow_redirects=False, headers=self.headers)
+            response = requests.get(url, timeout=10, headers=self.headers)
             self.stdout.write(f" Response Status Code: {response.status_code}")
             response.raise_for_status()
         except requests.exceptions.Timeout:
