@@ -5,7 +5,7 @@ from datetime import datetime, time
 import pytz
 from django.core.management.base import BaseCommand, CommandError
 
-BASE_API_URL = "http://proclubs.ea.com/api/nhl/clubs/matches?matchType=club_private&platform=common-gen5&clubIds="
+BASE_API_URL = "https://proclubs.ea.com/api/nhl/clubs/matches?matchType=club_private&platform=common-gen5&clubIds="
                
 class Command(BaseCommand):
     help = "Polls the EA API for game data and updates the database"
@@ -22,10 +22,8 @@ class Command(BaseCommand):
             self.stdout.write(f" Response Status Code: {response.status_code}")
             response.raise_for_status()
         except requests.exceptions.Timeout:
-            self.stderr.write(f"Request to pull data for team {team_id} timed out")
             raise CommandError(f"Request to pull data for team {team_id} timed out")
         except requests.exceptions.RequestException as e:
-            self.stderr.write(f"Error fetching data: {e}")
             raise CommandError(f"Error fetching data: {e}")
         else:
             self.stdout.write("Parsing JSON response...")
