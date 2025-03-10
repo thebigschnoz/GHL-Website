@@ -5,17 +5,20 @@ from datetime import datetime, time
 import pytz
 from django.core.management.base import BaseCommand, CommandError
 
-BASE_API_URL = "https://proclubs.ea.com/api/nhl/clubs/matches?matchType=club_private&platform=common-gen5&clubIds="
+BASE_API_URL = "http://proclubs.ea.com/api/nhl/clubs/matches?matchType=club_private&platform=common-gen5&clubIds="
                
 class Command(BaseCommand):
-    help = "Polls the EA API for game data and updates the database"           
+    help = "Polls the EA API for game data and updates the database"
+    headers = {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    }
 
     def fetch_and_process_games(self, team_id):
         try:
             # Construct the URL with the team ID
             url = f"{BASE_API_URL}{team_id}"
             self.stdout.write(f"Fetching data from {url}...")
-            response = requests.get(url, timeout=15, allow_redirects=False)
+            response = requests.get(url, timeout=15, allow_redirects=False, headers=self.headers)
             self.stdout.write(f" Response Status Code: {response.status_code}")
             response.raise_for_status()
         except requests.exceptions.Timeout:
