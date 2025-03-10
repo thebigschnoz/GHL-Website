@@ -14,8 +14,10 @@ class Command(BaseCommand):
         try:
             # Construct the URL with the team ID
             url = f"{BASE_API_URL}{team_id}"
+            self.stdout.write(f"Fetching data from {url}...")
             response = requests.get(url)
             response.raise_for_status()
+            self.stdout.write("Parsing JSON response...")
             data = response.json()  # Parse JSON
 
             # Define the time range in EST
@@ -32,8 +34,10 @@ class Command(BaseCommand):
                 # Check if the game time is within the desired range
                 if not (start_time <= game_time <= end_time):
                     seasonSetting = 0
+                    self.stdout.write(f"Game time {game_time} is not within the desired range - moving to test season")
                 else:
                     seasonSetting = get_seasonSetting()
+                    self.stdout.write(f"Game time {game_time} is within the desired range - using season setting {seasonSetting}")
 
                 # Extract team numbers
                 teamnumbers = iter(game["clubs"].keys())
@@ -227,6 +231,7 @@ class Command(BaseCommand):
             calculate_leaders()
         
         except requests.exceptions.RequestException as e:
+            self.stderr.write(f"Error fetching data: {e}")
             raise CommandError(f"Error fetching data: {e}")
 
     def handle(self, *args, **options):
