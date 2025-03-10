@@ -15,8 +15,15 @@ class Command(BaseCommand):
             # Construct the URL with the team ID
             url = f"{BASE_API_URL}{team_id}"
             self.stdout.write(f"Fetching data from {url}...")
-            response = requests.get(url)
+            response = requests.get(url, timeout=15)
             response.raise_for_status()
+        except requests.exceptions.Timeout:
+            self.stderr.write("Request timed out")
+            raise CommandError("Request timed out")
+        except requests.exceptions.RequestException as e:
+            self.stderr.write(f"Error fetching data: {e}")
+            raise CommandError(f"Error fetching data: {e}")
+        else:
             self.stdout.write("Parsing JSON response...")
             data = response.json()  # Parse JSON
 
@@ -230,9 +237,6 @@ class Command(BaseCommand):
             calculate_standings()
             calculate_leaders()
         
-        except requests.exceptions.RequestException as e:
-            self.stderr.write(f"Error fetching data: {e}")
-            raise CommandError(f"Error fetching data: {e}")
 
     def handle(self, *args, **options):
         self.stdout.write("Polling EA API for game data...")
