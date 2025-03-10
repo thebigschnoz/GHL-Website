@@ -9,7 +9,6 @@ BASE_API_URL = "https://proclubs.ea.com/api/nhl/clubs/matches?matchType=club_pri
                
 class Command(BaseCommand):
     help = "Polls the EA API for game data and updates the database"           
-    # Get active teams
 
     def fetch_and_process_games(team_id):
         try:
@@ -233,8 +232,11 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.stdout.write("Polling EA API for game data...")
         self.stdout.write("Getting active teamlist")
-        active_teams = Team.objects.filter(isActive=True)
+        active_teams = Team.objects.filter(isActive=True) # Gets active teams
         self.stdout.write(f"Found {len(active_teams)} active teams")
         for team in active_teams:
             self.stdout.write(f"Fetching and processing games for {team.club_full_name}")
-            self.fetch_and_process_games(team.ea_club_num)
+            clubnum = team.ea_club_num
+            self.fetch_and_process_games(clubnum)
+            self.stdout.write(f"Finished processing games for {team.club_full_name}")
+        self.stdout.write("Finished polling EA API for game data")
