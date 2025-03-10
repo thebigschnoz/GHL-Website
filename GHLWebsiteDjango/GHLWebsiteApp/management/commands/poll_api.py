@@ -3,17 +3,9 @@ import requests
 from GHLWebsiteApp.models import Game, TeamRecord, SkaterRecord, GoalieRecord, Player, Team
 from datetime import datetime, time
 import pytz
-from GHLWebsiteHome.celery_app import app
+from django.core.management.base import BaseCommand, CommandError
 
 BASE_API_URL = "https://proclubs.ea.com/api/nhl/clubs/matches?matchType=club_private&platform=common-gen5&clubIds="
-
-@app.task
-def fetch_and_process_games_task():
-
-    # Get active teams
-    active_teams = Team.objects.filter(isActive=True)
-    for team in active_teams:
-        fetch_and_process_games(team.ea_club_num)
 
 def fetch_and_process_games(team_id):
     try:
@@ -98,14 +90,14 @@ def fetch_and_process_games(team_id):
                 game_obj, created = Game.objects.get_or_create(
                     game_num=game_num,
                     defaults={"season_num": seasonSetting,
-                              "gamelength": gamelength,
-                              "played_time": timestamp,
-                              "dnf": dnf,
-                              "a_team_num": a_team_num,
-                              "h_team_num": h_team_num,
-                              "a_team_gf": a_team_gf,
-                              "h_team_gf": h_team_gf
-                              }
+                            "gamelength": gamelength,
+                            "played_time": timestamp,
+                            "dnf": dnf,
+                            "a_team_num": a_team_num,
+                            "h_team_num": h_team_num,
+                            "a_team_gf": a_team_gf,
+                            "h_team_gf": h_team_gf
+                            }
                 )
             
             # Parse team stats
@@ -205,7 +197,7 @@ def fetch_and_process_games(team_id):
                     player_obj, created = Player.objects.get_or_create(
                         ea_player_num=player_id,
                         defaults={"username": player_data.get("playername", "Username Not Found"),
-                                  "current_team": team_id
+                                "current_team": team_id
                     })
 
                     # If pos_sorted is 0, add a GoalieRecord
@@ -234,4 +226,12 @@ def fetch_and_process_games(team_id):
         calculate_leaders()
     
     except requests.exceptions.RequestException as e:
-        print(f"Error fetching data for team {team_id}: {e}")
+        print(f"Error fetching data for team {team_id}: {e}")\
+                
+class Command(BaseCommand):
+    help = "Polls the EA API for game data and updates the database"           
+    # Get active teams
+    def handle(self, *args, **options):
+        active_teams = Team.objects.filter(isActive=True)
+        for team in active_teams:
+            fetch_and_process_games(team.ea_club_num)
