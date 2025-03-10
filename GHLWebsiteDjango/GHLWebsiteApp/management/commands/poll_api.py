@@ -59,7 +59,7 @@ class Command(BaseCommand):
                 # Check if the game time is within the desired range
                 if not (start_time <= game_time <= end_time):
                     seasonSetting = 2
-                    self.stdout.write(f"Game time {game_time} is not within the desired range - moving to test season")
+                    self.stdout.write(f"Game time {game_time} is not within the desired range - setting season to test season")
                 else:
                     seasonSetting = get_seasonSetting()
                     self.stdout.write(f"Game time {game_time} is within the desired range - using season setting {seasonSetting}")
@@ -68,10 +68,12 @@ class Command(BaseCommand):
                 teamnumbers = iter(game["clubs"].keys())
                 a_team_num = next(teamnumbers)
                 h_team_num = next(teamnumbers)
+                self.stdout.write(f"Processing game between {game['clubs'][a_team_num]['name']} and {game['clubs'][h_team_num]['name']}")
 
                 # Extract dnf value
                 dnf = game["clubs"][a_team_num]["dnf"] or game["clubs"][h_team_num]["dnf"]
                 if dnf:
+                    self.stdout.write("DNF detected - setting season to test season")
                     seasonSetting = 2
 
                 # Make sure it's a private game
@@ -80,12 +82,14 @@ class Command(BaseCommand):
                     for club_id, club_data in game["clubs"].items()
                 )
                 if not is_private_game:
+                    self.stdout.write("Not a private game - skipping")
                     continue
                 
                 game_num = game.get("matchId", 0)
 
                 # Check if the match already exists
                 if Game.objects.filter(game_num=game_num).exists():
+                    self.stdout.write(f"Game {game_num} already exists in database - skipping")
                     continue
 
                 # Calculate gamelength (max 'toi' from all players)
@@ -98,6 +102,7 @@ class Command(BaseCommand):
                 # Extract gfraw values for a_team_gf and h_team_gf
                 a_team_gf = game["clubs"][a_team_num].get("gfraw", 0)
                 h_team_gf = game["clubs"][h_team_num].get("gfraw", 0)
+                self.stdout.write(f"Game ended with score {a_team_gf} - {h_team_gf}")
         
                 # Find the matching game by date and team numbers
                 matching_games = Game.objects.filter(
@@ -115,6 +120,7 @@ class Command(BaseCommand):
                     game_obj.a_team_gf = a_team_gf
                     game_obj.h_team_gf = h_team_gf
                     game_obj.save()
+                    self.stdout.write(f"Updated existing game {game_num}")
                 else:
                     # If no matching game is found, create a new game record
                     game_obj, created = Game.objects.get_or_create(
@@ -129,6 +135,7 @@ class Command(BaseCommand):
                                 "h_team_gf": h_team_gf
                                 }
                     )
+                    self.stdout.write(f"Created new game {game_num}")
                 
                 # Parse team stats
                 for club_id, club_data in game["clubs"].items():
@@ -162,6 +169,7 @@ class Command(BaseCommand):
                             "shot_att_team": shot_att_team,
                         }
                     )
+                self.stdout.write(f"Processed team stats for game {game_num}")
 
                 # Parse skater stats
                 for team_id, team_players in game["players"].items():
@@ -252,8 +260,11 @@ class Command(BaseCommand):
                                     "ps_saves": ps_saves,
                                 }
                             )
+                self.stdout.write(f"Processed skater stats for game {game_num}")
             calculate_standings()
+            self.stdout.write("Recalculated standings")
             calculate_leaders()
+            self.stdout.write("Recalculated leaders")
         
 
     def handle(self, *args, **options):
