@@ -12,7 +12,7 @@ class Command(BaseCommand):
 
     def fetch_and_process_games(self, team_id):
         try:
-            # Construct the URL with the team ID
+            s = requests.Session()
             headers = {
                 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
                 'accept-language': 'en-US,en;q=0.9',
@@ -26,16 +26,16 @@ class Command(BaseCommand):
                 'sec-fetch-user': '?1',
                 'upgrade-insecure-requests': '1',
                 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36',
-                # 'cookie': '_tt_enable_cookie=1; _ttp=daV-aRnWav3agxQyEyoKt2V-8_q; _CEFT=Q%3D%3D%3D; _ga_LCS9CY367P=GS1.1.1716760680.1.1.1716760805.60.0.0; _ce.s=v~d8a13a0a459366326ebfffbe3adc28f34f0b8057~lcw~1716760805744~lva~1716760680711~vpv~0~v11.cs~390387~v11.s~05108120-1bab-11ef-89a4-0fc371320a0a~v11.sla~1716760805752~gtrk.la~lwo31wqr~v11.send~1716760805744~lcw~1716760805752; _scid=733b8ad6-18be-45cb-8da0-6baa99d5e3ae; _sctr=1%7C1721016000000; _scid_r=733b8ad6-18be-45cb-8da0-6baa99d5e3ae; _ga=GA1.2.1164406783.1709522617; _ga_Q3MDF068TF=GS1.1.1721099317.37.1.1721099568.60.0.0; notice_preferences=2:; notice_gdpr_prefs=0,1,2:; notice_poptime=1599001200000; cmapi_gtm_bl=; cmapi_cookie_privacy=permit 1,2,3; notice_behavior=implied,us; notice_location=us,fl; ealocale=en-us; _abck=41ABCE51CFBF09624E53124107E1FED1~-1~YAAQknLMFw4UGmyVAQAAl3DtgQ0t/2W+d/fKLdiCAzQbEDUS07WtyFKr8jH0NGXtroGs0P4gh8bJhHqG1amekMxWHceF9RztJ5cjwQtmRsCH1f8gjTQhzlhpB9MpZiS90Vayq01/SmATVKFDEqxXT8nKh9C8TtM2+pF+9hn48g0TXT5W6O9ltfqcf20AKmHXAbWT0GvjUw2qdCpJ6KSldUKgqLKCqZUzDpgoLyMHCDQYXVM2MWDHfqNMIcPmA6/nT9ixwzA8vBxg0tFjayEPRQsHkXTXw/EScm5YrGiiaMrbuglSbeqOLh/Tw3nRUvHW4v286yF949PomuXe8LR6Cxl/e21r94mTOvgNlA==~-1~-1~-1',
             }
+            s.headers.update(headers)
+            # Construct the URL with the team ID
             params = {
                 'matchType': 'club_private',
                 'platform': 'common-gen5',
                 'clubIds': team_id,
             }
             self.stdout.write(f"Fetching data from API...")
-            response = requests.get(BASE_API_URL, timeout=10, headers=headers, params=params)
-            self.stdout.write(f" Response Status Code: {response.status_code}")
+            response = s.get(BASE_API_URL, timeout=10, params=params)
             response.raise_for_status()
         except requests.exceptions.Timeout:
             raise CommandError(f"Request to pull data for team {team_id} timed out")
@@ -48,7 +48,7 @@ class Command(BaseCommand):
             # Define the time range in EST
             est = pytz.timezone('US/Eastern')
             start_time = time(21, 1)  # 9:01pm
-            end_time = time(22, 45)    # 10:45pm
+            end_time = time(22, 45)   # 10:45pm
             
             # Process the data
             for game in data:
@@ -59,10 +59,10 @@ class Command(BaseCommand):
                 # Check if the game time is within the desired range
                 if not (start_time <= game_time <= end_time):
                     seasonSetting = 2
-                    self.stdout.write(f"Game time {game_time} is not within the desired range - setting season to test season")
+                    self.stdout.write(f"Game time is not within the desired range - setting season to test season")
                 else:
                     seasonSetting = get_seasonSetting()
-                    self.stdout.write(f"Game time {game_time} is within the desired range - using season setting {seasonSetting}")
+                    self.stdout.write(f"Game time is within the desired range - using season setting {seasonSetting}")
 
                 # Extract team numbers
                 teamnumbers = iter(game["clubs"].keys())
