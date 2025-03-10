@@ -48,14 +48,12 @@ def fetch_and_process_games(team_id):
                 for club_id, club_data in game["clubs"].items()
             )
             if not is_private_game:
-                print(f"Skipping game {game['gameId']} due to invalid Game Type")
                 continue
             
             game_num = game.get("matchId", 0)
 
             # Check if the match already exists
             if Game.objects.filter(game_num=game_num).exists():
-                print(f"Skipping match {game_num} as it already exists in the database.")
                 continue
 
             # Calculate gamelength (max 'toi' from all players)
@@ -226,7 +224,7 @@ def fetch_and_process_games(team_id):
         calculate_leaders()
     
     except requests.exceptions.RequestException as e:
-        print(f"Error fetching data for team {team_id}: {e}")\
+        raise CommandError("Error fetching data")
                 
 class Command(BaseCommand):
     help = "Polls the EA API for game data and updates the database"           
