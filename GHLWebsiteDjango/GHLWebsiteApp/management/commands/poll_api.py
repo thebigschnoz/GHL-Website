@@ -15,11 +15,12 @@ class Command(BaseCommand):
             # Construct the URL with the team ID
             url = f"{BASE_API_URL}{team_id}"
             self.stdout.write(f"Fetching data from {url}...")
-            response = requests.get(url, timeout=15)
+            response = requests.get(url, timeout=15, allow_redirects=False)
+            self.stdout.write(f" Response Status Code: {response.status_code}")
             response.raise_for_status()
         except requests.exceptions.Timeout:
-            self.stderr.write("Request timed out")
-            raise CommandError("Request timed out")
+            self.stderr.write(f"Request to pull data for team {team_id} timed out")
+            raise CommandError(f"Request to pull data for team {team_id} timed out")
         except requests.exceptions.RequestException as e:
             self.stderr.write(f"Error fetching data: {e}")
             raise CommandError(f"Error fetching data: {e}")
