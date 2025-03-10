@@ -224,7 +224,7 @@ def fetch_and_process_games(team_id):
         calculate_leaders()
     
     except requests.exceptions.RequestException as e:
-        raise CommandError("Error fetching data")
+        raise CommandError(f"Error fetching data: {e}")
                 
 class Command(BaseCommand):
     help = "Polls the EA API for game data and updates the database"           
