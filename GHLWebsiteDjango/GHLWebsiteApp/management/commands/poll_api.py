@@ -58,7 +58,7 @@ class Command(BaseCommand):
 
                 # Check if the game time is within the desired range
                 if not (start_time <= game_time <= end_time):
-                    seasonSetting = 0
+                    seasonSetting = 2
                     self.stdout.write(f"Game time {game_time} is not within the desired range - moving to test season")
                 else:
                     seasonSetting = get_seasonSetting()
@@ -72,7 +72,7 @@ class Command(BaseCommand):
                 # Extract dnf value
                 dnf = game["clubs"][a_team_num]["dnf"] or game["clubs"][h_team_num]["dnf"]
                 if dnf:
-                    seasonSetting = 0
+                    seasonSetting = 2
 
                 # Make sure it's a private game
                 is_private_game = any(
