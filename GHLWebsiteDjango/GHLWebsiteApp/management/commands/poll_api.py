@@ -10,7 +10,7 @@ BASE_API_URL = "https://proclubs.ea.com/api/nhl/clubs/matches?matchType=club_pri
 class Command(BaseCommand):
     help = "Polls the EA API for game data and updates the database"           
 
-    def fetch_and_process_games(team_id):
+    def fetch_and_process_games(self, team_id):
         try:
             # Construct the URL with the team ID
             url = f"{BASE_API_URL}{team_id}"
