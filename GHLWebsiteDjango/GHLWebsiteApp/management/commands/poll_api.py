@@ -14,13 +14,18 @@ class Command(BaseCommand):
         try:
             url = f"{BASE_API_URL}{team_id}"
             headers = {
-                'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+                'accept': 'application/json, text/plain, */*',
                 'accept-language': 'en-US,en;q=0.9',
-                'upgrade-insecure-requests': '1',
+                'cache-control': 'no-cache',
+                'pragma': 'no-cache',
+                'referer': 'https://proclubs.ea.com/',
+                'sec-fetch-dest': 'empty',
+                'sec-fetch-mode': 'cors',
+                'sec-fetch-site': 'same-origin',
                 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36',
             }
             self.stdout.write(f"Fetching data from API...")
-            response = requests.get(url, timeout=10, headers=headers)
+            response = requests.get(url, timeout=30, headers=headers)
             self.stdout.write(f"Response status code: {response.status_code}")
             response.raise_for_status()
         except requests.exceptions.Timeout:
