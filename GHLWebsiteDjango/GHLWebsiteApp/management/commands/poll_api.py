@@ -12,22 +12,12 @@ class Command(BaseCommand):
 
     def fetch_and_process_games(self, team_id):
         try:
-            s = requests.Session()
             headers = {
                 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
                 'accept-language': 'en-US,en;q=0.9',
-                'priority': 'u=0, i',
-                'sec-ch-ua': '"Not(A:Brand";v="99", "Google Chrome";v="133", "Chromium";v="133"',
-                'sec-ch-ua-mobile': '?0',
-                'sec-ch-ua-platform': '"Windows"',
-                'sec-fetch-dest': 'document',
-                'sec-fetch-mode': 'navigate',
-                'sec-fetch-site': 'none',
-                'sec-fetch-user': '?1',
                 'upgrade-insecure-requests': '1',
                 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36',
             }
-            s.headers.update(headers)
             # Construct the URL with the team ID
             params = {
                 'matchType': 'club_private',
@@ -35,7 +25,7 @@ class Command(BaseCommand):
                 'clubIds': team_id,
             }
             self.stdout.write(f"Fetching data from API...")
-            response = s.get(BASE_API_URL, timeout=10, params=params)
+            response = requests.get(BASE_API_URL, timeout=10, headers=headers, params=params)
             response.raise_for_status()
         except requests.exceptions.Timeout:
             raise CommandError(f"Request to pull data for team {team_id} timed out")
