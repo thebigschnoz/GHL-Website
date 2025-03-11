@@ -5,27 +5,23 @@ from datetime import datetime, time
 import pytz
 from django.core.management.base import BaseCommand, CommandError
 
-BASE_API_URL = "https://proclubs.ea.com/api/nhl/clubs/matches"
+BASE_API_URL = "https://proclubs.ea.com/api/nhl/clubs/matches?matchType=club_private&platform=common-gen5&clubIds="
                
 class Command(BaseCommand):
     help = "Polls the EA API for game data and updates the database"
 
     def fetch_and_process_games(self, team_id):
         try:
+            url = f"{BASE_API_URL}{team_id}"
             headers = {
                 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
                 'accept-language': 'en-US,en;q=0.9',
                 'upgrade-insecure-requests': '1',
                 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36',
             }
-            # Construct the URL with the team ID
-            params = {
-                'matchType': 'club_private',
-                'platform': 'common-gen5',
-                'clubIds': team_id,
-            }
             self.stdout.write(f"Fetching data from API...")
-            response = requests.get(BASE_API_URL, timeout=10, headers=headers, params=params)
+            response = requests.get(url, timeout=10, headers=headers)
+            self.stdout.write(f"Response status code: {response.status_code}")
             response.raise_for_status()
         except requests.exceptions.Timeout:
             raise CommandError(f"Request to pull data for team {team_id} timed out")
@@ -259,7 +255,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.stdout.write("Polling EA API for game data...")
-        self.stdout.write("Getting active teamlist")
+        self.stdout.write("Getting active teamlist...")
         active_teams = Team.objects.filter(isActive=True) # Gets active teams
         self.stdout.write(f"Found {len(active_teams)} active teams")
         for team in active_teams:
