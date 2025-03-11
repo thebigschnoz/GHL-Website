@@ -24,7 +24,7 @@ class Command(BaseCommand):
                 'sec-fetch-site': 'same-origin',
                 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36',
             }
-            self.stdout.write(f"Fetching data from API...")
+            self.stdout.write(f"Fetching data from {url}...")
             response = requests.get(url, timeout=30, headers=headers)
             self.stdout.write(f"Response status code: {response.status_code}")
             response.raise_for_status()
