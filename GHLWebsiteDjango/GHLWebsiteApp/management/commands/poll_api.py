@@ -11,7 +11,7 @@ class Command(BaseCommand):
     help = "Polls the EA API for game data and updates the database"
 
     def fetch_and_process_games(self, team_id):
-        c = httpx.AsyncClient(http2=True)
+        c = httpx.Client(http2=True)
         try:
             url = f"{BASE_API_URL}{team_id}"
             headers = {
