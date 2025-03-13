@@ -12,20 +12,26 @@ class Command(BaseCommand):
 
     def fetch_and_process_games(self, team_id):
         try:
+            s = requests.Session()
             url = f"{BASE_API_URL}{team_id}"
             headers = {
-                'accept': 'application/json, text/plain, */*',
+                'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
                 'accept-language': 'en-US,en;q=0.9',
+                'priority': 'u=0, i',
+                'sec-ch-ua': '"Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"',
+                'sec-ch-ua-mobile': '?0',
+                'sec-ch-ua-platform': '"Windows"',
                 'cache-control': 'no-cache',
                 'pragma': 'no-cache',
                 'referer': 'https://proclubs.ea.com/',
-                'sec-fetch-dest': 'empty',
-                'sec-fetch-mode': 'cors',
-                'sec-fetch-site': 'same-origin',
+                'sec-fetch-dest': 'document',
+                'sec-fetch-mode': 'navigate',
+                'sec-fetch-site': 'none',
                 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36',
+                'upgrade-insecure-requests': '1',
             }
             self.stdout.write(f"Fetching data from {url}...")
-            response = requests.get(url, timeout=15, headers=headers, verify=True)
+            response = s.get(url, timeout=15, headers=headers)
             self.stdout.write(f"Response status code: {response.status_code}")
             response.raise_for_status()
         except requests.exceptions.Timeout:
