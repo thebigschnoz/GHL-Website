@@ -68,8 +68,8 @@ class Command(BaseCommand):
 
                 # Fetch the Team instances
                 try:
-                    a_team_instance = Team.objects.get(a_team=a_team_num)
-                    h_team_instance = Team.objects.get(h_team=h_team_num)
+                    a_team_instance = Team.objects.get(ea_club_num=a_team_num)
+                    h_team_instance = Team.objects.get(ea_club_num=h_team_num)
                 except Team.DoesNotExist:
                     self.stdout.write(f"One of the teams does not exist in the database - skipping game")
                     continue
