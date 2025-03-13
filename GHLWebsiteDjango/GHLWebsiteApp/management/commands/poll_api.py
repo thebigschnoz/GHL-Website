@@ -155,14 +155,14 @@ class Command(BaseCommand):
                 
                 # Parse team stats
                 for club_id, club_data in game["clubs"].items():
-                    pass_att_team = game["aggregates"].get(club_id, {}).get("skpassattempts", 0)
-                    pass_comp_team = game["aggregates"].get(club_id, {}).get("skpasses", 0)
-                    fow_team = game["aggregates"].get(club_id, {}).get("skfow", 0)
-                    fol_team = game["aggregates"].get(club_id, {}).get("skfol", 0)
-                    hits_team = game["aggregates"].get(club_id, {}).get("skhits", 0)
-                    pims_team = game["aggregates"].get(club_id, {}).get("skpim", 0)
-                    shg_team = game["aggregates"].get(club_id, {}).get("skshg", 0)
-                    shot_att_team = game["aggregates"].get(club_id, {}).get("skshots", 0)
+                    pass_att_team = game["aggregate"].get(club_id, {}).get("skpassattempts", 0)
+                    pass_comp_team = game["aggregate"].get(club_id, {}).get("skpasses", 0)
+                    fow_team = game["aggregate"].get(club_id, {}).get("skfow", 0)
+                    fol_team = game["aggregate"].get(club_id, {}).get("skfol", 0)
+                    hits_team = game["aggregate"].get(club_id, {}).get("skhits", 0)
+                    pims_team = game["aggregate"].get(club_id, {}).get("skpim", 0)
+                    shg_team = game["aggregate"].get(club_id, {}).get("skshg", 0)
+                    shot_att_team = game["aggregate"].get(club_id, {}).get("skshots", 0)
                     teamrecord_obj, _ = TeamRecord.objects.update_or_create(
                         ea_club_num=club_id,
                         game_num=game_obj,
