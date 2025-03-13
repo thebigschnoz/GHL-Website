@@ -195,9 +195,10 @@ class Command(BaseCommand):
                 # Parse skater stats
                 for team_id, team_players in game["players"].items():
                     for player_id, player_data in team_players.items():
+                        players_team_instance = Team.objects.get(ea_club_num=team_id)
                         player_instance = Player.objects.get_or_create(ea_player_num=player_id,
                                     defaults={"username": player_data.get("playername", "Username Not Found"),
-                                    "current_team": team_id
+                                    "current_team": players_team_instance
                         })
                         pos_sorted = player_data.get("posSorted", 0)
                         player_class = player_data.get("class", 0)
