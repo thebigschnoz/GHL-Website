@@ -155,6 +155,11 @@ class Command(BaseCommand):
                 
                 # Parse team stats
                 for club_id, club_data in game["clubs"].items():
+                    try:
+                        team_instance = Team.objects.get(team_num=club_id)
+                    except Team.DoesNotExist:
+                        self.stdout.write(f"Team with team_num {club_id} does not exist in the database - skipping")
+                        continue
                     pass_att_team = game["aggregate"].get(club_id, {}).get("skpassattempts", 0)
                     pass_comp_team = game["aggregate"].get(club_id, {}).get("skpasses", 0)
                     fow_team = game["aggregate"].get(club_id, {}).get("skfow", 0)
@@ -164,7 +169,7 @@ class Command(BaseCommand):
                     shg_team = game["aggregate"].get(club_id, {}).get("skshg", 0)
                     shot_att_team = game["aggregate"].get(club_id, {}).get("skshots", 0)
                     teamrecord_obj, _ = TeamRecord.objects.update_or_create(
-                        ea_club_num=club_id,
+                        ea_club_num=team_instance,
                         game_num=game_obj,
                         defaults={
                             "home_away": club_data.get("teamSide", 0),
