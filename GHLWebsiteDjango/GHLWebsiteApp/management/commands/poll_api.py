@@ -1,6 +1,6 @@
 from GHLWebsiteApp.views import get_seasonSetting, calculate_leaders, calculate_standings
 import httpx
-from GHLWebsiteApp.models import Game, TeamRecord, SkaterRecord, GoalieRecord, Player, Team, Season
+from GHLWebsiteApp.models import *
 from datetime import datetime, time
 import pytz
 from django.core.management.base import BaseCommand, CommandError
@@ -202,8 +202,8 @@ class Command(BaseCommand):
                                 "username": player_data.get("playername", "Username Not Found"),
                                 "current_team": players_team_instance
                         })
-                        pos_sorted = player_data.get("posSorted", 0)
-                        player_class = player_data.get("class", 0)
+                        pos_sorted = Position.objects.get(ea_pos=player_data.get("posSorted", 0))
+                        player_class = Build.objects.get(ea_build=player_data.get("class", 0))
                         skgoals = player_data.get("skgoals", 0)
                         skassists = player_data.get("skassists")
                         skhits = player_data.get("skhits", 0)
@@ -269,9 +269,9 @@ class Command(BaseCommand):
                             ps_saves = player_data.get("glpensaves", 0)
 
                             goalie_obj, _ = GoalieRecord.objects.update_or_create(
-                                ea_player_num=player_id,
+                                ea_player_num=player_instance,
                                 game_num=game_obj,
-                                ea_club_num=team_id,
+                                ea_club_num=players_team_instance,
                                 defaults={
                                     "shots_against": shots_against,
                                     "saves": saves,
