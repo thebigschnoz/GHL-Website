@@ -65,6 +65,14 @@ class Command(BaseCommand):
                 teamnumbers = iter(game["clubs"].keys())
                 a_team_num = next(teamnumbers)
                 h_team_num = next(teamnumbers)
+
+                # Fetch the Team instances
+                try:
+                    a_team_instance = Team.objects.get(team_num=a_team_num)
+                    h_team_instance = Team.objects.get(team_num=h_team_num)
+                except Team.DoesNotExist:
+                    self.stdout.write(f"One of the teams does not exist in the database - skipping game")
+                    continue
                 self.stdout.write(f"Processing game between {game['clubs'][a_team_num]['details']['name']} and {game['clubs'][h_team_num]['details']['name']}")
 
                 # Extract dnf value
@@ -113,8 +121,8 @@ class Command(BaseCommand):
         
                 # Find the matching game by date and team numbers
                 matching_games = Game.objects.filter(
-                    a_team_num=a_team_num,
-                    h_team_num=h_team_num,
+                    a_team_num=a_team_instance,
+                    h_team_num=h_team_instance,
                     expected_time__date=game_date
                 )
 
@@ -133,8 +141,8 @@ class Command(BaseCommand):
                     # If no matching game is found, create a new game record
                     game_obj = Game(
                         game_num=game_num,
-                        a_team_num=a_team_num,
-                        h_team_num=h_team_num,
+                        a_team_num=a_team_instance,
+                        h_team_num=h_team_instance,
                         played_time=datetime.fromtimestamp(timestamp, est),
                         dnf=dnf,
                         gamelength=gamelength,
