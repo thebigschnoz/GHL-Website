@@ -1,5 +1,5 @@
 from GHLWebsiteApp.views import get_seasonSetting, calculate_leaders, calculate_standings
-import requests
+import httpx
 from GHLWebsiteApp.models import Game, TeamRecord, SkaterRecord, GoalieRecord, Player, Team
 from datetime import datetime, time
 import pytz
@@ -12,7 +12,6 @@ class Command(BaseCommand):
 
     def fetch_and_process_games(self, team_id):
         try:
-            s = requests.Session()
             url = f"{BASE_API_URL}{team_id}"
             cookies = {
                 '_tt_enable_cookie': '1',
@@ -53,12 +52,12 @@ class Command(BaseCommand):
                 'upgrade-insecure-requests': '1',
             }
             self.stdout.write(f"Fetching data from {url}...")
-            response = s.get(url, timeout=15, cookies=cookies, headers=headers)
+            response = httpx.get(url, timeout=15, cookies=cookies, headers=headers)
             self.stdout.write(f"Response status code: {response.status_code}")
             response.raise_for_status()
-        except requests.exceptions.Timeout:
+        except httpx.exceptions.Timeout:
             raise CommandError(f"Request to pull data for team {team_id} timed out")
-        except requests.exceptions.RequestException as e:
+        except httpx.exceptions.RequestException as e:
             raise CommandError(f"Error fetching data: {e}")
         else:
             self.stdout.write("Parsing JSON response...")
