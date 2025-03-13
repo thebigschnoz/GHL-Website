@@ -156,7 +156,7 @@ class Command(BaseCommand):
                 # Parse team stats
                 for club_id, club_data in game["clubs"].items():
                     try:
-                        team_instance = Team.objects.get(team_num=club_id)
+                        team_instance = Team.objects.get(ea_club_num=club_id)
                     except Team.DoesNotExist:
                         self.stdout.write(f"Team with team_num {club_id} does not exist in the database - skipping")
                         continue
