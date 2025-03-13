@@ -95,7 +95,7 @@ class SkaterRecord(models.Model):
     
     @property
     def shotpctcalc(self):
-        if self.shot_attempts > 0:
+        if self.sog > 0:
             shotpct = (self.goals / self.sog) * 100
             return shotpct
         else:
