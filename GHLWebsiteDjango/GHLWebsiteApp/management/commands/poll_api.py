@@ -68,7 +68,11 @@ class Command(BaseCommand):
                 self.stdout.write(f"Processing game between {game['clubs'][a_team_num]['details']['name']} and {game['clubs'][h_team_num]['details']['name']}")
 
                 # Extract dnf value
-                dnf = game["clubs"][a_team_num]["dnf"] or game["clubs"][h_team_num]["dnf"]
+                dnf = any(
+                    player_data.get("player_dnf", 0) == 1
+                    for team_id, team_players in game["players"].items()
+                    for player_id, player_data in team_players.items()
+                )
                 if dnf:
                     self.stdout.write("DNF detected - setting season to test season")
                     seasonSetting = 2
