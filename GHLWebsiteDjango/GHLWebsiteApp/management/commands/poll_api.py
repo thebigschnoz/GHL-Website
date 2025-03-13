@@ -65,7 +65,7 @@ class Command(BaseCommand):
                 teamnumbers = iter(game["clubs"].keys())
                 a_team_num = next(teamnumbers)
                 h_team_num = next(teamnumbers)
-                self.stdout.write(f"Processing game between {game['clubs'][a_team_num]['name']} and {game['clubs'][h_team_num]['name']}")
+                self.stdout.write(f"Processing game between {game['clubs'][a_team_num]['details']['name']} and {game['clubs'][h_team_num]['details']['name']}")
 
                 # Extract dnf value
                 dnf = game["clubs"][a_team_num]["dnf"] or game["clubs"][h_team_num]["dnf"]
