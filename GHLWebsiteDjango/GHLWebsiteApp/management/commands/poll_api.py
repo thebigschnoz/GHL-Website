@@ -228,7 +228,7 @@ class Command(BaseCommand):
                         skfol = player_data.get("skfol", 0)
 
                         skater_obj, _ = SkaterRecord.objects.update_or_create(
-                            ea_player_num=player_instance.ea_player_num,
+                            ea_player_num=player_instance,
                             game_num=game_obj,
                             ea_club_num=team_id,
                             defaults={
