@@ -230,7 +230,7 @@ class Command(BaseCommand):
                         skater_obj, _ = SkaterRecord.objects.update_or_create(
                             ea_player_num=player_instance,
                             game_num=game_obj,
-                            ea_club_num=team_id,
+                            ea_club_num=players_team_instance,
                             defaults={
                                 "position": pos_sorted,
                                 "build": player_class,
