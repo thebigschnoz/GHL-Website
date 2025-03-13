@@ -260,7 +260,7 @@ class Command(BaseCommand):
                         )
 
                         # If pos_sorted is 0, add a GoalieRecord
-                        if pos_sorted == 0:
+                        if pos_sorted == Position.objects.get(ea_pos=0):
                             shots_against = int(player_data.get("glshots", 0))
                             saves = int(player_data.get("glsaves", 0))
                             breakaway_shots = int(player_data.get("glbrkshots", 0))
