@@ -130,10 +130,10 @@ class Command(BaseCommand):
                 if matching_games.exists():
                     game_obj = matching_games.first()
                     game_obj.played_time = datetime.fromtimestamp(timestamp, est)
-                    game_obj.dnf = dnf
-                    game_obj.gamelength = gamelength
-                    game_obj.a_team_gf = a_team_gf
-                    game_obj.h_team_gf = h_team_gf
+                    game_obj.dnf = int(dnf)
+                    game_obj.gamelength = int(gamelength)
+                    game_obj.a_team_gf = int(a_team_gf)
+                    game_obj.h_team_gf = int(h_team_gf)
                     game_obj.season_num = season_instance
                     game_obj.save()
                     self.stdout.write(f"Updated existing game {game_num}")
@@ -145,9 +145,9 @@ class Command(BaseCommand):
                         h_team_num=h_team_instance,
                         played_time=datetime.fromtimestamp(timestamp, est),
                         dnf=dnf,
-                        gamelength=gamelength,
-                        a_team_gf=a_team_gf,
-                        h_team_gf=h_team_gf,
+                        gamelength=int(gamelength),
+                        a_team_gf=int(a_team_gf),
+                        h_team_gf=int(h_team_gf),
                         season_num=season_instance
                     )
                     game_obj.save()
