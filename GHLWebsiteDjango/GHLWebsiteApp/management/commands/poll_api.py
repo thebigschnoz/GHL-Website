@@ -11,6 +11,7 @@ class Command(BaseCommand):
     help = "Polls the EA API for game data and updates the database"
 
     def fetch_and_process_games(self, team_id):
+        c = httpx.AsyncClient(http2=True)
         try:
             url = f"{BASE_API_URL}{team_id}"
             headers = {
@@ -30,7 +31,7 @@ class Command(BaseCommand):
                 'upgrade-insecure-requests': '1',
             }
             self.stdout.write(f"Fetching data from {url}...")
-            response = httpx.get(url, timeout=15, headers=headers)
+            response = c.get(url, timeout=15, headers=headers)
             self.stdout.write(f"Response status code: {response.status_code}")
             response.raise_for_status()
         except httpx.ConnectTimeout:
