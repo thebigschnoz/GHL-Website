@@ -79,7 +79,7 @@ def calculate_standings():
                 ppperc = Decimal(0)
             else:
                 ppperc = round((Decimal(TeamRecord.objects.filter(game_num__season_num=seasonSetting, ea_club_num=team).aggregate(Sum("ppg_team"))["ppg_team__sum"]) / Decimal(ppocalc))*100, 1)
-            #pkperc = 
+            pkperc = Decimal(0) # TODO: Add PK% calculation
             lasttengames = TeamRecord.objects.filter(game_num__season_num=seasonSetting, ea_club_num=team).order_by("-game_num")[:10:-1]
                 # this is where I totally forgot that I made TeamRecord as a model. Schnoz, you idiot
             l10w = l10l = l10otl = 0
@@ -112,7 +112,7 @@ def calculate_standings():
                         else:
                             break
                 streak = f"{streak_type}{streak_count}"
-            standing, created = Standing.objects.update_or_create(team=team, season=Season.objects.get(season_num=seasonSetting), defaults={'wins': wins, 'losses': losses, 'otlosses': otlosses, 'points': points, 'goalsfor': goalsfor, 'goalsagainst': goalsagainst, "gp": gp, "winperc": winperc, "ppperc": ppperc, "lastten": lastten, "streak": streak})
+            standing, created = Standing.objects.update_or_create(team=team, season=Season.objects.get(season_num=seasonSetting), defaults={'wins': wins, 'losses': losses, 'otlosses': otlosses, 'points': points, 'goalsfor': goalsfor, 'goalsagainst': goalsagainst, "gp": gp, "winperc": winperc, "ppperc": ppperc, "pkperc": pkperc, "lastten": lastten, "streak": streak})
 
 def get_scoreboard():
     data = Game.objects.filter(season_num=seasonSetting).order_by("-played_time")[:15]
