@@ -73,12 +73,12 @@ def calculate_standings():
             goalsfor = (Game.objects.filter(season_num=seasonSetting, a_team_num__isActive=True, a_team_num=team).aggregate(Sum("a_team_gf"))["a_team_gf__sum"] or 0) + (Game.objects.filter(season_num=seasonSetting, h_team_num__isActive=True, h_team_num=team).aggregate(Sum("h_team_gf"))["h_team_gf__sum"] or 0)
             goalsagainst = (Game.objects.filter(season_num=seasonSetting, a_team_num__isActive=True, a_team_num=team).aggregate(Sum("h_team_gf"))["h_team_gf__sum"] or 0) + (Game.objects.filter(season_num=seasonSetting, h_team_num__isActive=True, h_team_num=team).aggregate(Sum("a_team_gf"))["a_team_gf__sum"] or 0)
             gp = gamelist
-            winperc = round(points/(gp*2), 3)
+            winperc = round(Decimal(points)/Decimal(gp*2), 3)
             ppocalc = TeamRecord.objects.filter(game_num__season_num=seasonSetting, ea_club_num=team).aggregate(Sum("ppo_team"))["ppo_team__sum"]
             if not ppocalc:
-                ppperc = 0
+                ppperc = Decimal(0)
             else:
-                ppperc = round((TeamRecord.objects.filter(game_num__season_num=seasonSetting, ea_club_num=team).aggregate(Sum("ppg_team"))["ppg_team__sum"] / TeamRecord.objects.filter(game_num__season_num=seasonSetting, ea_club_num=team).aggregate(Sum("ppo_team"))["ppo_team__sum"])*100, 1)
+                ppperc = round((Decimal(TeamRecord.objects.filter(game_num__season_num=seasonSetting, ea_club_num=team).aggregate(Sum("ppg_team"))["ppg_team__sum"]) / Decimal(ppocalc))*100, 1)
             #pkperc = 
             lasttengames = TeamRecord.objects.filter(game_num__season_num=seasonSetting, ea_club_num=team).order_by("-game_num")[:10:-1]
                 # this is where I totally forgot that I made TeamRecord as a model. Schnoz, you idiot
