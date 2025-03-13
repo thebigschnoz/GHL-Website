@@ -1,6 +1,6 @@
 from GHLWebsiteApp.views import get_seasonSetting, calculate_leaders, calculate_standings
 import httpx
-from GHLWebsiteApp.models import Game, TeamRecord, SkaterRecord, GoalieRecord, Player, Team
+from GHLWebsiteApp.models import Game, TeamRecord, SkaterRecord, GoalieRecord, Player, Team, Season
 from datetime import datetime, time
 import pytz
 from django.core.management.base import BaseCommand, CommandError
@@ -77,6 +77,12 @@ class Command(BaseCommand):
                     self.stdout.write("DNF detected - setting season to test season")
                     seasonSetting = 2
 
+                # Fetch the Season instance
+                try:
+                    season_instance = Season.objects.get(pk=seasonSetting)
+                except Season.DoesNotExist:
+                    raise CommandError(f"Season with id {seasonSetting} does not exist")
+
                 # Make sure it's a private game
                 is_private_game = any(
                     club_data.get("cNhlOnlineGameType") == "5"
@@ -120,22 +126,23 @@ class Command(BaseCommand):
                     game_obj.gamelength = gamelength
                     game_obj.a_team_gf = a_team_gf
                     game_obj.h_team_gf = h_team_gf
+                    game_obj.season_num = season_instance
                     game_obj.save()
                     self.stdout.write(f"Updated existing game {game_num}")
                 else:
                     # If no matching game is found, create a new game record
-                    game_obj, created = Game.objects.get_or_create(
+                    game_obj = Game(
                         game_num=game_num,
-                        defaults={"season_num": seasonSetting,
-                                "gamelength": gamelength,
-                                "played_time": timestamp,
-                                "dnf": dnf,
-                                "a_team_num": a_team_num,
-                                "h_team_num": h_team_num,
-                                "a_team_gf": a_team_gf,
-                                "h_team_gf": h_team_gf
-                                }
+                        a_team_num=a_team_num,
+                        h_team_num=h_team_num,
+                        played_time=datetime.fromtimestamp(timestamp, est),
+                        dnf=dnf,
+                        gamelength=gamelength,
+                        a_team_gf=a_team_gf,
+                        h_team_gf=h_team_gf,
+                        season_num=season_instance
                     )
+                    game_obj.save()
                     self.stdout.write(f"Created new game {game_num}")
                 
                 # Parse team stats
