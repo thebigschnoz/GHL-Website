@@ -196,9 +196,11 @@ class Command(BaseCommand):
                 for team_id, team_players in game["players"].items():
                     for player_id, player_data in team_players.items():
                         players_team_instance = Team.objects.get(ea_club_num=team_id)
-                        player_instance = Player.objects.get_or_create(ea_player_num=player_id,
-                                    defaults={"username": player_data.get("playername", "Username Not Found"),
-                                    "current_team": players_team_instance
+                        player_instance, _ = Player.objects.get_or_create(
+                            ea_player_num=player_id,
+                            defaults={
+                                "username": player_data.get("playername", "Username Not Found"),
+                                "current_team": players_team_instance
                         })
                         pos_sorted = player_data.get("posSorted", 0)
                         player_class = player_data.get("class", 0)
@@ -226,7 +228,7 @@ class Command(BaseCommand):
                         skfol = player_data.get("skfol", 0)
 
                         skater_obj, _ = SkaterRecord.objects.update_or_create(
-                            ea_player_num=player_instance,
+                            ea_player_num=player_instance.ea_player_num,
                             game_num=game_obj,
                             ea_club_num=team_id,
                             defaults={
