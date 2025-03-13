@@ -195,6 +195,10 @@ class Command(BaseCommand):
                 # Parse skater stats
                 for team_id, team_players in game["players"].items():
                     for player_id, player_data in team_players.items():
+                        player_instance = Player.objects.get_or_create(ea_player_num=player_id,
+                                    defaults={"username": player_data.get("playername", "Username Not Found"),
+                                    "current_team": team_id
+                        })
                         pos_sorted = player_data.get("posSorted", 0)
                         player_class = player_data.get("class", 0)
                         skgoals = player_data.get("skgoals", 0)
@@ -221,7 +225,7 @@ class Command(BaseCommand):
                         skfol = player_data.get("skfol", 0)
 
                         skater_obj, _ = SkaterRecord.objects.update_or_create(
-                            ea_player_num=player_id,
+                            ea_player_num=player_instance,
                             game_num=game_obj,
                             ea_club_num=team_id,
                             defaults={
@@ -251,13 +255,6 @@ class Command(BaseCommand):
                                 "fol": skfol,
                             }
                         )
-
-                        # Update or create Player
-                        player_obj, created = Player.objects.get_or_create(
-                            ea_player_num=player_id,
-                            defaults={"username": player_data.get("playername", "Username Not Found"),
-                                    "current_team": team_id
-                        })
 
                         # If pos_sorted is 0, add a GoalieRecord
                         if pos_sorted == 0:
