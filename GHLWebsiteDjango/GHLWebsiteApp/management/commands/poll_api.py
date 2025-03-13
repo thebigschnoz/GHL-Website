@@ -14,6 +14,28 @@ class Command(BaseCommand):
         try:
             s = requests.Session()
             url = f"{BASE_API_URL}{team_id}"
+            cookies = {
+                '_tt_enable_cookie': '1',
+                '_ttp': 'daV-aRnWav3agxQyEyoKt2V-8_q',
+                '_CEFT': 'Q%3D%3D%3D',
+                '_ga_LCS9CY367P': 'GS1.1.1716760680.1.1.1716760805.60.0.0',
+                '_ce.s': 'v~d8a13a0a459366326ebfffbe3adc28f34f0b8057~lcw~1716760805744~lva~1716760680711~vpv~0~v11.cs~390387~v11.s~05108120-1bab-11ef-89a4-0fc371320a0a~v11.sla~1716760805752~gtrk.la~lwo31wqr~v11.send~1716760805744~lcw~1716760805752',
+                '_scid': '733b8ad6-18be-45cb-8da0-6baa99d5e3ae',
+                '_sctr': '1%7C1721016000000',
+                '_scid_r': '733b8ad6-18be-45cb-8da0-6baa99d5e3ae',
+                '_ga': 'GA1.2.1164406783.1709522617',
+                '_ga_Q3MDF068TF': 'GS1.1.1721099317.37.1.1721099568.60.0.0',
+                'notice_preferences': '2:',
+                'notice_gdpr_prefs': '0,1,2:',
+                'notice_poptime': '1599001200000',
+                'cmapi_gtm_bl': '',
+                'cmapi_cookie_privacy': 'permit 1,2,3',
+                'notice_behavior': 'implied,us',
+                'notice_location': 'us,fl',
+                'ealocale': 'en-us',
+                '_abck': '41ABCE51CFBF09624E53124107E1FED1~-1~YAAQknLMFw4UGmyVAQAAl3DtgQ0t/2W+d/fKLdiCAzQbEDUS07WtyFKr8jH0NGXtroGs0P4gh8bJhHqG1amekMxWHceF9RztJ5cjwQtmRsCH1f8gjTQhzlhpB9MpZiS90Vayq01/SmATVKFDEqxXT8nKh9C8TtM2+pF+9hn48g0TXT5W6O9ltfqcf20AKmHXAbWT0GvjUw2qdCpJ6KSldUKgqLKCqZUzDpgoLyMHCDQYXVM2MWDHfqNMIcPmA6/nT9ixwzA8vBxg0tFjayEPRQsHkXTXw/EScm5YrGiiaMrbuglSbeqOLh/Tw3nRUvHW4v286yF949PomuXe8LR6Cxl/e21r94mTOvgNlA==~-1~-1~-1',
+                'ak_bmsc': '6C72D43BE8EA48058F43F5947A562DC7~000000000000000000000000000000~YAAQEvzaFw5UCYyVAQAAyVV0jBtZ5278RWC0hCCAwvJJ3cD0phdkZyjhjcFEcZdqteSNTxBsMvKwYBA01cV+RP7KWwIDDiDuyByR6U7Ds0IP7JlrQBqeDXNLYnRM3b5Yr7ZTy4uoJNHn8X1JjXEZAQPWEvzvfTicpLZw98H/5uWod+dGiVGkeBHNc/JfXlGXD+kc16+b2hvctvjofENGjpru18SNsFGnUH+MjPzk0fzhYJwTcuebooSqXL7juK8bZy+er3REKtXAC4MioiPfrSdRZx+eoJdtjIcZN6BWmGDcxX67PqF0f0DLxL2wqWjkKNoUejCAjNot4lW00y+kdmH7TpKPG1mzyHU7+NhJ16CyAN8DiZi3kAat/FvCbAqbtcwAZDE=',
+            }
             headers = {
                 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
                 'accept-language': 'en-US,en;q=0.9',
@@ -31,7 +53,7 @@ class Command(BaseCommand):
                 'upgrade-insecure-requests': '1',
             }
             self.stdout.write(f"Fetching data from {url}...")
-            response = s.get(url, timeout=15, headers=headers)
+            response = s.get(url, timeout=15, cookies=cookies, headers=headers)
             self.stdout.write(f"Response status code: {response.status_code}")
             response.raise_for_status()
         except requests.exceptions.Timeout:
