@@ -75,7 +75,7 @@ def calculate_standings():
             goalsagainst = (Game.objects.filter(season_num=seasonSetting, a_team_num__isActive=True, a_team_num=team).aggregate(Sum("h_team_gf"))["h_team_gf__sum"] or 0) + (Game.objects.filter(season_num=seasonSetting, h_team_num__isActive=True, h_team_num=team).aggregate(Sum("a_team_gf"))["a_team_gf__sum"] or 0)
             gp = gamelist
             try:
-                winperc = round(Decimal(points)/(Decimal(gp)*2), 3)
+                winperc = round(Decimal(points) / Decimal(gp*2), 3)
             except InvalidOperation:
                 winperc = Decimal(0)
             ppocalc = TeamRecord.objects.filter(game_num__season_num=seasonSetting, ea_club_num=team).aggregate(Sum("ppo_team"))["ppo_team__sum"] # total power play opportunities for the team
