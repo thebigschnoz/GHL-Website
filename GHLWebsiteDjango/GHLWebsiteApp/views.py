@@ -76,7 +76,7 @@ def calculate_standings():
             gp = gamelist
             winperc = round(Decimal(points)/(Decimal(gp)*2), 3)
             ppocalc = TeamRecord.objects.filter(game_num__season_num=seasonSetting, ea_club_num=team).aggregate(Sum("ppo_team"))["ppo_team__sum"] # total power play opportunities for the team
-            if not ppocalc:
+            if ppocalc == 0:
                 ppperc = Decimal(0)
             else:
                 ppperc = round((Decimal(TeamRecord.objects.filter(game_num__season_num=seasonSetting, ea_club_num=team).aggregate(Sum("ppg_team"))["ppg_team__sum"]) / Decimal(ppocalc))*100, 1)
