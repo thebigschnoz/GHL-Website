@@ -74,12 +74,18 @@ def calculate_standings():
             goalsfor = (Game.objects.filter(season_num=seasonSetting, a_team_num__isActive=True, a_team_num=team).aggregate(Sum("a_team_gf"))["a_team_gf__sum"] or 0) + (Game.objects.filter(season_num=seasonSetting, h_team_num__isActive=True, h_team_num=team).aggregate(Sum("h_team_gf"))["h_team_gf__sum"] or 0)
             goalsagainst = (Game.objects.filter(season_num=seasonSetting, a_team_num__isActive=True, a_team_num=team).aggregate(Sum("h_team_gf"))["h_team_gf__sum"] or 0) + (Game.objects.filter(season_num=seasonSetting, h_team_num__isActive=True, h_team_num=team).aggregate(Sum("a_team_gf"))["a_team_gf__sum"] or 0)
             gp = gamelist
-            winperc = round(Decimal(points)/(Decimal(gp)*2), 3)
+            try:
+                winperc = round(Decimal(points)/(Decimal(gp)*2), 3)
+            except InvalidOperation:
+                winperc = Decimal(0)
             ppocalc = TeamRecord.objects.filter(game_num__season_num=seasonSetting, ea_club_num=team).aggregate(Sum("ppo_team"))["ppo_team__sum"] # total power play opportunities for the team
             if ppocalc == 0:
                 ppperc = Decimal(0)
             else:
-                ppperc = round((Decimal(TeamRecord.objects.filter(game_num__season_num=seasonSetting, ea_club_num=team).aggregate(Sum("ppg_team"))["ppg_team__sum"]) / Decimal(ppocalc))*100, 1)
+                try:
+                    ppperc = round((Decimal(TeamRecord.objects.filter(game_num__season_num=seasonSetting, ea_club_num=team).aggregate(Sum("ppg_team"))["ppg_team__sum"]) / Decimal(ppocalc))*100, 1)
+                except InvalidOperation:
+                    ppperc = Decimal(0)
             pkperc = Decimal(0) # TODO: Add PK% calculation
             lasttengames = TeamRecord.objects.filter(game_num__season_num=seasonSetting, ea_club_num=team).order_by("-game_num")[:10:-1]
                 # this is where I totally forgot that I made TeamRecord as a model. Schnoz, you idiot
@@ -113,7 +119,7 @@ def calculate_standings():
                         else:
                             break
                 streak = f"{streak_type}{streak_count}"
-            standing, created = Standing.objects.update_or_create(team=team, season=Season.objects.get(season_num=seasonSetting), defaults={'wins': wins, 'losses': losses, 'otlosses': otlosses, 'points': points, 'goalsfor': goalsfor, 'goalsagainst': goalsagainst, "gp": gp, "winperc": Decimal(winperc), "ppperc": Decimal(ppperc), "pkperc": Decimal(pkperc), "lastten": lastten, "streak": streak})
+            standing, created = Standing.objects.update_or_create(team=team, season=Season.objects.get(season_num=seasonSetting), defaults={'wins': wins, 'losses': losses, 'otlosses': otlosses, 'points': points, 'goalsfor': goalsfor, 'goalsagainst': goalsagainst, "gp": gp, "winperc": winperc, "ppperc": ppperc, "pkperc": pkperc, "lastten": lastten, "streak": streak})
 
 def get_scoreboard():
     data = Game.objects.filter(season_num=seasonSetting).order_by("-played_time")[:15]
