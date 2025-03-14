@@ -248,9 +248,9 @@ class Standing(models.Model):
     goalsfor = models.IntegerField(default=0)
     goalsagainst = models.IntegerField(default=0)
     gp = models.IntegerField(default=0)
-    winperc = models.DecimalField(max_digits=3, decimal_places=1, default=0)
-    ppperc = models.DecimalField(max_digits=3, decimal_places=1, default=0)
-    pkperc = models.DecimalField(max_digits=3, decimal_places=1, default=0)
+    winperc = models.DecimalField(max_digits=4, decimal_places=1, default=0)
+    ppperc = models.DecimalField(max_digits=4, decimal_places=1, default=0)
+    pkperc = models.DecimalField(max_digits=4, decimal_places=1, default=0)
     lastten = models.CharField(max_length=8, default="n/a")
     streak = models.CharField(max_length=4, default="n/a")
 
