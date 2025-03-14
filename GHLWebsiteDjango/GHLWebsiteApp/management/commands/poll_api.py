@@ -203,7 +203,11 @@ class Command(BaseCommand):
                                 "current_team": players_team_instance
                         })
                         pos_sorted = Position.objects.get(ea_pos=player_data.get("posSorted", 0))
-                        player_class = Build.objects.get(ea_build=player_data.get("class", 0))
+                        build = player_data.get("class", 0)
+                        try:
+                            player_class = Build.objects.get(ea_build=build)
+                        except:
+                            player_class = Build.objects.get(ea_build=30)
                         skgoals = int(player_data.get("skgoals", 0))
                         skassists = int(player_data.get("skassists", 0))
                         skhits = int(player_data.get("skhits", 0))
