@@ -37,7 +37,7 @@
         {% for goalie in all_goalies %}
         <tr>
           <td>{{ forloop.counter }}</td>
-          <td><a href="{% url 'player' goalie.ea_player_num.ea_player_num %}">{{ goalie.username }}</a></td>
+          <td><a href="{% url 'player' goalie.ea_player_num.ea_player_num %}">{{ goalie.ea_player_num.username }}</a></td>
           <td>{{ goalie.ea_player_num.current_team.club_abbr }}</td>
           <td>{{ goalie.goaliesgp }}</td>
           <td>{{ goalie.goaliesshots }}</td>
