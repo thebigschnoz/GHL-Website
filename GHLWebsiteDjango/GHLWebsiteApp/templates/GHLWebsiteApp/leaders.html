@@ -95,8 +95,8 @@
                                 {% for skater in leaders_svp %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
-                                    <td><a href="{% url 'player' skater.ea_player_num.ea_player_num %}">{{ skater.ea_player_num }}</a></td>
-                                    <td>{{ skater.ea_player_num.current_team }}</td>
+                                    <td><a href="{% url 'player' skater.ea_player_num.ea_player_num %}">{{ skater.username }}</a></td>
+                                    <td>{{ skater.ea_player_num.current_team.club_abbr }}</td>
                                     <td class="points">{{ skater.savepercsum|floatformat:1 }}%</td>
                                 </tr>
                                 {% empty %}
@@ -120,8 +120,8 @@
                                 {% for skater in leaders_assists %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
-                                    <td><a href="{% url 'player' skater.ea_player_num.ea_player_num %}">{{ skater.ea_player_num }}</a></td>
-                                    <td>{{ skater.ea_player_num.current_team }}</td>
+                                    <td><a href="{% url 'player' skater.ea_player_num.ea_player_num %}">{{ skater.username }}</a></td>
+                                    <td>{{ skater.ea_player_num.current_team.club_abbr }}</td>
                                     <td class="points">{{ skater.numassists }}</td>
                                 </tr>
                                 {% empty %}
@@ -143,8 +143,8 @@
                                 {% for skater in leaders_gaa %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
-                                    <td><a href="{% url 'player' skater.ea_player_num.ea_player_num %}">{{ skater.ea_player_num }}</a></td>
-                                    <td>{{ skater.ea_player_num.current_team }}</td>
+                                    <td><a href="{% url 'player' skater.ea_player_num.ea_player_num %}">{{ skater.username }}</a></td>
+                                    <td>{{ skater.ea_player_num.current_team.club_abbr }}</td>
                                     <td class="points">{{ skater.gaatotal|floatformat:2 }}</td>
                                 </tr>
                                 {% empty %}
@@ -168,8 +168,8 @@
                                 {% for skater in leaders_shooting %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
-                                    <td><a href="{% url 'player' skater.ea_player_num.ea_player_num %}">{{ skater.ea_player_num }}</a></td>
-                                    <td>{{ skater.ea_player_num.current_team }}</td>
+                                    <td><a href="{% url 'player' skater.ea_player_num.ea_player_num %}">{{ skater.username }}</a></td>
+                                    <td>{{ skater.ea_player_num.current_team.club_abbr }}</td>
                                     <td class="points">{{ skater.shootperc|floatformat:1 }}</td>
                                 </tr>
                                 {% empty %}
@@ -191,8 +191,8 @@
                                 {% for skater in leaders_shutouts %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
-                                    <td><a href="{% url 'player' skater.ea_player_num.ea_player_num %}">{{ skater.ea_player_num }}</a></td>
-                                    <td>{{ skater.ea_player_num.current_team }}</td>
+                                    <td><a href="{% url 'player' skater.ea_player_num.ea_player_num %}">{{ skater.username }}</a></td>
+                                    <td>{{ skater.ea_player_num.current_team.club_abbr }}</td>
                                     <td class="points">{{ skater.shutoutcount }}</td>
                                 </tr>
                                 {% empty %}
