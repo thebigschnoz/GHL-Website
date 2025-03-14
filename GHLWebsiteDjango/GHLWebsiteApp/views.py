@@ -5,7 +5,7 @@ from django.db.models.functions import Cast
 from django.http import JsonResponse
 from django.core import serializers
 import random, json
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 
 seasonSetting = 1 # Current season in GHL
 
