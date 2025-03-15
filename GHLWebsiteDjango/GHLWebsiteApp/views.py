@@ -247,6 +247,7 @@ def goalies(request):
     context = {
         "all_goalies": all_goalies, "scoreboard": get_scoreboard()
     }
+    print(context)
     return render(request, "GHLWebsiteApp/goalies.html", context)
 
 def team(request, team):
