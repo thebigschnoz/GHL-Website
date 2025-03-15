@@ -216,9 +216,7 @@ def skaters(request):
     return render(request, "GHLWebsiteApp/skaters.html", context)
 
 def goalies(request):
-    all_goalies = GoalieRecord.objects.filter(game_num__season_num=seasonSetting).values("ea_player_num").annotate(
-        goaliesusername = Player.objects.get(ea_player_num=F("ea_player_num")).username,
-        goaliesclub = Team.objects.get(ea_club_num=F("current_team")).club_abbr,
+    all_goalies = GoalieRecord.objects.filter(game_num__season_num=seasonSetting).values("ea_player_num", "ea_player_num__username", "current_team__ea_club_num__club_name").annotate(
         goaliesgp = Count("game_num"),
         goaliesshots = Sum("shots_against"),
         goaliesga = (Sum("shots_against")-Sum("saves")),
