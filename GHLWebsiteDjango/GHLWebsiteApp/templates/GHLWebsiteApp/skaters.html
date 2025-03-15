@@ -42,7 +42,7 @@
         <tr>
           <td>{{ forloop.counter }}</td>
           <td><a href="{% url 'player' player.ea_player_num %}">{{ player.username }}</a></td>
-          <td>{{ player.ea_player_num.current_team.club_abbr }}</td>
+          <td>{{ player.current_team.club_abbr }}</td>
           <td>{{ player.skatersgp }}</td>
           <td>{{ player.skatersgoals }}</td>
           <td>{{ player.skatersassists }}</td>
