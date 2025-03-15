@@ -217,6 +217,8 @@ def skaters(request):
 
 def goalies(request):
     all_goalies = GoalieRecord.objects.filter(game_num__season_num=seasonSetting).values("ea_player_num").annotate(
+        goaliesusername = F("ea_player_num__username"),
+        goaliesclub = F("current_team__ea_club_num__club_abbr"),
         goaliesgp = Count("game_num"),
         goaliesshots = Sum("shots_against"),
         goaliesga = (Sum("shots_against")-Sum("saves")),
