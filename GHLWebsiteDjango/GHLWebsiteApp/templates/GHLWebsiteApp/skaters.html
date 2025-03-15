@@ -41,8 +41,8 @@
         {% for player in all_skaters %}
         <tr>
           <td>{{ forloop.counter }}</td>
-          <td><a href="{% url 'player' player.ea_player_num %}">{{ player.username }}</a></td>
-          <td>{{ player.current_team.club_abbr }}</td>
+          <td><a href="{% url 'player' player.ea_player_num %}">{{ player.ea_player_num__username }}</a></td>
+          <td>{{ player.ea_player_num__current_team__club_abbr }}</td>
           <td>{{ player.skatersgp }}</td>
           <td>{{ player.skatersgoals }}</td>
           <td>{{ player.skatersassists }}</td>
