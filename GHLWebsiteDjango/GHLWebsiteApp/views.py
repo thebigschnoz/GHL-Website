@@ -211,7 +211,7 @@ def skaters(request):
         skatersbs=Avg("blocked_shots"),
         skatersppg=Sum("ppg"),
         skatersshg=Sum("shg"),
-    ).order_by("ea_player_num")
+    ).order_by("skaterspoints", "skatersgoals", -"skatersgp", "skaterspims")
     context = {
         "all_skaters": all_skaters, "scoreboard": get_scoreboard()
     }
