@@ -53,7 +53,7 @@
                         {% for leader in leaders %}
                         <tr>
                             <td>{{ leader.attribute }}</td>
-                            <td class="points">{{ leader.ea_player_num__username }}</td>
+                            <td class="points">{{ leader.player__username }}</td>
                             {% if leader.attribute == "SV%" or leader.attribute == "SH%" %}
                             <td>{{ leader.stat|floatformat:1 }}%</td>
                             {% elif leader.attribute == "GAA" %}
