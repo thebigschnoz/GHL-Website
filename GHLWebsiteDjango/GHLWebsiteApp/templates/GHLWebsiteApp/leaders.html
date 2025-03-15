@@ -24,8 +24,8 @@
                                 {% for skater in leaders_points %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
-                                    <td><a href="{% url 'player' skater.ea_player_num %}">{{ skater.username }}</a></td>
-                                    <td>{{ skater.current_team.club_abbr }}</td>
+                                    <td><a href="{% url 'player' skater.ea_player_num %}">{{ skater.ea_player_num__username }}</a></td>
+                                    <td>{{ skater.ea_player_num__current_team__club_abbr }}</td>
                                     <td class="points">{{ skater.numpoints }}</td>
                                 </tr>
                                 {% empty %}
@@ -47,8 +47,8 @@
                                 {% for skater in leaders_wins %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
-                                    <td><a href="{% url 'player' skater.ea_player_num %}">{{ skater.username }}</a></td>
-                                    <td>{{ skater.current_team.club_abbr }}</td>
+                                    <td><a href="{% url 'player' skater.ea_player_num %}">{{ skater.ea_player_num__username }}</a></td>
+                                    <td>{{ skater.ea_player_num__current_team__club_abbr }}</td>
                                     <td class="points">{{ skater.wincount }}</td>
                                 </tr>
                                 {% empty %}
@@ -72,8 +72,8 @@
                                 {% for skater in leaders_goals %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
-                                    <td><a href="{% url 'player' skater.ea_player_num %}">{{ skater.username }}</a></td>
-                                    <td>{{ skater.current_team.club_abbr }}</td>
+                                    <td><a href="{% url 'player' skater.ea_player_num %}">{{ skater.ea_player_num__username }}</a></td>
+                                    <td>{{ skater.ea_player_num__current_team__club_abbr }}</td>
                                     <td class="points">{{ skater.numgoals }}</td>
                                 </tr>
                                 {% empty %}
@@ -95,8 +95,8 @@
                                 {% for skater in leaders_svp %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
-                                    <td><a href="{% url 'player' skater.ea_player_num %}">{{ skater.username }}</a></td>
-                                    <td>{{ skater.ecurrent_team.club_abbr }}</td>
+                                    <td><a href="{% url 'player' skater.ea_player_num %}">{{ skater.ea_player_num__username }}</a></td>
+                                    <td>{{ skater.ea_player_num__current_team__club_abbr }}</td>
                                     <td class="points">{{ skater.savepercsum|floatformat:1 }}%</td>
                                 </tr>
                                 {% empty %}
@@ -120,8 +120,8 @@
                                 {% for skater in leaders_assists %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
-                                    <td><a href="{% url 'player' skater.ea_player_num %}">{{ skater.username }}</a></td>
-                                    <td>{{ skatercurrent_team.club_abbr }}</td>
+                                    <td><a href="{% url 'player' skater.ea_player_num %}">{{ skater.ea_player_num__username }}</a></td>
+                                    <td>{{ skater.ea_player_num__current_team__club_abbr }}</td>
                                     <td class="points">{{ skater.numassists }}</td>
                                 </tr>
                                 {% empty %}
@@ -143,8 +143,8 @@
                                 {% for skater in leaders_gaa %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
-                                    <td><a href="{% url 'player' skater.ea_player_num %}">{{ skater.username }}</a></td>
-                                    <td>{{ skater.current_team.club_abbr }}</td>
+                                    <td><a href="{% url 'player' skater.ea_player_num %}">{{ skater.ea_player_num__username }}</a></td>
+                                    <td>{{ skater.ea_player_num__current_team__club_abbr }}</td>
                                     <td class="points">{{ skater.gaatotal|floatformat:2 }}</td>
                                 </tr>
                                 {% empty %}
@@ -168,8 +168,8 @@
                                 {% for skater in leaders_shooting %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
-                                    <td><a href="{% url 'player' skater.ea_player_num %}">{{ skater.username }}</a></td>
-                                    <td>{{ skater.current_team.club_abbr }}</td>
+                                    <td><a href="{% url 'player' skater.ea_player_num %}">{{ skater.ea_player_num__username }}</a></td>
+                                    <td>{{ skater.ea_player_num__current_team__club_abbr }}</td>
                                     <td class="points">{{ skater.shootperc|floatformat:1 }}</td>
                                 </tr>
                                 {% empty %}
@@ -191,8 +191,8 @@
                                 {% for skater in leaders_shutouts %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
-                                    <td><a href="{% url 'player' skater.ea_player_num %}">{{ skater.username }}</a></td>
-                                    <td>{{ skater.current_team.club_abbr }}</td>
+                                    <td><a href="{% url 'player' skater.ea_player_num %}">{{ skater.ea_player_num__username }}</a></td>
+                                    <td>{{ skater.ea_player_num__current_team__club_abbr }}</td>
                                     <td class="points">{{ skater.shutoutcount }}</td>
                                 </tr>
                                 {% empty %}

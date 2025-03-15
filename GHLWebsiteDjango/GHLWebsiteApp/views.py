@@ -164,24 +164,24 @@ def standings(request):
     return render(request, "GHLWebsiteApp/standings.html", {"standings": standings, "scoreboard": get_scoreboard()})
 
 def leaders(request):
-    leaders_goals = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).values("ea_player_num").annotate(numgoals=Sum("goals")).filter(numgoals__gt=0).order_by("-numgoals")[:10]
-    leaders_assists = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).values("ea_player_num").annotate(numassists=Sum("assists")).filter(numassists__gt=0).order_by("-numassists")[:10]
-    leaders_points = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).values("ea_player_num").annotate(numpoints=Sum("points")).filter(numpoints__gt=0).order_by("-numpoints")[:10]
-    leaders_shooting = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).values("ea_player_num").annotate(shootperc=(Cast(Sum("goals"), models.FloatField())/Cast(Sum("sog"), models.FloatField()))*100).filter(shootperc__gt=0).order_by("-shootperc")[:10]
-    leaders_svp = GoalieRecord.objects.filter(game_num__season_num=seasonSetting).values("ea_player_num").annotate(savepercsum=(Cast(Sum("saves"), models.FloatField())/Cast(Sum("shots_against"), models.FloatField()))*100).order_by("-savepercsum")[:10]
-    leaders_shutouts = GoalieRecord.objects.filter(game_num__season_num=seasonSetting).values("ea_player_num").annotate(
+    leaders_goals = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(numgoals=Sum("goals")).filter(numgoals__gt=0).order_by("-numgoals")[:10]
+    leaders_assists = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(numassists=Sum("assists")).filter(numassists__gt=0).order_by("-numassists")[:10]
+    leaders_points = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(numpoints=Sum("points")).filter(numpoints__gt=0).order_by("-numpoints")[:10]
+    leaders_shooting = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(shootperc=(Cast(Sum("goals"), models.FloatField())/Cast(Sum("sog"), models.FloatField()))*100).filter(shootperc__gt=0).order_by("-shootperc")[:10]
+    leaders_svp = GoalieRecord.objects.filter(game_num__season_num=seasonSetting).values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(savepercsum=(Cast(Sum("saves"), models.FloatField())/Cast(Sum("shots_against"), models.FloatField()))*100).order_by("-savepercsum")[:10]
+    leaders_shutouts = GoalieRecord.objects.filter(game_num__season_num=seasonSetting).values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(
         shutoutcount=Sum(Case(
         When(shutout=True, then=1),
         default=0,
         output_field=models.IntegerField()
     ))).filter(shutoutcount__gte=1).order_by("-shutoutcount")[:10]
-    leaders_wins = GoalieRecord.objects.filter(game_num__season_num=seasonSetting).values("ea_player_num").annotate(
+    leaders_wins = GoalieRecord.objects.filter(game_num__season_num=seasonSetting).values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(
         wincount=Sum(Case(
         When(win=True, then=1),
         default=0,
         output_field=models.IntegerField()
     ))).filter(wincount__gte=1).order_by("-wincount")[:10]
-    leaders_gaa = GoalieRecord.objects.filter(game_num__season_num=seasonSetting).values("ea_player_num").annotate(gaatotal=((Cast(Sum("shots_against"), models.FloatField())-Cast(Sum("saves"), models.FloatField()))/Cast(Sum("game_num__gamelength"), models.FloatField()))*3600).order_by("gaatotal")[:10]
+    leaders_gaa = GoalieRecord.objects.filter(game_num__season_num=seasonSetting).values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(gaatotal=((Cast(Sum("shots_against"), models.FloatField())-Cast(Sum("saves"), models.FloatField()))/Cast(Sum("game_num__gamelength"), models.FloatField()))*3600).order_by("gaatotal")[:10]
     context = {
         "leaders_goals": leaders_goals,
         "leaders_assists": leaders_assists,
@@ -247,7 +247,6 @@ def goalies(request):
     context = {
         "all_goalies": all_goalies, "scoreboard": get_scoreboard()
     }
-    print(context)
     return render(request, "GHLWebsiteApp/goalies.html", context)
 
 def team(request, team):
