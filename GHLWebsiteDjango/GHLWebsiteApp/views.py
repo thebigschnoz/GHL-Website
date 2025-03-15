@@ -138,6 +138,7 @@ def index(request):
             thisseason = 0
         else:
             randomplayer = random.choice(Player.objects.all())
+            username = randomplayer.username
             gp = SkaterRecord.objects.filter(ea_player_num=randomplayer).count()
             goals = SkaterRecord.objects.filter(ea_player_num=randomplayer).aggregate(Sum("goals"))["goals__sum"]
             assists = SkaterRecord.objects.filter(ea_player_num=randomplayer).aggregate(Sum("assists"))["assists__sum"]
@@ -147,16 +148,17 @@ def index(request):
     else:
         randomgame = random.choice(allgames)
         randomplayer = randomgame.ea_player_num
+        username = randomplayer.username
         gp = SkaterRecord.objects.filter(game_num__season_num=seasonSetting, ea_player_num=randomplayer).count()
         goals = SkaterRecord.objects.filter(game_num__season_num=seasonSetting, ea_player_num=randomplayer).aggregate(Sum("goals"))["goals__sum"]
         assists = SkaterRecord.objects.filter(game_num__season_num=seasonSetting, ea_player_num=randomplayer).aggregate(Sum("assists"))["assists__sum"]
         plusminus = SkaterRecord.objects.filter(game_num__season_num=seasonSetting, ea_player_num=randomplayer).aggregate(Sum("plus_minus"))["plus_minus__sum"]
         pims = SkaterRecord.objects.filter(game_num__season_num=seasonSetting, ea_player_num=randomplayer).aggregate(Sum("pims"))["pims__sum"]
         thisseason = 1
-    standings = Standing.objects.filter(season=seasonSetting).order_by('-points', '-wins', '-goalsfor', 'goalsagainst', 'team__club_full_name')
+    standings = Standing.objects.filter(season=seasonSetting).values("ea_player_num__username").order_by('-points', '-wins', '-goalsfor', 'goalsagainst', 'team__club_full_name')
     leaders = Leader.objects.all()
     scoreboard = get_scoreboard()
-    context = {"standings": standings, "leaders": leaders, "thisseason": thisseason, "randomplayer":randomplayer, "gp": gp, "goals": goals, "assists": assists, "plusminus": plusminus, "pims": pims, "scoreboard": scoreboard}
+    context = {"standings": standings, "leaders": leaders, "thisseason": thisseason, "username": username, "gp": gp, "goals": goals, "assists": assists, "plusminus": plusminus, "pims": pims, "scoreboard": scoreboard}
     return render(request, "GHLWebsiteApp/index.html", context)
 
 def standings(request):
