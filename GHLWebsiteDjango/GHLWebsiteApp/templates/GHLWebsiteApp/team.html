@@ -18,7 +18,7 @@
                                 <form>
                                     <select id="seasonSel" name="season">
                                         <optgroup>
-                                            <option selected value="">Season Dropdown</option>
+                                            <option selected value="">Season Dropdown (WIP)</option>
                                         </optgroup>
                                     </select>
                                 </form>
@@ -86,7 +86,7 @@
                 <tbody>
                     {% for player in skaterrecords %}
                     <tr class="no-bg">
-                        <td><a href="{% url 'player' player.ea_player_num.ea_player_num %}">{{ player.ea_player_num }}</a></td>
+                        <td><a href="{% url 'player' player.ea_player_num.ea_player_num %}">{{ player.ea_player_num__username }}</a></td>
                         <td>{{player.skatersgp}}</td>
                         <td>{{player.skatersgoals}}</td>
                         <td>{{player.skatersassists}}</td>
@@ -154,7 +154,7 @@
                 <tbody>
                     {% for player in goalierecords %}
                     <tr class="no-bg">
-                        <td><a href="{% url 'player' player.ea_player_num.ea_player_num %}">{{ player.ea_player_num }}</a></td>
+                        <td><a href="{% url 'player' player.ea_player_num.ea_player_num %}">{{ player.ea_player_num__username }}</a></td>
                         <td>{{player.goaliesshots}}</td>
                         <td>{{player.goaliessaves}}</td>
                         <td>{{player.goaliessvp|floatformat:1}}%</td>

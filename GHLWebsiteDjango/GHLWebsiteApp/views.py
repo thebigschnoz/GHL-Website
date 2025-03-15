@@ -253,7 +253,7 @@ def goalies(request):
 
 def team(request, team):
     teamnum = get_object_or_404(Team, pk=team)
-    skaterrecords = SkaterRecord.objects.filter(ea_club_num=teamnum.ea_club_num, game_num__season_num=seasonSetting).exclude(position="0").annotate(
+    skaterrecords = SkaterRecord.objects.filter(ea_club_num=teamnum.ea_club_num, game_num__season_num=seasonSetting).exclude(position="0").values("ea_player_num", "ea_player_num__username").annotate(
         skatersgp=Count("game_num"),
         skatersgoals=Sum("goals"),
         skatersassists=Sum("assists"),
@@ -278,7 +278,7 @@ def team(request, team):
         skatersshoteffperc=Cast(Sum("sog"), models.FloatField())/Cast(Sum("shot_attempts"), models.FloatField())*100,
         skaterspassperc=Cast(Sum("pass_comp"), models.FloatField())/Cast(Sum("pass_att"), models.FloatField())*100,
     ).order_by("ea_player_num")
-    goalierecords = GoalieRecord.objects.filter(ea_club_num=teamnum.ea_club_num, game_num__season_num=seasonSetting).annotate(
+    goalierecords = GoalieRecord.objects.filter(ea_club_num=teamnum.ea_club_num, game_num__season_num=seasonSetting).values("ea_player_num", "ea_player_num__username").annotate(
         goaliesgp = Count("game_num"),
         goaliesshots = Sum("shots_against"),
         goaliessaves = Sum("saves"),
