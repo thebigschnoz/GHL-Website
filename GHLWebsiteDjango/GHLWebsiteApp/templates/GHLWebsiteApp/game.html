@@ -169,7 +169,7 @@
                 <tbody>
                     {% for player in a_skater_records %}
                     <tr class="no-bg">
-                        <td><a href="{% url 'player' player.ea_player_num.ea_player_num %}">{{ player.username }}</a></td>
+                        <td><a href="{% url 'player' player.ea_player_num.ea_player_num %}">{{ player.ea_player_num.username }}</a></td>
                         <td>{{player.position.positionShort}}</td>
                         <td>{{player.build.buildShort}}</td>
                         <td>{{player.goals}}</td>
@@ -236,7 +236,7 @@
                 <tbody>
                     {% for player in a_goalie_records %}
                     <tr class="no-bg">
-                        <td><a href="{% url 'player' player.ea_player_num.ea_player_num %}">{{ player.username }}</a></td>
+                        <td><a href="{% url 'player' player.ea_player_num.ea_player_num %}">{{ player.ea_player_num.username }}</a></td>
                         <td>{{player.shots_against}}</td>
                         <td>{{player.saves}}</td>
                         <td>{{player.save_pct|floatformat:1}}%</td>
@@ -330,7 +330,7 @@
                 <tbody>
                     {% for player in h_skater_records %}
                     <tr class="no-bg">
-                        <td><a href="{% url 'player' player.ea_player_num.ea_player_num %}">{{ player.username }}</a></td>
+                        <td><a href="{% url 'player' player.ea_player_num.ea_player_num %}">{{ player.ea_player_num.username }}</a></td>
                         <td>{{player.position.positionShort}}</td>
                         <td>{{player.build.buildShort}}</td>
                         <td>{{player.goals}}</td>
