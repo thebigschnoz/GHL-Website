@@ -196,7 +196,7 @@ def leaders(request):
     return render(request, "GHLWebsiteApp/leaders.html", context)
 
 def skaters(request):
-    all_skaters = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).annotate(
+    all_skaters = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).values("ea_player_num").annotate(
         skatersgp=Count("game_num"),
         skatersgoals=Sum("goals"),
         skatersassists=Sum("assists"),
@@ -216,7 +216,7 @@ def skaters(request):
     return render(request, "GHLWebsiteApp/skaters.html", context)
 
 def goalies(request):
-    all_goalies = GoalieRecord.objects.filter(game_num__season_num=seasonSetting).annotate(
+    all_goalies = GoalieRecord.objects.filter(game_num__season_num=seasonSetting).values("ea_player_num").annotate(
         goaliesgp = Count("game_num"),
         goaliesshots = Sum("shots_against"),
         goaliesga = (Sum("shots_against")-Sum("saves")),
