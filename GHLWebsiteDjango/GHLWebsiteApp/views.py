@@ -155,8 +155,8 @@ def index(request):
         plusminus = SkaterRecord.objects.filter(game_num__season_num=seasonSetting, ea_player_num=randomplayer).aggregate(Sum("plus_minus"))["plus_minus__sum"]
         pims = SkaterRecord.objects.filter(game_num__season_num=seasonSetting, ea_player_num=randomplayer).aggregate(Sum("pims"))["pims__sum"]
         thisseason = 1
-    standings = Standing.objects.filter(season=seasonSetting).values("ea_player_num__username").order_by('-points', '-wins', '-goalsfor', 'goalsagainst', 'team__club_full_name')
-    leaders = Leader.objects.all()
+    standings = Standing.objects.filter(season=seasonSetting).order_by('-points', '-wins', '-goalsfor', 'goalsagainst', 'team__club_full_name')
+    leaders = Leader.objects.all().values("ea_player_num__username")
     scoreboard = get_scoreboard()
     context = {"standings": standings, "leaders": leaders, "thisseason": thisseason, "username": username, "gp": gp, "goals": goals, "assists": assists, "plusminus": plusminus, "pims": pims, "scoreboard": scoreboard}
     return render(request, "GHLWebsiteApp/index.html", context)
