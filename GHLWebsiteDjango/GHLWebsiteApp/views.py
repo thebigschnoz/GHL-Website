@@ -245,7 +245,7 @@ def goalies(request):
             default=0,
             output_field=models.IntegerField()
         )),
-    ).order_by("goaliessvp", "goalieswins", "goaliesshutouts", "ea_player_num__username")
+    ).order_by(-"goaliessvp", "goalieswins", "goaliesshutouts", "ea_player_num__username")
     context = {
         "all_goalies": all_goalies, "scoreboard": get_scoreboard()
     }
