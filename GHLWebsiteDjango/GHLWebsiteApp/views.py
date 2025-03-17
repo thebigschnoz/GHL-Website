@@ -211,7 +211,7 @@ def skaters(request):
         skatersbs=Avg("blocked_shots"),
         skatersppg=Sum("ppg"),
         skatersshg=Sum("shg"),
-    ).order_by("skaterspoints", "skatersgoals", -"skatersgp", "skaterspims")
+    ).order_by("skaterspoints", "skatersgoals", -"skatersgp", "skaterspims", "ea_player_num__username")
     context = {
         "all_skaters": all_skaters, "scoreboard": get_scoreboard()
     }
@@ -245,7 +245,7 @@ def goalies(request):
             default=0,
             output_field=models.IntegerField()
         )),
-    ).order_by("ea_player_num")
+    ).order_by("goaliessvp", "goalieswins", "goaliesshutouts", "ea_player_num__username")
     context = {
         "all_goalies": all_goalies, "scoreboard": get_scoreboard()
     }
