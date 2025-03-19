@@ -4,7 +4,7 @@ from .models import *
 
 # Register your models here.
 class TeamListAdmin(admin.ModelAdmin):
-    list_display = ("club_full_name", "ea_club_num", "club_abbr", "isActive", "team_logo_link")
+    list_display = ("club_full_name", "ea_club_num", "club_abbr", "isActive")
 
 class BuildsAdmin(admin.ModelAdmin):
     list_display = ("build", "buildShort")
@@ -16,7 +16,7 @@ class SeasonsAdmin(admin.ModelAdmin):
     list_display = ("season_text", "season_num", "isPlayoff")
 
 class GameAdmin(admin.ModelAdmin):
-    list_display = ("game_num", "season_num", "gamelength", "expected_time", "played_time")
+    list_display = ("game_num", "season_num__season_text", "gamelength", "expected_time", "played_time", "dnf")
 
 admin.site.register(Season, SeasonsAdmin)
 admin.site.register(Game, GameAdmin)
