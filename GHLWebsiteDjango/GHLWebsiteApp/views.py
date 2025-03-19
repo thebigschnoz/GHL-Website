@@ -163,7 +163,8 @@ def index(request):
 
 def standings(request):
     standings = Standing.objects.filter(season=seasonSetting).order_by('-points', '-wins', '-goalsfor', 'goalsagainst', 'team__club_full_name')
-    return render(request, "GHLWebsiteApp/standings.html", {"standings": standings, "scoreboard": get_scoreboard()})
+    season = Season.objects.get(season_num=seasonSetting)
+    return render(request, "GHLWebsiteApp/standings.html", {"standings": standings, "scoreboard": get_scoreboard(), "season": season})
 
 def leaders(request):
     leaders_goals = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(numgoals=Sum("goals")).filter(numgoals__gt=0).order_by("-numgoals")[:10]
@@ -212,8 +213,11 @@ def skaters(request):
         skatersppg=Sum("ppg"),
         skatersshg=Sum("shg"),
     ).order_by("-skaterspoints", "-skatersgoals", "-skatersgp", "skaterspims", "ea_player_num__username")
+    season = Season.objects.get(season_num=seasonSetting)
     context = {
-        "all_skaters": all_skaters, "scoreboard": get_scoreboard()
+        "all_skaters": all_skaters,
+        "scoreboard": get_scoreboard(),
+        "season": season
     }
     return render(request, "GHLWebsiteApp/skaters.html", context)
 
@@ -246,8 +250,11 @@ def goalies(request):
             output_field=models.IntegerField()
         )),
     ).order_by("-goaliessvp", "-goalieswins", "-goaliesshutouts", "ea_player_num__username")
+    season = Season.objects.get(season_num=seasonSetting)
     context = {
-        "all_goalies": all_goalies, "scoreboard": get_scoreboard()
+        "all_goalies": all_goalies,
+        "scoreboard": get_scoreboard(),
+        "season": season
     }
     return render(request, "GHLWebsiteApp/goalies.html", context)
 
