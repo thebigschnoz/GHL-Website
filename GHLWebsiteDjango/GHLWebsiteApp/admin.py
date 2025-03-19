@@ -10,7 +10,7 @@ class BuildsAdmin(admin.ModelAdmin):
     list_display = ("build", "buildShort")
 
 class PlayerListAdmin(admin.ModelAdmin):
-    list_display = ("username", "current_team")
+    list_display = ("username", "current_team__club_full_name")
 
 class SeasonsAdmin(admin.ModelAdmin):
     list_display = ("season_text", "season_num", "isPlayoff")
