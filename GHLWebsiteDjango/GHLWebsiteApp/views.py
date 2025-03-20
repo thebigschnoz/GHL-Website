@@ -86,16 +86,15 @@ def calculate_standings():
                     ppperc = round((Decimal(TeamRecord.objects.filter(game_num__season_num=seasonSetting, ea_club_num=team).aggregate(Sum("ppg_team"))["ppg_team__sum"]) / Decimal(ppocalc))*100, 1)
                 except InvalidOperation:
                     ppperc = Decimal(0)
-            pkperc = Decimal(0)
-            # TODO: Add PK% calculation
-            '''
-            - Get all the games a team is in
-            - Get all the team records where joined with those games where the team is NOT ea_club_num
-            - Get the sum of the ppo_team and ppg_team for those records
-            - If ppo_team is 0, set pkperc to 0
-            - pkperc = 1 - (ppg_team / ppo_team)
-            - Multiply by 100 and round to 1 decimal place
-            '''
+            pkgames = Game.objects.filter(season_num=seasonSetting, a_team_num__isActive=True, a_team_num=team) | Game.objects.filter(season_num=seasonSetting, h_team_num__isActive=True, h_team_num=team) # get all games team is in
+            pkoppscalc = Decimal(TeamRecord.objects.filter(pkgames).exclude(ea_club_num=team).aggregate(Sum("ppo_team"))["ppo_team__sum"]) # total TeamRecord power play opportunities in pkgames excluding the team
+            if pkoppscalc == 0:
+                pkperc = Decimal(0)
+            else:
+                try:
+                    pkperc = round((1 - (Decimal(TeamRecord.objects.filter(pkgames).exclude(ea_club_num=team).aggregate(Sum("ppg_team"))["ppg_team__sum"]) / pkoppscalc))*100, 1)
+                except InvalidOperation:
+                    pkperc = Decimal(0)
             lasttengames = TeamRecord.objects.filter(game_num__season_num=seasonSetting, ea_club_num=team).order_by("-game_num")[:10:-1]
                 # this is where I totally forgot that I made TeamRecord as a model. Schnoz, you idiot
             l10w = l10l = l10otl = 0
