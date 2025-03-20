@@ -87,12 +87,12 @@ def calculate_standings():
                 except InvalidOperation:
                     ppperc = Decimal(0)
             pkgames = Game.objects.filter(season_num=seasonSetting, a_team_num__isActive=True, a_team_num=team) | Game.objects.filter(season_num=seasonSetting, h_team_num__isActive=True, h_team_num=team) # get all games team is in
-            pkoppscalc = Decimal(TeamRecord.objects.filter(game_num=pkgames).exclude(ea_club_num=team).aggregate(Sum("ppo_team"))["ppo_team__sum"]) # total TeamRecord power play opportunities in pkgames excluding the team
+            pkoppscalc = Decimal(TeamRecord.objects.filter(game_num__in=pkgames).exclude(ea_club_num=team).aggregate(Sum("ppo_team"))["ppo_team__sum"]) # total TeamRecord power play opportunities in pkgames excluding the team
             if pkoppscalc == 0:
                 pkperc = Decimal(0)
             else:
                 try:
-                    pkperc = round((1 - (Decimal(TeamRecord.objects.filter(game_num=pkgames).exclude(ea_club_num=team).aggregate(Sum("ppg_team"))["ppg_team__sum"]) / pkoppscalc))*100, 1)
+                    pkperc = round((1 - (Decimal(TeamRecord.objects.filter(game_num__in=pkgames).exclude(ea_club_num=team).aggregate(Sum("ppg_team"))["ppg_team__sum"]) / pkoppscalc))*100, 1)
                 except InvalidOperation:
                     pkperc = Decimal(0)
             lasttengames = TeamRecord.objects.filter(game_num__season_num=seasonSetting, ea_club_num=team).order_by("-game_num")[:10:-1]
