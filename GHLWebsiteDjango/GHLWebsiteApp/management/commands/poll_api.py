@@ -70,6 +70,9 @@ class Command(BaseCommand):
                 try:
                     a_team_instance = Team.objects.get(ea_club_num=a_team_num)
                     h_team_instance = Team.objects.get(ea_club_num=h_team_num)
+                    if a_team_instance.isActive == False or h_team_instance.isActive == False:
+                        self.stdout.write(f"One of the teams is inactive - skipping game")
+                        continue
                 except Team.DoesNotExist:
                     self.stdout.write(f"One of the teams does not exist in the database - skipping game")
                     continue
