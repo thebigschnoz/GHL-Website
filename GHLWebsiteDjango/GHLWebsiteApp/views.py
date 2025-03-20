@@ -56,9 +56,12 @@ def calculate_leaders():
                 Leader(attribute="GAA", player=leaders_gaa[0].ea_player_num, stat=leaders_gaa[0].gaatotal),
                 Leader(attribute="SV%", player=leaders_svp[0].ea_player_num, stat=leaders_svp[0].savepercsum),
                 Leader(attribute="W", player=leaders_wins[0].ea_player_num, stat=leaders_wins[0].wincount),
-                Leader(attribute="SO", player=leaders_shutouts[0].ea_player_num, stat=leaders_shutouts[0].shutoutcount),
             ]
         )
+        if leaders_shutouts:
+            Leader.objects.create(attribute="SO", player=leaders_shutouts[0].ea_player_num, stat=leaders_shutouts[0].shutoutcount)
+        else:
+            Leader.objects.create(attribute="SO", player=None, stat=0)
 
 def calculate_standings():
     teams = Team.objects.filter(isActive=True)
