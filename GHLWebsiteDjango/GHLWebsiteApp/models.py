@@ -1,6 +1,5 @@
 from django.db import models
 from decimal import *
-from import_export import resources
 
 class Season(models.Model):
     season_num = models.AutoField(primary_key=True)
@@ -269,9 +268,3 @@ class Leader(models.Model):
     attribute = models.CharField(max_length=3)
     player = models.ForeignKey(Player, blank=True, null=True, on_delete=models.CASCADE)
     stat = models.DecimalField(max_digits=5, decimal_places=2, default=0)
-
-class GameResources(resources.ModelResource):
-    class Meta:
-        model = Game
-        import_id_fields = ('game_num',)
-        use_bulk = True
