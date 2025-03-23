@@ -16,4 +16,5 @@ urlpatterns = [
     # path('game/', views.calendar, name="calendar"),
     path('game/<int:game>/', views.game, name="game"),
     path('gameapi/', views.GamesRequest, name="gamesrequest"),
+    path('uploadcsvforgames/', views.upload_file, name="upload_file"),
 ]

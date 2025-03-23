@@ -1,11 +1,15 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from .forms import UploadFileForm
+from datetime import datetime
 from GHLWebsiteApp.models import *
 from django.db.models import Sum, Count, Case, When, Avg, F
 from django.db.models.functions import Cast
 from django.http import JsonResponse
 from django.core import serializers
 from decimal import *
-import random, json
+import random
+import pandas as pd
 
 seasonSetting = 1 # Current season in GHL
 
@@ -514,3 +518,27 @@ def awards(request, awardnum):
         "awardhistory": awardhistory,
         "scoreboard": get_scoreboard()
     })
+
+def upload_file(request):
+    if request.method == 'POST':
+        form = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            file = request.FILES['file']
+            df = pd.read_excel(file)
+            for _, row in df.iterrows():
+                game, created = Game.objects.get_or_create(
+                    game_num=row['Game Num'],
+                    season_num=seasonSetting,
+                    expected_time=row['Expected Time'],
+                    a_team_num=row['Away Team'],
+                    h_team_num=row['Home Team'],
+                    publication_date=datetime.strptime(row['Expected Game Time'], '%Y-%m-%d %H:%M:%S') # TODO: change this to expected time and do proper parsing
+                )
+                if created:
+                    messages.success(request, f'Successfully imported {game.title}')
+                else:
+                    messages.warning(request, f'{game.title} already exists')
+            return redirect('upload_file')
+    else:
+        form = UploadFileForm()
+    return render(request, 'data_import/upload.html', {'form': form})

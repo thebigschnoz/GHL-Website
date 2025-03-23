@@ -1,0 +1,19 @@
+{% extends "GHLWebsiteApp/layout.html" %}
+{% load static %}
+{% block body %}
+    Upload Excel File
+
+
+    Upload Excel File
+    {% if messages %}
+        
+            {% for message in messages %}
+                {{ message }}
+            {% endfor %}
+        
+    {% endif %}
+
+        {% csrf_token %}
+        {{ form.as_p }}
+        Upload
+{% endblock %}
