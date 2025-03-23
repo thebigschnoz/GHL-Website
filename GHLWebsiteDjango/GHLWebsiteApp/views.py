@@ -532,7 +532,7 @@ def upload_file(request):
                     expected_time=row['Expected Time'],
                     a_team_num=row['Away Team'],
                     h_team_num=row['Home Team'],
-                    publication_date=datetime.strptime(row['Expected Game Time'], '%Y-%m-%d %H:%M:%S') # TODO: change this to expected time and do proper parsing
+                    publication_date=datetime.strptime(row['Expected Game Time'], '%Y-%m-%d %H:%M:%S')
                 )
                 if created:
                     messages.success(request, f'Successfully imported {game.title}')
