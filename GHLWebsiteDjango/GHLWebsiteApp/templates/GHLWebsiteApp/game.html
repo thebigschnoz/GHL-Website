@@ -28,8 +28,10 @@
                         <center>
                             {% if game.gamelength > 3600 %}
                             <span style="font-weight: 400; font-size: 32px">Final/OT</span>
-                            {% else %}
+                            {% elif game.gamelength == 3600 %}
                             <span style="font-weight: 400; font-size: 32px">Final</span>
+                            {% else %}
+                            <span style="font-weight: 400; font-size: 32px">Scheduled</span>
                             {% endif %}
                             <div style="width: 100%; display: table;">
                                 <div style="display:table-cell;text-align:right;width:37%; font-size:32px">
