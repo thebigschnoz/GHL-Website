@@ -524,21 +524,25 @@ def upload_file(request):
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             file = request.FILES['file']
-            df = pd.read_excel(file)
-            for _, row in df.iterrows():
-                game, created = Game.objects.get_or_create(
-                    game_num=row['Game Num'],
-                    season_num=seasonSetting,
-                    expected_time=row['Expected Time'],
-                    a_team_num=row['Away Team'],
-                    h_team_num=row['Home Team'],
-                    publication_date=datetime.strptime(row['Expected Game Time'], '%Y-%m-%d %H:%M:%S')
-                )
-                if created:
-                    messages.success(request, f'Successfully imported {game.title}')
-                else:
-                    messages.warning(request, f'{game.title} already exists')
-            return redirect('upload_file')
+            try:    
+                df = pd.read_excel(file)
+                for _, row in df.iterrows():
+                    game, created = Game.objects.get_or_create(
+                        game_num=row['Game Num'],
+                        season_num=seasonSetting,
+                        defaults={
+                            "a_team_num": Team.objects.get(ea_club_num=row['Away Team']),
+                            "h_team_num": Team.objects.get(ea_club_num=row['Home Team']),
+                            "expected_time": datetime.strptime(row['Expected Game Time'], '%Y-%m-%d %H:%M:%S')
+                        }
+                    )
+                    if created:
+                        messages.success(request, f'Successfully imported {game.title}')
+                    else:
+                        messages.warning(request, f'{game.title} already exists')
+                return redirect('upload_file')
+            except Exception as e:
+                messages.error(request, f'An error occurred: {e}')
     else:
         form = UploadFileForm()
     return render(request, 'data_import/upload.html', {'form': form})

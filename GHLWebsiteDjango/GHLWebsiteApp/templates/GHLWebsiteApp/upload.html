@@ -1,19 +1,18 @@
 {% extends "GHLWebsiteApp/layout.html" %}
 {% load static %}
 {% block body %}
-    Upload Excel File
-
-
-    Upload Excel File
+    <h1>Upload Excel File</h1>
+    <p />
     {% if messages %}
-        
+        <ul>
             {% for message in messages %}
-                {{ message }}
+                <li>{{ message }}</li>
             {% endfor %}
-        
+        </ul>
     {% endif %}
-
+    <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
-        Upload
+        <button type="submit">Upload</button>
+    </form>
 {% endblock %}
