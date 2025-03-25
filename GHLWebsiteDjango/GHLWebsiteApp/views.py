@@ -524,16 +524,20 @@ def upload_file(request):
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             file = request.FILES['file']
-            try:    
+            try:
                 df = pd.read_excel(file)
                 for _, row in df.iterrows():
+                    expected_time = row['Expected Game Time']
+                    if isinstance(expected_time, str):
+                        # Parse the string into a datetime object
+                        expected_time = datetime.strptime(expected_time, '%Y-%m-%d %H:%M:%S')
                     game, created = Game.objects.get_or_create(
                         game_num=row['Game Num'],
                         season_num=seasonSetting,
                         defaults={
                             "a_team_num": Team.objects.get(ea_club_num=row['Away Team']),
                             "h_team_num": Team.objects.get(ea_club_num=row['Home Team']),
-                            "expected_time": datetime.strptime(row['Expected Game Time'], '%Y-%m-%d %H:%M:%S')
+                            "expected_time": expected_time
                         }
                     )
                     if created:
