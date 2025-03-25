@@ -8,6 +8,7 @@ from django.db.models.functions import Cast
 from django.http import JsonResponse
 from django.core import serializers
 from decimal import *
+from itertools import chain
 import random
 import pandas as pd
 
@@ -331,8 +332,12 @@ def team(request, team):
             output_field=models.IntegerField()
         )),
     ).order_by("ea_player_num")
-    teamgames = Game.objects.filter(season_num=seasonSetting, a_team_num=teamnum) | Game.objects.filter(season_num=seasonSetting, h_team_num=teamnum)
-    teamgames.order_by("game_num")
+    awaygames = Game.objects.filter(season_num=seasonSetting, a_team_num=teamnum)
+    homegames = Game.objects.filter(season_num=seasonSetting, h_team_num=teamnum)
+    teamgames = sorted(
+        chain (awaygames, homegames),
+        key=lambda game: game.expected_time,
+    )
     context = {"team": teamnum, "scoreboard": get_scoreboard(), "skaterrecords": skaterrecords, "goalierecords": goalierecords, "teamgames": teamgames}  
     return render(request, "GHLWebsiteApp/team.html", context)
 
