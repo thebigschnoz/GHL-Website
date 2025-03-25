@@ -520,7 +520,6 @@ def awards(request, awardnum):
         "scoreboard": get_scoreboard()
     })
 
-''' Upload Page
 def upload_file(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
@@ -554,4 +553,3 @@ def upload_file(request):
     else:
         form = UploadFileForm()
     return render(request, 'GHLWebsiteApp/upload.html', {'form': form})
-'''
