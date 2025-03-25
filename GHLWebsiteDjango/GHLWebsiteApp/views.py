@@ -332,7 +332,7 @@ def team(request, team):
         )),
     ).order_by("ea_player_num")
     teamgames = Game.objects.filter(season_num=seasonSetting, a_team_num=teamnum) | Game.objects.filter(season_num=seasonSetting, h_team_num=teamnum)
-    teamgames.order_by("expected_time", "game_num")
+    teamgames.order_by("game_num")
     context = {"team": teamnum, "scoreboard": get_scoreboard(), "skaterrecords": skaterrecords, "goalierecords": goalierecords, "teamgames": teamgames}  
     return render(request, "GHLWebsiteApp/team.html", context)
 

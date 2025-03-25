@@ -203,7 +203,7 @@
                     {% if teamgames %}
                         {% for game in teamgames %}
                         <tr class="no-bg">
-                            <td><a href="{% url 'game' game.game_num %}">{{ game.played_time|date:"m/d/y g:i" }}</a></td>
+                            <td><a href="{% url 'game' game.game_num %}">{{ game.expected_time|date:"m/d/y  g:i" }}</a></td>
                             <td style="text-align: right; padding-right: 10px;"><a href="{% url 'team' game.a_team_num.ea_club_num %}">{{ game.a_team_num.club_full_name }}</a></td>
                             <td>{{ game.a_team_gf }}</td>
                             {% if game.gamelength > 3600 %}
