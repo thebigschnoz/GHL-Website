@@ -208,10 +208,10 @@
                             <td>{{ game.a_team_gf }}</td>
                             {% if game.gamelength > 3600 %}
                             <td>Final/OT</td>
-                            {% elif game.gamelength == 3600 %}
-                            <td>Final</td>
-                            {% else %}
+                            {% elif game.played_time is None %}
                             <td>Scheduled</td>
+                            {% else %}
+                            <td>Final</td>
                             {% endif %}
                             <td>{{ game.h_team_gf }}</td>
                             <td style="text-align: left; padding-left: 10px;"><a href="{% url 'team' game.h_team_num.ea_club_num %}">{{ game.h_team_num.club_full_name }}</a></td>
