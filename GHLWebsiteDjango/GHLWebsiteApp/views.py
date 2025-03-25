@@ -70,7 +70,7 @@ def calculate_leaders():
 def calculate_standings():
     teams = Team.objects.filter(isActive=True)
     for team in teams:
-        gamelist = Game.objects.filter(season_num=seasonSetting, a_team_num__isActive=True, a_team_num=team).count() + Game.objects.filter(season_num=seasonSetting, h_team_num__isActive=True, h_team_num=team).count()
+        gamelist = Game.objects.filter(season_num=seasonSetting, a_team_num__isActive=True, a_team_num=team).exclude(played_time=None).count() + Game.objects.filter(season_num=seasonSetting, h_team_num__isActive=True, h_team_num=team).exclude(played_time=None).count()
         if not gamelist:
             standing, created = Standing.objects.update_or_create(team=team, season=Season.objects.get(season_num=seasonSetting), defaults={"wins":0, "losses":0, "otlosses":0, "points":0, "goalsfor":0, "goalsagainst":0, "gp":0, "winperc":Decimal(0), "ppperc":Decimal(0), "pkperc":Decimal(0), "lastten":"0-0-0"})
         else:
