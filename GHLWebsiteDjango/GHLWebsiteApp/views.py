@@ -545,4 +545,4 @@ def upload_file(request):
                 messages.error(request, f'An error occurred: {e}')
     else:
         form = UploadFileForm()
-    return render(request, 'data_import/upload.html', {'form': form})
+    return render(request, 'GHLWebsiteApp/upload.html', {'form': form})
