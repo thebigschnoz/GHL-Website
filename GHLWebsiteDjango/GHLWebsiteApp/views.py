@@ -533,7 +533,7 @@ def upload_file(request):
                         expected_time = datetime.strptime(expected_time, '%Y-%m-%d %H:%M:%S')
                     game, created = Game.objects.get_or_create(
                         game_num=row['Game Num'],
-                        season_num=Season.objects.get(seasom_num=seasonSetting),
+                        season_num=Season.objects.get(season_num=seasonSetting),
                         defaults={
                             "a_team_num": Team.objects.get(ea_club_num=row['Away Team']),
                             "h_team_num": Team.objects.get(ea_club_num=row['Home Team']),
