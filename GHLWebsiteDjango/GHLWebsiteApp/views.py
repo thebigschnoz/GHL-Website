@@ -541,9 +541,9 @@ def upload_file(request):
                         }
                     )
                     if created:
-                        messages.success(request, f'Successfully imported {game.title}')
+                        messages.success(request, f'Successfully imported {game.game_num}')
                     else:
-                        messages.warning(request, f'{game.title} already exists')
+                        messages.warning(request, f'{game.game_num} already exists')
                 return redirect('upload_file')
             except Exception as e:
                 messages.error(request, f'An error occurred: {e}')
