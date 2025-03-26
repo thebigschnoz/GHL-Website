@@ -178,9 +178,15 @@ def index(request):
     return render(request, "GHLWebsiteApp/index.html", context)
 
 def standings(request):
-    standings = Standing.objects.filter(season=seasonSetting).order_by('-points', '-wins', '-goalsfor', 'goalsagainst', 'team__club_full_name')
-    season = Season.objects.get(season_num=seasonSetting)
-    return render(request, "GHLWebsiteApp/standings.html", {"standings": standings, "scoreboard": get_scoreboard(), "season": season})
+    currentSeason = Standing.objects.get(season=seasonSetting)
+    if currentSeason.isPlayoff == False:
+        standings = Standing.objects.filter(season=seasonSetting).order_by('-points', '-wins', '-goalsfor', 'goalsagainst', 'team__club_full_name')
+        season = Season.objects.get(season_num=seasonSetting)
+        return render(request, "GHLWebsiteApp/standings.html", {"standings": standings, "scoreboard": get_scoreboard(), "season": season})
+    else:
+        # TODO: Playoff Games need to be sent here. Not sure how to parse for the html
+        season = Season.objects.get(season_num=seasonSetting)
+        return render(request, "GHLWebsiteApp/standings.html", {"scoreboard": get_scoreboard(), "season": season})
 
 def leaders(request):
     leaders_goals = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).exclude(game_num__played_time=None).values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(numgoals=Sum("goals")).filter(numgoals__gt=0).order_by("-numgoals")[:10]
