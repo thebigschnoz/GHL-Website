@@ -17,4 +17,5 @@ urlpatterns = [
     path('game/<int:game>/', views.game, name="game"),
     path('gameapi/', views.GamesRequest, name="gamesrequest"),
     path('uploadcsvforgames/', views.upload_file, name="upload_file"),
+    path('glossary/', views.glossary, name="glossary"),
 ]

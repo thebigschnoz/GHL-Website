@@ -1,0 +1,29 @@
+{% extends "GHLWebsiteApp/layout.html" %}
+{% load static %}
+{% block body %}
+<center>
+    <div class="section section_lg"><center>
+        <div class="subsection-container">
+            <table>
+                <tr>
+                    <th>Term</th>
+                    <th>Definition</th>
+                </tr>
+                <tr>
+                    <td>SOG</td>
+                    <td>Shots on Goal - Shots that would go into the net if the goalie does not save them. <br>
+                        EA does not count deflections as shots on goal.
+                    </td>
+                </tr>
+                <tr>
+                    <td>Shot Eff</td>
+                    <td>Shot Effectiveness - The amount of shots on goal divided by the total amount of shots taken, including blocked and wide shots.</td>
+                </tr>
+                <tr>
+                    <td>PK Clears</td>
+                    <td>EA classifies this as pressing up on the RS while in the defensive zone on the PK, and the puck leaves the zone. Passes do not count.</td>
+                </tr>
+        </div>
+    </center></div>
+</center>
+{% endblock %}

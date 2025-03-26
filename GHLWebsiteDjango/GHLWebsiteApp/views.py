@@ -525,6 +525,9 @@ def awards(request, awardnum):
         "scoreboard": get_scoreboard()
     })
 
+def glossary(request):
+    return render(request, "GHLWebsiteApp/glossary.html")
+
 def upload_file(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
