@@ -26,19 +26,6 @@ class Game(models.Model):
     a_team_gf = models.IntegerField(verbose_name="Away Score", default="0", blank=True)
     h_team_gf = models.IntegerField(verbose_name="Home Score", default="0", blank=True)
 
-class PlayoffGame(models.Model):
-    game_num = models.AutoField(primary_key=True)
-    season_num = models.ForeignKey(Season, on_delete=models.CASCADE)
-    round_num = models.PositiveSmallIntegerField(verbose_name="Round Number", default="1")
-    gamelength = models.PositiveIntegerField(verbose_name="Game Length in seconds", default="3600", blank=True, null=True)
-    expected_time = models.DateTimeField(verbose_name="Expected Game Time", blank=True, null=True)
-    played_time = models.DateTimeField(verbose_name="Actual Game Time", blank=True, null=True)
-    dnf = models.BooleanField(default=False, verbose_name="DNF", blank=True, null=True)
-    a_team_num = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="a_team")
-    h_team_num = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="h_team")
-    a_team_gf = models.IntegerField(verbose_name="Away Score", default="0", blank=True)
-    h_team_gf = models.IntegerField(verbose_name="Home Score", default="0", blank=True)
-
 class AwardTitle(models.Model):
     award_num = models.IntegerField(primary_key=True)
     award_Name = models.CharField(max_length=50)
