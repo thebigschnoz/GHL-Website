@@ -209,6 +209,8 @@ class Command(BaseCommand):
                                     "username": player_data.get("playername", "Username Not Found"),
                                     "current_team": players_team_instance
                             })
+                            player_instance.current_team = players_team_instance
+                            player_instance.save()
                         pos_sorted = Position.objects.get(ea_pos=player_data.get("posSorted", 0))
                         build = player_data.get("class", 0)
                         try:
