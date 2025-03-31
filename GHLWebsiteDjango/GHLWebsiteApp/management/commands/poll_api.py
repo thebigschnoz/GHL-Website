@@ -80,7 +80,7 @@ class Command(BaseCommand):
 
                 # Extract dnf value
                 dnf = any(
-                    player_data.get("player_dnf", 0) == 1
+                    player_data.get("player_dnf", 0) == True
                     for team_id, team_players in game["players"].items()
                     for player_id, player_data in team_players.items()
                 )
@@ -128,33 +128,27 @@ class Command(BaseCommand):
                     h_team_num=h_team_instance,
                     expected_time__date=game_date
                 )
-
-                # Get or create game record
                 if matching_games.exists():
-                    game_obj = matching_games.first()
-                    game_obj.played_time = datetime.fromtimestamp(timestamp, est)
-                    game_obj.dnf = int(dnf)
-                    game_obj.gamelength = int(gamelength)
-                    game_obj.a_team_gf = int(a_team_gf)
-                    game_obj.h_team_gf = int(h_team_gf)
-                    game_obj.season_num = season_instance
-                    game_obj.save()
-                    self.stdout.write(f"Updated existing game {game_num}")
+                    expected_time = matching_games.first().expected_time
                 else:
-                    # If no matching game is found, create a new game record
-                    game_obj = Game(
-                        game_num=game_num,
-                        a_team_num=a_team_instance,
-                        h_team_num=h_team_instance,
-                        played_time=datetime.fromtimestamp(timestamp, est),
-                        dnf=dnf,
-                        gamelength=int(gamelength),
-                        a_team_gf=int(a_team_gf),
-                        h_team_gf=int(h_team_gf),
-                        season_num=season_instance
-                    )
-                    game_obj.save()
-                    self.stdout.write(f"Created new game {game_num}")
+                    expected_time = None
+
+                # Create game record
+                game_obj = Game(
+                    game_num=game_num,
+                    a_team_num=a_team_instance,
+                    h_team_num=h_team_instance,
+                    played_time=datetime.fromtimestamp(timestamp, est),
+                    expected_time=expected_time,
+                    dnf=dnf,
+                    gamelength=int(gamelength),
+                    a_team_gf=int(a_team_gf),
+                    h_team_gf=int(h_team_gf),
+                    season_num=season_instance,
+                )
+                game_obj.save()
+                matching_games.first().delete()
+                self.stdout.write(f"Created new game {game_num}")
                 
                 # Parse team stats
                 for club_id, club_data in game["clubs"].items():
