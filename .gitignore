@@ -15,3 +15,7 @@ __pycache__/
 *.pyo
 *.py[cod]
 *$py.class
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
