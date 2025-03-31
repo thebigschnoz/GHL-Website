@@ -308,5 +308,5 @@ class Command(BaseCommand):
             self.stdout.write(f"Fetching and processing games for {team.club_full_name}")
             clubnum = team.ea_club_num
             self.fetch_and_process_games(clubnum)
-            self.stdout.write(f"Finished processing games for {team.club_full_name}")
-        self.stdout.write("Finished polling EA API for game data")
+            self.stdout.write(self.style.SUCCESS(f"Finished processing games for {team.club_full_name}"))
+        self.stdout.write(self.style.SUCCESS("Finished polling EA API for game data"))
