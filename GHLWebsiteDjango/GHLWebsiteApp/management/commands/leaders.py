@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from views import calculate_leaders, calculate_standings
+from ...views import calculate_leaders, calculate_standings
 
 class Command(BaseCommand):
     help = "Refresh leaderboards and standings"
