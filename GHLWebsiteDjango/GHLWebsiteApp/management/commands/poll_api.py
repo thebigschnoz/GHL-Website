@@ -80,7 +80,7 @@ class Command(BaseCommand):
 
                 # Extract dnf value
                 dnf = any(
-                    player_data.get("player_dnf", 0) == True
+                    player_data.get("player_dnf", 0) == 1
                     for team_id, team_players in game["players"].items()
                     for player_id, player_data in team_players.items()
                 )
