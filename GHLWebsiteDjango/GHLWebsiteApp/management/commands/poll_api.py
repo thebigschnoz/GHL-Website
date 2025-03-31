@@ -128,6 +128,7 @@ class Command(BaseCommand):
                     h_team_num=h_team_instance,
                     expected_time__date=game_date
                 )
+                # If there is a matching game, use its expected time
                 if matching_games.exists():
                     expected_time = matching_games.first().expected_time
                 else:
