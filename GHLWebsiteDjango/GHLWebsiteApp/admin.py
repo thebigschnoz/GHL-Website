@@ -16,7 +16,7 @@ class SeasonsAdmin(admin.ModelAdmin):
     list_display = ("season_text", "season_num", "isPlayoff")
 
 class GameAdmin(admin.ModelAdmin):
-    list_display = ("game_num", "season_num__season_text", "gamelength", "expected_time", "played_time", "dnf")
+    list_display = ("game_num", "season_num__season_text", "gamelength", "a_team_num__club_abbr", "h_team_num__club_abbr", "expected_time", "played_time", "dnf")
 
 admin.site.register(Season, SeasonsAdmin)
 admin.site.register(Game, GameAdmin)
