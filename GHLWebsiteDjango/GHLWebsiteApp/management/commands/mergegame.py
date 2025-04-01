@@ -50,7 +50,7 @@ class Command(BaseCommand):
         teamrecord_merge = TeamRecord.objects.filter(game_num=merge_game.game_num)
 
         for merge_team in teamrecord_merge:
-            survivor_team = teamrecord_survivor.get(ea_team_num=merge_team.ea_club_num)
+            survivor_team = teamrecord_survivor.get(ea_club_num=merge_team.ea_club_num)
             if survivor_team:
                 for field in TeamRecord._meta.get_fields():
                     if isinstance(field, Field) and not field.auto_created:
