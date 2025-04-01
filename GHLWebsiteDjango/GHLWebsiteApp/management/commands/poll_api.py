@@ -152,7 +152,8 @@ class Command(BaseCommand):
                     season_num=season_instance,
                 )
                 game_obj.save()
-                matching_games.first().delete()
+                if matching_games.exists():
+                    matching_games.first().delete()
                 self.stdout.write(f"Created new game {game_num}")
                 
                 # Parse team stats
