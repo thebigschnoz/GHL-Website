@@ -49,7 +49,7 @@ class Command(BaseCommand):
         teamrecord_merge = TeamRecord.objects.filter(game_num=merge_game.game_num)
 
         for merge_team in teamrecord_merge:
-            survivor_team = teamrecord_survivor.filter(ea_club_num=merge_team.ea_club_num).first()
+            survivor_team = teamrecord_survivor.get(ea_team_num=merge_team.ea_team_num)
             if survivor_team:
                 for field in TeamRecord._meta.get_fields():
                     if isinstance(field, Field) and not field.auto_created:
@@ -69,8 +69,9 @@ class Command(BaseCommand):
                 merge_team.delete()  # Delete the merged teamrecord
             else:
                 # If no matching survivor_team exists, reassign the merge_team to survivor_game
-                merge_team.game_num = survivor_game.game_num
+                merge_team.game_num = survivor_game
                 merge_team.save()
+                self.stdout.write(self.style.WARNING(f"TeamRecord {merge_team.ea_team_num} from game {merge_game_num} was not found in game {game_num}. Reassigned to game {game_num}."))
         
         # Find matching SkaterRecords by game_num 
         skaterlist_survivor = SkaterRecord.objects.filter(game_num=survivor_game.game_num)
@@ -95,8 +96,9 @@ class Command(BaseCommand):
                 merge_skater.delete()  # Delete the merged skater
             else:
                 # If no matching survivor_skater exists, reassign the merge_skater to survivor_game
-                merge_skater.game_num = survivor_game.game_num
+                merge_skater.game_num = survivor_game
                 merge_skater.save()
+                self.stdout.write(self.style.WARNING(f"SkaterRecord {merge_skater.ea_player_num} from game {merge_game_num} was not found in game {game_num}. Reassigned to game {game_num}."))
 
         # Find matching SkaterRecords by game_num 
         goalielist_survivor = GoalieRecord.objects.filter(game_num=survivor_game.game_num)
@@ -121,8 +123,9 @@ class Command(BaseCommand):
                 merge_goalie.delete()  # Delete the merged skater
             else:
                 # If no matching survivor_skater exists, reassign the merge_skater to survivor_game
-                merge_goalie.game_num = survivor_game.game_num
+                merge_goalie.game_num = survivor_game
                 merge_goalie.save()
+                self.stdout.write(self.style.WARNING(f"GoalieRecord {merge_goalie.ea_player_num} from game {merge_game_num} was not found in game {game_num}. Reassigned to game {game_num}."))
 
         survivor_game.save() # Save the survivor game
         merge_game.delete() # Delete the merged game
