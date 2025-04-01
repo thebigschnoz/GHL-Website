@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand, CommandError
 from GHLWebsiteApp.models import *
 from django.db.models import Model
 from django.db.models.fields import Field
+from ...views import calculate_leaders, calculate_standings
 
 class Command(BaseCommand):
     help = "Merge two or more games together"
@@ -131,3 +132,6 @@ class Command(BaseCommand):
         merge_game.delete() # Delete the merged game
 
         self.stdout.write(self.style.SUCCESS(f"Successfully merged game {merge_game_num} into game {game_num}."))
+        calculate_leaders()
+        calculate_standings()
+        self.stdout.write(self.style.SUCCESS("Leaders and standings refreshed."))
