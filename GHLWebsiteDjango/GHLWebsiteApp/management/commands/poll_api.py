@@ -64,11 +64,17 @@ class Command(BaseCommand):
                 # Extract team numbers
                 teamnumbers = iter(game["clubs"].keys())
                 try:
-                    a_team_num = next(teamnumbers)
-                    h_team_num = next(teamnumbers)
+                    first_team_num = next(teamnumbers)
+                    second_team_num = next(teamnumbers)
                 except StopIteration:
                     self.stdout.write("Not enough teams in the game data - skipping game")
                     continue
+                if game['clubs'][first_team_num]['teamSide'] == 1:
+                    a_team_num = first_team_num
+                    h_team_num = second_team_num
+                else:
+                    a_team_num = second_team_num
+                    h_team_num = first_team_num
 
                 # Fetch the Team instances
                 try:
