@@ -417,7 +417,7 @@ def player(request, player):
         else:
             sk_fo_perc = "-"
 
-    allgoaliegames = playernum.goalierecord_set.all()
+    allgoaliegames = playernum.goalierecord_set.filter(game_num__season_num=seasonSetting)
     if not allgoaliegames:
         g_gp = g_so = g_wins = g_losses = g_otlosses = g_toi = g_sha = g_sav = g_gaa = g_br_sh = g_br_sa = g_ps_sh = g_ps_sa = g_ga =  g_svp = g_br_perc = g_ps_perc = 0
     else:
