@@ -46,17 +46,17 @@ class Command(BaseCommand):
         # Merge all TeamRecords, Skater Records, and GameRecords from merge_game into survivor_game
 
         # Find matching TeamRecords by game_num
-        teamrecord_survivor = TeamRecord.objects.filter(game_num=survivor_game.game_num)
-        teamrecord_merge = TeamRecord.objects.filter(game_num=merge_game.game_num)
+        teamrecordlist_survivor = TeamRecord.objects.filter(game_num=survivor_game.game_num) #  The TeamRecords from the survivor game
+        teamrecordlist_merge = TeamRecord.objects.filter(game_num=merge_game.game_num) #  The TeamRecords from the merge game
 
-        for merge_team in teamrecord_merge:
-            survivor_team = teamrecord_survivor.get(ea_club_num=merge_team.ea_club_num)
+        for record in teamrecordlist_merge: #  For each of the TeamRecords from the merged game...
+            survivor_team = teamrecordlist_survivor.filter(ea_club_num=record.ea_club_num).first() #  ...find the corresponding TeamRecord in the survivor game
             if survivor_team:
                 for field in TeamRecord._meta.get_fields():
                     if isinstance(field, Field) and not field.auto_created:
                         field_name = field.name
                         survivor_value = getattr(survivor_team, field_name, None)
-                        merge_value = getattr(merge_team, field_name, None)
+                        merge_value = getattr(record, field_name, None)
 
                         # Handle DNF field
                         if field_name == "dnf":
@@ -67,12 +67,12 @@ class Command(BaseCommand):
                             setattr(survivor_team, field_name, survivor_value + merge_value)
 
                 survivor_team.save()  # Save the survivor teamrecord
-                merge_team.delete()  # Delete the merged teamrecord
+                record.delete()  # Delete the merged teamrecord
             else:
-                # If no matching survivor_team exists, reassign the merge_team to survivor_game
-                merge_team.game_num = survivor_game
-                merge_team.save()
-                self.stdout.write(self.style.WARNING(f"TeamRecord {merge_team.ea_club_num} from game {merge_game_num} was not found in game {game_num}. Reassigned to game {game_num}."))
+                # If no matching survivor_team exists, reassign the record to survivor_game
+                record.game_num = survivor_game
+                record.save()
+                self.stdout.write(self.style.WARNING(f"TeamRecord {record.ea_club_num} from game {merge_game_num} was not found in game {game_num}. Reassigned to game {game_num}."))
         
         # Find matching SkaterRecords by game_num 
         skaterlist_survivor = SkaterRecord.objects.filter(game_num=survivor_game.game_num)
@@ -80,7 +80,7 @@ class Command(BaseCommand):
 
         for merge_skater in skaterlist_merge:
             # Match SkaterRecords by ea_player_num
-            survivor_skater = skaterlist_survivor.get(ea_player_num=merge_skater.ea_player_num)
+            survivor_skater = skaterlist_survivor.filter(ea_player_num=merge_skater.ea_player_num).first()
             if survivor_skater:
                 # Add all integer fields together
                 for field in SkaterRecord._meta.get_fields():
@@ -107,7 +107,7 @@ class Command(BaseCommand):
 
         for merge_goalie in goalielist_merge:
             # Match GoalieRecords by ea_player_num
-            survivor_goalie = goalielist_survivor.get(ea_player_num=merge_goalie.ea_player_num)
+            survivor_goalie = goalielist_survivor.filter(ea_player_num=merge_goalie.ea_player_num).first()
             if survivor_goalie:
                 # Add all integer fields together
                 for field in GoalieRecord._meta.get_fields():
