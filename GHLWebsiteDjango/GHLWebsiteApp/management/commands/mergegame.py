@@ -72,7 +72,7 @@ class Command(BaseCommand):
                 # If no matching survivor_team exists, reassign the merge_team to survivor_game
                 merge_team.game_num = survivor_game
                 merge_team.save()
-                self.stdout.write(self.style.WARNING(f"TeamRecord {merge_team.ea_team_num} from game {merge_game_num} was not found in game {game_num}. Reassigned to game {game_num}."))
+                self.stdout.write(self.style.WARNING(f"TeamRecord {merge_team.ea_club_num} from game {merge_game_num} was not found in game {game_num}. Reassigned to game {game_num}."))
         
         # Find matching SkaterRecords by game_num 
         skaterlist_survivor = SkaterRecord.objects.filter(game_num=survivor_game.game_num)
