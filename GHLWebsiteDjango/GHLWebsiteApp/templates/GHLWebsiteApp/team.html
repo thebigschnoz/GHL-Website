@@ -203,15 +203,15 @@
                     {% if teamgames %}
                         {% for game in teamgames %}
                         <tr class="no-bg">
-                            <td><a href="{% url 'game' game.game_num %}">{{ game.expected_time|date:"m/d/y  g:i" }}</a></td>
+                            <td>{{ game.expected_time|date:"m/d/y  g:i" }}</td>
                             <td style="text-align: right; padding-right: 10px;"><a href="{% url 'team' game.a_team_num.ea_club_num %}">{{ game.a_team_num.club_full_name }}</a></td>
                             <td>{{ game.a_team_gf }}</td>
                             {% if game.gamelength > 3600 %}
-                            <td>Final/OT</td>
+                            <td><a href="{% url 'game' game.game_num %}">Final/OT</a></td>
                             {% elif game.played_time is None %}
-                            <td>@</td>
+                            <td><a href="{% url 'game' game.game_num %}">@</a></td>
                             {% else %}
-                            <td>Final</td>
+                            <td><a href="{% url 'game' game.game_num %}">Final</a></td>
                             {% endif %}
                             <td>{{ game.h_team_gf }}</td>
                             <td style="text-align: left; padding-left: 10px;"><a href="{% url 'team' game.h_team_num.ea_club_num %}">{{ game.h_team_num.club_full_name }}</a></td>
