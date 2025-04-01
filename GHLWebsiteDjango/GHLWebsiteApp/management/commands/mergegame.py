@@ -49,7 +49,7 @@ class Command(BaseCommand):
         teamrecord_merge = TeamRecord.objects.filter(game_num=merge_game.game_num)
 
         for merge_team in teamrecord_merge:
-            survivor_team = teamrecord_survivor.get(ea_team_num=merge_team.ea_team_num)
+            survivor_team = teamrecord_survivor.get(ea_team_num=merge_team.ea_club_num)
             if survivor_team:
                 for field in TeamRecord._meta.get_fields():
                     if isinstance(field, Field) and not field.auto_created:
@@ -79,7 +79,7 @@ class Command(BaseCommand):
 
         for merge_skater in skaterlist_merge:
             # Match SkaterRecords by ea_player_num
-            survivor_skater = skaterlist_survivor.filter(ea_player_num=merge_skater.ea_player_num).first()
+            survivor_skater = skaterlist_survivor.get(ea_player_num=merge_skater.ea_player_num)
             if survivor_skater:
                 # Add all integer fields together
                 for field in SkaterRecord._meta.get_fields():
@@ -106,7 +106,7 @@ class Command(BaseCommand):
 
         for merge_goalie in goalielist_merge:
             # Match GoalieRecords by ea_player_num
-            survivor_goalie = goalielist_survivor.filter(ea_player_num=merge_goalie.ea_player_num).first()
+            survivor_goalie = goalielist_survivor.get(ea_player_num=merge_goalie.ea_player_num)
             if survivor_goalie:
                 # Add all integer fields together
                 for field in GoalieRecord._meta.get_fields():
