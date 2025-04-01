@@ -69,6 +69,8 @@ class Command(BaseCommand):
                 except StopIteration:
                     self.stdout.write("Not enough teams in the game data - skipping game")
                     continue
+
+                # Determine which team is home and away
                 if game['clubs'][first_team_num]['teamSide'] == 1:
                     a_team_num = first_team_num
                     h_team_num = second_team_num
