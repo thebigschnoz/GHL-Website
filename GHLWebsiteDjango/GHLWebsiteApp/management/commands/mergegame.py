@@ -65,7 +65,8 @@ class Command(BaseCommand):
                         elif isinstance(survivor_value, (int, float)) and isinstance(merge_value, (int, float)):
                             setattr(survivor_team, field_name, survivor_value + merge_value)
 
-                survivor_team.save()  # Save the updated survivor_team
+                survivor_team.save()  # Save the survivor teamrecord
+                merge_team.delete()  # Delete the merged teamrecord
             else:
                 # If no matching survivor_team exists, reassign the merge_team to survivor_game
                 merge_team.game_num = survivor_game.game_num
@@ -90,13 +91,14 @@ class Command(BaseCommand):
                         if isinstance(survivor_value, (int, float)) and isinstance(merge_value, (int, float)):
                             setattr(survivor_skater, field_name, survivor_value + merge_value)
 
-                survivor_skater.save()  # Save the updated survivor_skater
+                survivor_skater.save()  # Save the survivor skater
+                merge_skater.delete()  # Delete the merged skater
             else:
                 # If no matching survivor_skater exists, reassign the merge_skater to survivor_game
                 merge_skater.game_num = survivor_game.game_num
                 merge_skater.save()
 
-                # Find matching SkaterRecords by game_num 
+        # Find matching SkaterRecords by game_num 
         goalielist_survivor = GoalieRecord.objects.filter(game_num=survivor_game.game_num)
         goalielist_merge = GoalieRecord.objects.filter(game_num=merge_game.game_num)
 
@@ -115,13 +117,14 @@ class Command(BaseCommand):
                         if isinstance(survivor_value, (int, float)) and isinstance(merge_value, (int, float)):
                             setattr(survivor_skater, field_name, survivor_value + merge_value)
 
-                survivor_goalie.save()  # Save the updated survivor_skater
+                survivor_goalie.save()  # Save the survivor skater
+                merge_goalie.delete()  # Delete the merged skater
             else:
                 # If no matching survivor_skater exists, reassign the merge_skater to survivor_game
                 merge_goalie.game_num = survivor_game.game_num
                 merge_goalie.save()
 
-        survivor_game.save() # Save the updated survivor_game
+        survivor_game.save() # Save the survivor game
         merge_game.delete() # Delete the merged game
 
         self.stdout.write(self.style.SUCCESS(f"Successfully merged game {merge_game_num} into game {game_num}."))
