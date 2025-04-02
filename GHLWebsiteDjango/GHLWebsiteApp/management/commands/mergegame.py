@@ -52,7 +52,7 @@ class Command(BaseCommand):
 
         for record in teamrecordlist_merge: #  For each of the TeamRecords from the merged game...
             survivor_team = teamrecordlist_survivor.filter(ea_club_num=record.ea_club_num).first() #  ...find the corresponding TeamRecord in the survivor game
-            if survivor_team.exists():
+            if survivor_team:
                 for field in TeamRecord._meta.get_fields():
                     if isinstance(field, Field) and not field.auto_created:
                         field_name = field.name
@@ -66,13 +66,12 @@ class Command(BaseCommand):
                         # Add all integer fields together
                         elif isinstance(survivor_value, (int, float)) and isinstance(merge_value, (int, float)):
                             setattr(survivor_team, field_name, survivor_value + merge_value)
-
                 survivor_team.save()  # Save the survivor teamrecord
                 record.delete()  # Delete the merged teamrecord
             else:
                 # If no matching survivor_team exists, reassign the record to survivor_game
-                record.game_num = survivor_game
-                record.save()
+                # record.game_num = survivor_game
+                # record.save()
                 self.stdout.write(self.style.WARNING(f"TeamRecord {record.ea_club_num} from game {merge_game_num} was not found in game {game_num}. Reassigned to game {game_num}."))
         
         # Find matching SkaterRecords by game_num 
