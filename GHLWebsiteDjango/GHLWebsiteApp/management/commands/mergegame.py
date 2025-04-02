@@ -71,8 +71,8 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.SUCCESS(f"Successfully merged TeamRecord {record.ea_club_num} from game {merge_game_num} into game {game_num}."))
             else:
                 # If no matching survivor_team exists, reassign the record to survivor_game
-                # record.game_num = survivor_game
-                # record.save()
+                record.game_num = survivor_game
+                record.save()
                 self.stdout.write(self.style.WARNING(f"TeamRecord {record.ea_club_num} from game {merge_game_num} was not found in game {game_num}. Reassigned to game {game_num}."))
         
         # Find matching SkaterRecords by game_num 
