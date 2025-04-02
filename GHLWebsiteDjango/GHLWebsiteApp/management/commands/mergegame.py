@@ -47,8 +47,8 @@ class Command(BaseCommand):
         # Merge all TeamRecords, Skater Records, and GameRecords from merge_game into survivor_game
 
         # Find matching TeamRecords by game_num
-        teamrecordlist_survivor = TeamRecord.objects.filter(game_num=survivor_game.game_num) #  The TeamRecords from the survivor game
-        teamrecordlist_merge = TeamRecord.objects.filter(game_num=merge_game.game_num) #  The TeamRecords from the merge game
+        teamrecordlist_survivor = TeamRecord.objects.filter(game_num=game_num) #  The TeamRecords from the survivor game
+        teamrecordlist_merge = TeamRecord.objects.filter(game_num=merge_game_num) #  The TeamRecords from the merge game
 
         for record in teamrecordlist_merge: #  For each of the TeamRecords from the merged game...
             survivor_team = teamrecordlist_survivor.filter(ea_club_num=record.ea_club_num).first() #  ...find the corresponding TeamRecord in the survivor game
@@ -76,8 +76,8 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.WARNING(f"TeamRecord {record.ea_club_num} from game {merge_game_num} was not found in game {game_num}. Reassigned to game {game_num}."))
         
         # Find matching SkaterRecords by game_num 
-        skaterlist_survivor = SkaterRecord.objects.filter(game_num=survivor_game.game_num)
-        skaterlist_merge = SkaterRecord.objects.filter(game_num=merge_game.game_num)
+        skaterlist_survivor = SkaterRecord.objects.filter(game_num=game_num)
+        skaterlist_merge = SkaterRecord.objects.filter(game_num=merge_game_num)
 
         for merge_skater in skaterlist_merge:
             # Match SkaterRecords by ea_player_num
@@ -103,8 +103,8 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.WARNING(f"SkaterRecord {merge_skater.ea_player_num} from game {merge_game_num} was not found in game {game_num}. Reassigned to game {game_num}."))
 
         # Find matching SkaterRecords by game_num 
-        goalielist_survivor = GoalieRecord.objects.filter(game_num=survivor_game.game_num)
-        goalielist_merge = GoalieRecord.objects.filter(game_num=merge_game.game_num)
+        goalielist_survivor = GoalieRecord.objects.filter(game_num=game_num)
+        goalielist_merge = GoalieRecord.objects.filter(game_num=merge_game_num)
 
         for merge_goalie in goalielist_merge:
             # Match GoalieRecords by ea_player_num
