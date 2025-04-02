@@ -118,7 +118,7 @@ class Command(BaseCommand):
                     if isinstance(field, Field) and not field.auto_created:
                         field_name = field.name
                         survivor_value = getattr(survivor_goalie, field_name, None)
-                        merge_value = getattr(merge_skater, field_name, None)
+                        merge_value = getattr(merge_goalie, field_name, None)
 
                         if field_name == ("game_num" or "ea_player_num" or "ea_club_num"):
                             continue
@@ -128,10 +128,10 @@ class Command(BaseCommand):
                         elif isinstance(survivor_value, (int, float)) and isinstance(merge_value, (int, float)):
                             setattr(survivor_goalie, field_name, survivor_value + merge_value)
 
-                survivor_goalie.save()  # Save the survivor skater
-                merge_goalie.delete()  # Delete the merged skater
+                survivor_goalie.save()  # Save the survivor goalie
+                merge_goalie.delete()  # Delete the merged goalie
             else:
-                # If no matching survivor_goalie exists, reassign the merge_skater to survivor_game
+                # If no matching survivor_goalie exists, reassign the merge_goalie to survivor_game
                 merge_goalie.game_num = survivor_game
                 merge_goalie.save()
                 self.stdout.write(self.style.WARNING(f"GoalieRecord {merge_goalie.ea_player_num} from game {merge_game_num} was not found in game {game_num}. Reassigned to game {game_num}."))
