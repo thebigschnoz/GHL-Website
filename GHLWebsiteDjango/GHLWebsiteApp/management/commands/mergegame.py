@@ -14,6 +14,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         game_num = options["game_num"]
         merge_game_num = options["merge_game_num"]
+        self.stdout.write(f"Merging game {merge_game_num} into game {game_num}...")
         try:
             survivor_game = Game.objects.get(game_num=game_num)
             merge_game = Game.objects.get(game_num=merge_game_num)
