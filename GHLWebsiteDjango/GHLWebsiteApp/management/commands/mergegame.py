@@ -37,12 +37,11 @@ class Command(BaseCommand):
                     merge_value = getattr(merge_game, field_name)
 
                     # Handle numeric fields
-                    if isinstance(survivor_value, (int, float)) and isinstance(merge_value, (int, float)):
+                    if field_name == ("game_num" or "season_num" or "a_team_num" or "h_team_num"):
+                        continue
+
+                    elif isinstance(survivor_value, (int, float)) and isinstance(merge_value, (int, float)):
                         setattr(survivor_game, field_name, survivor_value + merge_value)
-                    
-                    # Handle string fields (concatenate or choose one)
-                    elif isinstance(survivor_value, str) and isinstance(merge_value, str):
-                        setattr(survivor_game, field_name, f"{survivor_value} {merge_value}".strip())
                     
         # Merge all TeamRecords, Skater Records, and GameRecords from merge_game into survivor_game
 
@@ -92,10 +91,10 @@ class Command(BaseCommand):
                         survivor_value = getattr(survivor_skater, field_name, None)
                         merge_value = getattr(merge_skater, field_name, None)
 
-                        if field_name == "game_num" or field_name == "ea_player_num" or field_name == "ea_club_num" or field_name == "position" or field_name == "build" or field_name == "home_away":
+                        if field_name == ("game_num" or "ea_player_num" or "ea_club_num" or "position" or "build" or "home_away"):
                             continue
                         # Handle numeric fields
-                        if isinstance(survivor_value, (int, float)) and isinstance(merge_value, (int, float)):
+                        elif isinstance(survivor_value, (int, float)) and isinstance(merge_value, (int, float)):
                             setattr(survivor_skater, field_name, survivor_value + merge_value)
 
                 survivor_skater.save()  # Save the survivor skater
@@ -123,10 +122,10 @@ class Command(BaseCommand):
 
                         if field_name == "game_num" or field_name == "ea_player_num" or field_name == "ea_club_num":
                             continue
-                        if field_name == ("win" or "loss" or "otloss" or "shutout"):
+                        elif field_name == ("win" or "loss" or "otloss" or "shutout"):
                             continue
                         # Handle numeric fields
-                        if isinstance(survivor_value, (int, float)) and isinstance(merge_value, (int, float)):
+                        elif isinstance(survivor_value, (int, float)) and isinstance(merge_value, (int, float)):
                             setattr(survivor_skater, field_name, survivor_value + merge_value)
 
                 survivor_goalie.save()  # Save the survivor skater
