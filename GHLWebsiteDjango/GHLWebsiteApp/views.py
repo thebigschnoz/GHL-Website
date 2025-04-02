@@ -407,7 +407,7 @@ def player(request, player):
                 sk_sht_perc = round((sk_g / sk_sog)*100, 1)
             else:
                 sk_sht_perc = "-"
-            sk_sht_eff = round(sk_sog / sk_shot_att, 3)*100
+            sk_sht_eff = round((sk_sog / sk_shot_att)*100, 1)
         else:
             sk_sht_perc = sk_sht_eff = "-"
 
