@@ -16,8 +16,8 @@ class Command(BaseCommand):
         self.stdout.write(f"Swapping home and away teams for game {game.game_num}...")
 
         # Swap teams
-        old_home = Team.objects.get(ea_club_num=game.h_team_num)
-        old_away = Team.objects.get(ea_club_num=game.a_team_num)
+        old_home = Team.objects.get(ea_club_num=game.h_team_num.ea_club_num)
+        old_away = Team.objects.get(ea_club_num=game.a_team_num.ea_club_num)
         game.h_team_num = old_away
         game.a_team_num = old_home
 
