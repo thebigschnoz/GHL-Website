@@ -59,8 +59,10 @@ class Command(BaseCommand):
                         survivor_value = getattr(survivor_team, field_name, None)
                         merge_value = getattr(record, field_name, None)
 
+                        if field_name == "game_num" or field_name == "ea_club_num" or field_name == "home_away":
+                            continue
                         # Handle DNF field
-                        if field_name == "dnf":
+                        elif field_name == "dnf":
                             setattr(survivor_team, field_name, survivor_value or merge_value)
                             continue
                         # Add all integer fields together
@@ -90,6 +92,8 @@ class Command(BaseCommand):
                         survivor_value = getattr(survivor_skater, field_name, None)
                         merge_value = getattr(merge_skater, field_name, None)
 
+                        if field_name == "game_num" or field_name == "ea_player_num" or field_name == "ea_club_num" or field_name == "position" or field_name == "build" or field_name == "home_away":
+                            continue
                         # Handle numeric fields
                         if isinstance(survivor_value, (int, float)) and isinstance(merge_value, (int, float)):
                             setattr(survivor_skater, field_name, survivor_value + merge_value)
@@ -117,6 +121,10 @@ class Command(BaseCommand):
                         survivor_value = getattr(survivor_skater, field_name, None)
                         merge_value = getattr(merge_skater, field_name, None)
 
+                        if field_name == "game_num" or field_name == "ea_player_num" or field_name == "ea_club_num":
+                            continue
+                        if field_name == ("win" or "loss" or "otloss" or "shutout"):
+                            continue
                         # Handle numeric fields
                         if isinstance(survivor_value, (int, float)) and isinstance(merge_value, (int, float)):
                             setattr(survivor_skater, field_name, survivor_value + merge_value)
