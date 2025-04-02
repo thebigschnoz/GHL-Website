@@ -68,6 +68,7 @@ class Command(BaseCommand):
                             setattr(survivor_team, field_name, survivor_value + merge_value)
                 survivor_team.save()  # Save the survivor teamrecord
                 record.delete()  # Delete the merged teamrecord
+                self.stdout.write(self.style.SUCCESS(f"Successfully merged TeamRecord {record.ea_club_num} from game {merge_game_num} into game {game_num}."))
             else:
                 # If no matching survivor_team exists, reassign the record to survivor_game
                 # record.game_num = survivor_game
