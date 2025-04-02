@@ -52,7 +52,7 @@ class Command(BaseCommand):
 
         for record in teamrecordlist_merge: #  For each of the TeamRecords from the merged game...
             survivor_team = teamrecordlist_survivor.filter(ea_club_num=record.ea_club_num).first() #  ...find the corresponding TeamRecord in the survivor game
-            if survivor_team:
+            if survivor_team.exists():
                 for field in TeamRecord._meta.get_fields():
                     if isinstance(field, Field) and not field.auto_created:
                         field_name = field.name
