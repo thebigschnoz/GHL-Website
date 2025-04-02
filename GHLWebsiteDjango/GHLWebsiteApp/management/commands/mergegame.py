@@ -137,7 +137,8 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.WARNING(f"GoalieRecord {merge_goalie.ea_player_num} from game {merge_game_num} was not found in game {game_num}. Reassigned to game {game_num}."))
 
         survivor_game.save() # Save the survivor game
-        merge_game.delete() # Delete the merged game
+        merge_game.season_num = 2 # Move merged game to test season (so it doesn't show up in the standings and doesn't download again)
+        merge_game.save()
 
         self.stdout.write(self.style.SUCCESS(f"Successfully merged game {merge_game_num} into game {game_num}."))
         calculate_leaders()
