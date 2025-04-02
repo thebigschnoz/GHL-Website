@@ -27,7 +27,7 @@ class Command(BaseCommand):
         game.h_team_gf = old_away_gf
         game.a_team_gf = old_home_gf
 
-        # TODO: Swap home and away boolean in TeamRecord
+        # Swap TeamRecords' home_away values
         old_home_record = TeamRecord.objects.filter(game_num=game.game_num, ea_club_num=old_home.ea_club_num).first()
         old_away_record = TeamRecord.objects.filter(game_num=game.game_num, ea_club_num=old_away.ea_club_num).first()
         if old_home_record.home_away == 0:
