@@ -34,29 +34,29 @@ def calculate_leaders():
         ]
     )
     else:
-        leaders_goals = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).annotate(numgoals=Sum("goals")).values("ea_player_num", "numgoals").order_by("-numgoals").first()
-        leaders_assists = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).annotate(numassists=Sum("assists")).values("ea_player_num", "numassists").order_by("-numassists").first()
-        leaders_points = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).annotate(numpoints=Sum("points")).values("ea_player_num", "numpoints").order_by("-numpoints").first()
-        leaders_shooting = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).annotate(shootperc=(Cast(Sum("goals"), models.FloatField())/Cast(Sum("sog"), models.FloatField()))*100).values("ea_player_num", "shootperc").order_by("-shootperc").first()
-        leaders_svp = GoalieRecord.objects.filter(game_num__season_num=seasonSetting).annotate(savepercsum=(Cast(Sum("saves"), models.FloatField())/Cast(Sum("shots_against"), models.FloatField()))*100).values("ea_player_num", "savepercsum").order_by("-savepercsum").first()
-        leaders_shutouts = GoalieRecord.objects.filter(game_num__season_num=seasonSetting).annotate(
+        leaders_goals = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).values("ea_player_num").annotate(numgoals=Sum("goals")).order_by("-numgoals").first()
+        leaders_assists = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).values("ea_player_num").annotate(numassists=Sum("assists")).order_by("-numassists").first()
+        leaders_points = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).values("ea_player_num").annotate(numpoints=Sum("points")).order_by("-numpoints").first()
+        leaders_shooting = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).values("ea_player_num").annotate(shootperc=(Cast(Sum("goals"), models.FloatField())/Cast(Sum("sog"), models.FloatField()))*100).order_by("-shootperc").first()
+        leaders_svp = GoalieRecord.objects.filter(game_num__season_num=seasonSetting).values("ea_player_num").annotate(savepercsum=(Cast(Sum("saves"), models.FloatField())/Cast(Sum("shots_against"), models.FloatField()))*100).order_by("-savepercsum").first()
+        leaders_shutouts = GoalieRecord.objects.filter(game_num__season_num=seasonSetting).values("ea_player_num").annotate(
             shutoutcount=Sum(Case(
             When(shutout=True, then=1),
             default=0,
             output_field=models.IntegerField()
-        ))).values("ea_player_num", "shutoutcount").filter(shutoutcount__gte=1).order_by("-shutoutcount").first()
-        leaders_wins = GoalieRecord.objects.filter(game_num__season_num=seasonSetting).annotate(
+        ))).filter(shutoutcount__gte=1).order_by("-shutoutcount").first()
+        leaders_wins = GoalieRecord.objects.filter(game_num__season_num=seasonSetting).values("ea_player_num").annotate(
             wincount=Sum(Case(
             When(win=True, then=1),
             default=0,
             output_field=models.IntegerField()
-        ))).values("ea_player_num", "wincount").filter(wincount__gte=1).order_by("-wincount").first()
-        leaders_gaa = GoalieRecord.objects.filter(game_num__season_num=seasonSetting).annotate(
+        ))).filter(wincount__gte=1).order_by("-wincount").first()
+        leaders_gaa = GoalieRecord.objects.filter(game_num__season_num=seasonSetting).values("ea_player_num").annotate(
             gaatotal=((Cast(Sum("shots_against"), 
                 models.FloatField())-Cast(Sum("saves"), 
                 models.FloatField()))/Cast(Sum("game_num__gamelength"),
                 models.FloatField()))*3600
-            ).values("ea_player_num", "gaatotal").order_by("gaatotal").first()
+            ).order_by("gaatotal").first()
         Leader.objects.bulk_create(
             [
                 Leader(attribute="Pts", player=Player.objects.get(ea_player_num=leaders_points["ea_player_num"]), stat=leaders_points["numpoints"]),
