@@ -34,42 +34,42 @@ def calculate_leaders():
         ]
     )
     else:
-        leaders_goals = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).annotate(numgoals=Sum("goals")).values("ea_player_num").order_by("-numgoals")[:1]
-        leaders_assists = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).annotate(numassists=Sum("assists")).values("ea_player_num").order_by("-numassists")[:1]
-        leaders_points = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).annotate(numpoints=Sum("points")).values("ea_player_num").order_by("-numpoints")[:1]
-        leaders_shooting = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).annotate(shootperc=(Cast(Sum("goals"), models.FloatField())/Cast(Sum("sog"), models.FloatField()))*100).values("ea_player_num").order_by("-shootperc")[:1]
-        leaders_svp = GoalieRecord.objects.filter(game_num__season_num=seasonSetting).annotate(savepercsum=(Cast(Sum("saves"), models.FloatField())/Cast(Sum("shots_against"), models.FloatField()))*100).values("ea_player_num").order_by("-savepercsum")[:1]
+        leaders_goals = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).annotate(numgoals=Sum("goals")).values("ea_player_num").order_by("-numgoals").first()
+        leaders_assists = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).annotate(numassists=Sum("assists")).values("ea_player_num").order_by("-numassists").first()
+        leaders_points = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).annotate(numpoints=Sum("points")).values("ea_player_num").order_by("-numpoints").first()
+        leaders_shooting = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).annotate(shootperc=(Cast(Sum("goals"), models.FloatField())/Cast(Sum("sog"), models.FloatField()))*100).values("ea_player_num").order_by("-shootperc").first()
+        leaders_svp = GoalieRecord.objects.filter(game_num__season_num=seasonSetting).annotate(savepercsum=(Cast(Sum("saves"), models.FloatField())/Cast(Sum("shots_against"), models.FloatField()))*100).values("ea_player_num").order_by("-savepercsum").first()
         leaders_shutouts = GoalieRecord.objects.filter(game_num__season_num=seasonSetting).annotate(
             shutoutcount=Sum(Case(
             When(shutout=True, then=1),
             default=0,
             output_field=models.IntegerField()
-        ))).values("ea_player_num").filter(shutoutcount__gte=1).order_by("-shutoutcount")[:1]
+        ))).values("ea_player_num").filter(shutoutcount__gte=1).order_by("-shutoutcount").first()
         leaders_wins = GoalieRecord.objects.filter(game_num__season_num=seasonSetting).annotate(
             wincount=Sum(Case(
             When(win=True, then=1),
             default=0,
             output_field=models.IntegerField()
-        ))).values("ea_player_num").filter(wincount__gte=1).order_by("-wincount")[:1]
+        ))).values("ea_player_num").filter(wincount__gte=1).order_by("-wincount").first()
         leaders_gaa = GoalieRecord.objects.filter(game_num__season_num=seasonSetting).annotate(
             gaatotal=((Cast(Sum("shots_against"), 
                 models.FloatField())-Cast(Sum("saves"), 
                 models.FloatField()))/Cast(Sum("game_num__gamelength"),
                 models.FloatField()))*3600
-            ).values("ea_player_num").order_by("gaatotal")[:1]
+            ).values("ea_player_num").order_by("gaatotal").first()
         Leader.objects.bulk_create(
             [
-                Leader(attribute="Pts", player=leaders_points[0].ea_player_num, stat=leaders_points[0].numpoints),
-                Leader(attribute="G", player=leaders_goals[0].ea_player_num, stat=leaders_goals[0].numgoals),
-                Leader(attribute="A", player=leaders_assists[0].ea_player_num, stat=leaders_assists[0].numassists),
-                Leader(attribute="SH%", player=leaders_shooting[0].ea_player_num, stat=leaders_shooting[0].shootperc),
-                Leader(attribute="GAA", player=leaders_gaa[0].ea_player_num, stat=leaders_gaa[0].gaatotal),
-                Leader(attribute="SV%", player=leaders_svp[0].ea_player_num, stat=leaders_svp[0].savepercsum),
-                Leader(attribute="W", player=leaders_wins[0].ea_player_num, stat=leaders_wins[0].wincount),
+                Leader(attribute="Pts", player=leaders_points.ea_player_num, stat=leaders_points.numpoints),
+                Leader(attribute="G", player=leaders_goals.ea_player_num, stat=leaders_goals.numgoals),
+                Leader(attribute="A", player=leaders_assists.ea_player_num, stat=leaders_assists.numassists),
+                Leader(attribute="SH%", player=leaders_shooting.ea_player_num, stat=leaders_shooting.shootperc),
+                Leader(attribute="GAA", player=leaders_gaa.ea_player_num, stat=leaders_gaa.gaatotal),
+                Leader(attribute="SV%", player=leaders_svp.ea_player_num, stat=leaders_svp.savepercsum),
+                Leader(attribute="W", player=leaders_wins.ea_player_num, stat=leaders_wins.wincount),
             ]
         )
         if leaders_shutouts:
-            Leader.objects.create(attribute="SO", player=leaders_shutouts[0].ea_player_num, stat=leaders_shutouts[0].shutoutcount)
+            Leader.objects.create(attribute="SO", player=leaders_shutouts.ea_player_num, stat=leaders_shutouts.shutoutcount)
         else:
             Leader.objects.create(attribute="SO", player=None, stat=0)
 
