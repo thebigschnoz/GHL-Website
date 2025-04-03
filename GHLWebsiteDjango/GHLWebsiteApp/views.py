@@ -60,16 +60,16 @@ def calculate_leaders():
         Leader.objects.bulk_create(
             [
                 Leader(attribute="Pts", player=Player.objects.get(ea_player_num=leaders_points["ea_player_num"]), stat=leaders_points["numpoints"]),
-                Leader(attribute="G", player=Player.objects.get(leaders_goals["ea_player_num"]), stat=leaders_goals["numgoals"]),
-                Leader(attribute="A", player=Player.objects.get(leaders_assists["ea_player_num"]), stat=leaders_assists["numassists"]),
-                Leader(attribute="SH%", player=Player.objects.get(leaders_shooting["ea_player_num"]), stat=leaders_shooting["shootperc"]),
-                Leader(attribute="GAA", player=Player.objects.get(leaders_gaa["ea_player_num"]), stat=leaders_gaa["gaatotal"]),
-                Leader(attribute="SV%", player=Player.objects.get(leaders_svp["ea_player_num"]), stat=leaders_svp["savepercsum"]),
-                Leader(attribute="W", player=Player.objects.get(leaders_wins["ea_player_num"]), stat=leaders_wins["wincount"]),
+                Leader(attribute="G", player=Player.objects.get(ea_player_num=leaders_goals["ea_player_num"]), stat=leaders_goals["numgoals"]),
+                Leader(attribute="A", player=Player.objects.get(ea_player_num=leaders_assists["ea_player_num"]), stat=leaders_assists["numassists"]),
+                Leader(attribute="SH%", player=Player.objects.get(ea_player_num=leaders_shooting["ea_player_num"]), stat=leaders_shooting["shootperc"]),
+                Leader(attribute="GAA", player=Player.objects.get(ea_player_num=leaders_gaa["ea_player_num"]), stat=leaders_gaa["gaatotal"]),
+                Leader(attribute="SV%", player=Player.objects.get(ea_player_num=leaders_svp["ea_player_num"]), stat=leaders_svp["savepercsum"]),
+                Leader(attribute="W", player=Player.objects.get(ea_player_num=leaders_wins["ea_player_num"]), stat=leaders_wins["wincount"]),
             ]
         )
         if leaders_shutouts:
-            Leader.objects.create(attribute="SO", player=Player.objects.get(leaders_shutouts["ea_player_num"]), stat=leaders_shutouts["shutoutcount"])
+            Leader.objects.create(attribute="SO", player=Player.objects.get(ea_player_num=leaders_shutouts["ea_player_num"]), stat=leaders_shutouts["shutoutcount"])
         else:
             Leader.objects.create(attribute="SO", player=None, stat=0)
 
