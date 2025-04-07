@@ -99,11 +99,13 @@ class Command(BaseCommand):
 
                 survivor_skater.save()  # Save the survivor skater
                 merge_skater.delete()  # Delete the merged skater
+                self.stdout.write(self.style.SUCCESS(f"Successfully merged SkaterRecord {merge_skater.ea_player_num.username} from game {merge_game_num} into game {game_num}."))
             else:
                 # If no matching survivor_skater exists, reassign the merge_skater to survivor_game
                 merge_skater.game_num = survivor_game
                 merge_skater.save()
                 self.stdout.write(self.style.WARNING(f"SkaterRecord {merge_skater.ea_player_num} from game {merge_game_num} was not found in game {game_num}. Reassigned to game {game_num}."))
+        
 
         # Find matching SkaterRecords by game_num 
         goalielist_survivor = GoalieRecord.objects.filter(game_num=game_num)
@@ -130,14 +132,16 @@ class Command(BaseCommand):
 
                 survivor_goalie.save()  # Save the survivor goalie
                 merge_goalie.delete()  # Delete the merged goalie
+                self.stdout.write(self.style.SUCCESS(f"Successfully merged GoalieRecord {merge_goalie.ea_player_num.username} from game {merge_game_num} into game {game_num}."))
             else:
                 # If no matching survivor_goalie exists, reassign the merge_goalie to survivor_game
                 merge_goalie.game_num = survivor_game
                 merge_goalie.save()
                 self.stdout.write(self.style.WARNING(f"GoalieRecord {merge_goalie.ea_player_num} from game {merge_game_num} was not found in game {game_num}. Reassigned to game {game_num}."))
+            
 
         survivor_game.save() # Save the survivor game
-        merge_game.season_num = 2 # Move merged game to test season (so it doesn't show up in the standings and doesn't download again)
+        merge_game.season_num = Season.objects.get(season_num=2) # Move merged game to test season (so it doesn't show up in the standings and doesn't download again)
         merge_game.save()
 
         self.stdout.write(self.style.SUCCESS(f"Successfully merged game {merge_game_num} into game {game_num}."))
