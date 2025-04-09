@@ -145,7 +145,19 @@ class Command(BaseCommand):
                 if matching_games.exists():
                     expected_time = matching_games.first().expected_time
                 else:
-                    expected_time = None
+                    matching_games_flipped = Game.objects.filter(
+                        a_team_num=h_team_instance,
+                        h_team_num=a_team_instance,
+                        expected_time__date=game_date,
+                        played_time = None # Make sure you're not using a game that's already been downloaded if a team plays same opponent twice in a day
+                    ).order_by("expected_time")
+                    if matching_games_flipped.exists():
+                        expected_time = matching_games_flipped.first().expected_time
+                        # Swap variables for flipped game
+                        a_team_gf, h_team_gf = h_team_gf, a_team_gf
+                        a_team_num, h_team_num = h_team_num, a_team_num
+                    else:
+                        expected_time = None
 
                 # Create game record
                 game_obj = Game(
@@ -162,6 +174,8 @@ class Command(BaseCommand):
                 )
                 if matching_games.exists() and season_instance.season_num == get_seasonSetting():
                     matching_games.first().delete()
+                elif matching_games_flipped.exists() and season_instance.season_num == get_seasonSetting():
+                    matching_games_flipped.first().delete()
                 game_obj.save()
                 self.stdout.write(f"Created new game {game_num}")
                 
