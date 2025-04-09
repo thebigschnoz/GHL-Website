@@ -20,12 +20,12 @@ class GameAdmin(admin.ModelAdmin):
 
 class SkaterRecordAdmin(admin.ModelAdmin):
     list_display = ("ea_player_num__username", "game_num__game_num", "game_num__played_time")
-    list_filter = ("game_num__season_num", "game_num__a_team_num", "game_num__h_team_num", "game_num__played_time", "game_num__expected_time")
+    list_filter = ("game_num__season_num__season_text", "game_num__a_team_num", "game_num__h_team_num", "game_num__played_time", "game_num__expected_time")
     search_fields = ("ea_player_num__username", "game_num__game_num", "game_num__season_num", "game_num__a_team_num__club_abbr", "game_num__h_team_num__club_abbr")
 
 class GoalieRecordAdmin(admin.ModelAdmin):
     list_display = ("ea_player_num__username", "game_num__game_num", "game_num__played_time")
-    list_filter = ("game_num__season_num", "game_num__a_team_num__club_abbr", "game_num__h_team_num__club_abbr", "game_num__played_time", "game_num__expected_time")
+    list_filter = ("game_num__season_num__season_text", "game_num__a_team_num__club_abbr", "game_num__h_team_num__club_abbr", "game_num__played_time", "game_num__expected_time")
     search_fields = ("ea_player_num__username", "game_num__game_num")
 
 admin.site.register(Season, SeasonsAdmin)
