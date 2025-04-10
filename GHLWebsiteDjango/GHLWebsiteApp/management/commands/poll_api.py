@@ -156,6 +156,7 @@ class Command(BaseCommand):
                         # Swap variables for flipped game
                         a_team_gf, h_team_gf = h_team_gf, a_team_gf
                         a_team_num, h_team_num = h_team_num, a_team_num
+                        a_team_instance, h_team_instance = h_team_instance, a_team_instance
                     else:
                         expected_time = None
 
