@@ -18,7 +18,6 @@ class SeasonsAdmin(admin.ModelAdmin):
 class GameAdmin(admin.ModelAdmin):
     list_display = ("game_num", "season_num__season_text", "gamelength", "a_team_num__club_abbr", "h_team_num__club_abbr", "expected_time", "played_time", "dnf")
     list_filter = ("season_num__season_text", "dnf")
-    search_fields = ("game_num__game_num")
 
 class SkaterRecordAdmin(admin.ModelAdmin):
     list_display = ("ea_player_num__username", "game_num__game_num", "game_num__played_time")
