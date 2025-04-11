@@ -290,6 +290,7 @@ td.points {
 .freeze {
   position: absolute;
   left: 0;
+  width: 240px;
 }
 
 .inter-scoreboard {
