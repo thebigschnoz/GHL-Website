@@ -287,6 +287,11 @@ td.points {
   flex-grow: 1;
 }
 
+.freeze {
+  position: absolute;
+  left: 0;
+}
+
 .inter-scoreboard {
 	font-family: "Inter", sans-serif;
 	font-optical-sizing: auto;
