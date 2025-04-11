@@ -471,6 +471,13 @@ def player(request, player):
         sk_team_num = 0
     else:
         sk_team_num = playernum.current_team.ea_club_num
+
+    skater_games = Game.objects.filter(skaterrecord__ea_player_num=playernum)
+    goalie_games = Game.objects.filter(goalieRecord__ea_player_num=playernum)
+    if skater_games.exists() or goalie_games.exists():
+        all_games = skater_games.union(goalie_games).distinct().order_by("-expected_time")
+    else:
+        all_games = []
     context = {
         "playernum": playernum, 
         "sk_gp": sk_gp, 
@@ -509,6 +516,7 @@ def player(request, player):
         "g_gaa": g_gaa,
         "g_toi": g_toi,
         "sk_team_num": sk_team_num,
+        "games": all_games,
         "scoreboard": get_scoreboard()
         }
     return render(request, "GHLWebsiteApp/player.html", context)
