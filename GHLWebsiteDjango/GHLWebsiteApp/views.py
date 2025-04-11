@@ -473,7 +473,7 @@ def player(request, player):
         sk_team_num = playernum.current_team.ea_club_num
 
     skater_games = Game.objects.filter(skaterrecord__ea_player_num=playernum)
-    goalie_games = Game.objects.filter(goalieRecord__ea_player_num=playernum)
+    goalie_games = Game.objects.filter(goalierecord__ea_player_num=playernum)
     if skater_games.exists() or goalie_games.exists():
         all_games = skater_games.union(goalie_games).distinct().order_by("-expected_time")
     else:
