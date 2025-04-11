@@ -88,7 +88,7 @@
                 <tbody>
                     {% for player in skaterrecords %}
                     <tr class="no-bg">
-                        <td style="position: absolute;"><a href="{% url 'player' player.ea_player_num %}">{{ player.ea_player_num__username }}</a></td>
+                        <td><a href="{% url 'player' player.ea_player_num %}">{{ player.ea_player_num__username }}</a></td>
                         <td>{{player.skatersgp}}</td>
                         <td>{{player.skatersgoals}}</td>
                         <td>{{player.skatersassists}}</td>
