@@ -6,6 +6,9 @@ class Season(models.Model):
     season_text = models.CharField(max_length=50)
     isPlayoff = models.BooleanField(default=0)
 
+    def __str__(self):
+        return self.season_text
+
 class Team(models.Model):
     ea_club_num = models.IntegerField(primary_key=True)
     club_full_name = models.CharField(max_length=50)
