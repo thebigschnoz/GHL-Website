@@ -33,6 +33,9 @@ class AwardTitle(models.Model):
     award_num = models.IntegerField(primary_key=True)
     award_Name = models.CharField(max_length=50)
     award_Desc = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.award_Name
     
 class Position(models.Model):
     ea_pos = models.IntegerField(primary_key=True)
