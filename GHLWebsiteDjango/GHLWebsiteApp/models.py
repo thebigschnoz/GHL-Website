@@ -61,6 +61,9 @@ class AwardAssign(models.Model):
     award_type = models.ForeignKey(AwardTitle, on_delete = models.CASCADE)
     season_num = models.ForeignKey(Season, on_delete = models.CASCADE)
 
+    def __str__(self):
+        return f"{self.season_num.season_text} - {self.award_type.award_Name} - {self.ea_player_num.username}"
+
 class SkaterRecord(models.Model):
     ea_player_num = models.ForeignKey(Player, on_delete = models.CASCADE)
     game_num = models.ForeignKey(Game, on_delete = models.CASCADE)
