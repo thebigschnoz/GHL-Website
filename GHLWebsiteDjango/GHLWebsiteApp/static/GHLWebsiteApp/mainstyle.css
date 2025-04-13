@@ -210,6 +210,7 @@ th {
   margin: 5px;
   margin-bottom: 15px;
   min-width: 85%;
+  text-decoration: none;
 }
 
 #fullstandings {
