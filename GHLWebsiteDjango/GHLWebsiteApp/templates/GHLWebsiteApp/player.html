@@ -215,44 +215,46 @@
             <div class="header" style="width: 100%; text-align: center;">
                 Game Log
             </div><br>
-            <table class="statsbar betweenrows" style="width: 800px;">
-                <colgroup>
-                    <col style="width: 160px;"><!-- Game Time -->
-                    <col><!-- Away Team -->
-                    <col style="width: 80px;"><!-- Away Score -->
-                    <col style="width: 80px;"><!-- Final or OT -->
-                    <col style="width: 80px;"><!-- Home Score -->
-                    <col><!-- Home Team -->
-                </colgroup>
-                <thead>
-                    <tr>
-                        <th>Game Time</th>
-                        <th style="text-align: right; padding-right: 15px;">Away Team</th>
-                        <th>Away Score</th>
-                        <th>Final/OT</th>
-                        <th>Home Score</th>
-                        <th style="text-align: left; padding-left: 15px;">Home Team</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for game in games %}
-                    <tr class="no-bg">
-                        <td>{{ game.expected_time|date:"m/d/y  g:i" }}</td>
-                        <td style="text-align: right; padding-right: 10px;"><a href="{% url 'team' game.a_team_num.ea_club_num %}">{{ game.a_team_num.club_full_name }}</a></td>
-                        <td>{{ game.a_team_gf }}</td>
-                        {% if game.gamelength > 3600 %}
-                        <td><a href="{% url 'game' game.game_num %}">Final/OT</a></td>
-                        {% elif game.played_time is None %}
-                        <td><a href="{% url 'game' game.game_num %}">@</a></td>
-                        {% else %}
-                        <td><a href="{% url 'game' game.game_num %}">Final</a></td>
-                        {% endif %}
-                        <td>{{ game.h_team_gf }}</td>
-                        <td style="text-align: left; padding-left: 10px;"><a href="{% url 'team' game.h_team_num.ea_club_num %}">{{ game.h_team_num.club_full_name }}</a></td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <div>
+                <table class="statsbar betweenrows" style="width: 800px;">
+                    <colgroup>
+                        <col style="width: 160px;"><!-- Game Time -->
+                        <col><!-- Away Team -->
+                        <col style="width: 80px;"><!-- Away Score -->
+                        <col style="width: 80px;"><!-- Final or OT -->
+                        <col style="width: 80px;"><!-- Home Score -->
+                        <col><!-- Home Team -->
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th>Game Time</th>
+                            <th style="text-align: right; padding-right: 15px;">Away Team</th>
+                            <th>Away Score</th>
+                            <th>Final/OT</th>
+                            <th>Home Score</th>
+                            <th style="text-align: left; padding-left: 15px;">Home Team</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for game in games %}
+                        <tr class="no-bg">
+                            <td>{{ game.expected_time|date:"m/d/y  g:i" }}</td>
+                            <td style="text-align: right; padding-right: 10px;"><a href="{% url 'team' game.a_team_num.ea_club_num %}">{{ game.a_team_num.club_full_name }}</a></td>
+                            <td>{{ game.a_team_gf }}</td>
+                            {% if game.gamelength > 3600 %}
+                            <td><a href="{% url 'game' game.game_num %}">Final/OT</a></td>
+                            {% elif game.played_time is None %}
+                            <td><a href="{% url 'game' game.game_num %}">@</a></td>
+                            {% else %}
+                            <td><a href="{% url 'game' game.game_num %}">Final</a></td>
+                            {% endif %}
+                            <td>{{ game.h_team_gf }}</td>
+                            <td style="text-align: left; padding-left: 10px;"><a href="{% url 'team' game.h_team_num.ea_club_num %}">{{ game.h_team_num.club_full_name }}</a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </center></div>
     {% endif %}
