@@ -141,6 +141,7 @@ body {
   display: flex;
   flex-wrap: nowrap;
   margin-bottom: 15px;
+  gap: 5px;
 }
 
 .subsection-container-vert {
