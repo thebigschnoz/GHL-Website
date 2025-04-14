@@ -17,19 +17,19 @@ class SeasonsAdmin(admin.ModelAdmin):
 
 class GameAdmin(admin.ModelAdmin):
     list_display = ("game_num", "season_num__season_text", "gamelength", "a_team_num__club_abbr", "h_team_num__club_abbr", "expected_time", "played_time", "dnf")
-    list_select_related = ("season_num__season_text", "a_team_num__club_abbr", "h_team_num__club_abbr")
+    list_select_related = ("a_team_num__club_abbr", "h_team_num__club_abbr")
     list_filter = ("season_num__season_text", "dnf")
 
 class SkaterRecordAdmin(admin.ModelAdmin):
     list_display = ("ea_player_num__username", "game_num__game_num", "game_num__played_time")
     list_filter = ("game_num__season_num__season_text", "ea_club_num__club_abbr", "game_num__played_time", "game_num__expected_time")
-    list_select_related = ("game_num__season_num__season_text", "ea_club_num__club_abbr")
+    list_select_related = ("ea_club_num__club_abbr")
     search_fields = ("ea_player_num__username", "game_num__game_num")
 
 class GoalieRecordAdmin(admin.ModelAdmin):
     list_display = ("ea_player_num__username", "game_num__game_num", "game_num__played_time")
     list_filter = ("game_num__season_num__season_text", "ea_club_num__club_abbr", "game_num__played_time", "game_num__expected_time")
-    list_select_related = ("game_num__season_num__season_text", "ea_club_num__club_abbr")
+    list_select_related = ("ea_club_num__club_abbr")
     search_fields = ("ea_player_num__username", "game_num__game_num")
 
 admin.site.register(Season, SeasonsAdmin)
