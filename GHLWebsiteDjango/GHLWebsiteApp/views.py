@@ -252,7 +252,7 @@ def skatersAdvanced(request):
                 output_field=models.FloatField()
             ), models.FloatField())*100,
         skatersshoteffperc=Cast(Sum("sog"), models.FloatField())/Cast(Case(
-                When(sumshottatt=0, then=1),
+                When(sumshotatt=0, then=1),
                 default=Sum("shot_attempts"),
                 output_field=models.FloatField()
             ), models.FloatField())*100,
