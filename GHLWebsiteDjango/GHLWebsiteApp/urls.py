@@ -6,6 +6,7 @@ urlpatterns = [
     path('standings/', views.standings, name="standings"),
     path('leaders/', views.leaders, name="leaders"),
     path('skaters/', views.skaters, name="skaters"),
+    path('skaters/advanced/', views.skatersAdvanced, name="skatersAdvanced"),
     path('goalies/', views.goalies, name="goalies"),
     path('team/<int:team>/', views.team, name="team"),
     path('player/', views.skaters, name="playernonum"),

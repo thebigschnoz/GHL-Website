@@ -1,0 +1,61 @@
+{% extends 'GHLWebsiteApp/layout.html' %}
+{% load static %}
+{% block body %}
+  <center>
+    <div class="section section_lg" style="flex-direction: column;">
+      <center>
+      <div class="header">Advanced Skater Stats: {{ season.season_text }}</div>
+      <div><a href="{% url 'skaters' %}">Basic Stats</a></div>
+      <table id="fullstandings" class="sortable">
+        <col style="width: 60px;"> <!-- Pos -->
+        <col style="width: 300px;"> <!-- Player -->
+        <col style="width: 80px;"> <!-- Team -->
+        <col style="width: 80px;"> <!-- shot % -->
+        <col style="width: 80px;"> <!-- shot effectiveness -->
+        <col style="width: 80px;"> <!-- pass % -->
+        <col style="width: 80px;"> <!-- takeaways -->
+        <col style="width: 80px;"> <!-- interceptions -->
+        <col style="width: 80px;"> <!-- giveaways -->
+        <col style="width: 80px;"> <!-- pims / gp -->
+        <col style="width: 80px;"> <!-- drawn / gp -->
+        <col style="width: 80px;"> <!-- blocked shots -->
+        <tr>
+          <th>Pos</th>
+          <th>Player</th>
+          <th>Team</th>
+          <th>S%</th>
+          <th>Shot Eff</th>
+          <th>Pass%</th>
+          <th>TKA/G</th>
+          <th>INT/G</th>
+          <th>GVA/G</th>
+          <th>PIM/G</th>
+          <th>Drawn/G</th>
+          <th>BS/G</th>
+        </tr>
+        {% for player in all_skaters %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td><a href="{% url 'player' player.ea_player_num %}">{{ player.ea_player_num__username }}</a></td>
+          <td>{{ player.ea_player_num__current_team__club_abbr }}</td>
+          <td>{{ player.skatersshotperc|floatformat:1 }}</td>
+          <td>{{ player.skatersshoteffperc|floatformat:1 }}</td>
+          <td>{{ player.skaterspassperc|floatformat:1 }}</td>
+          <td>{{ player.skaterstka|floatformat:2 }}</td>
+          <td>{{ player.skatersint|floatformat:2 }}</td>
+          <td>{{ player.skatersgva|floatformat:2 }}</td>
+          <td>{{ player.skaterspims|floatformat:2 }}</td>
+          <td>{{ player.skatersdrawn|floatformat:2 }}</td>
+          <td>{{ player.skatersbs|floatformat:2 }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan=12>No games recorded.</td>
+        </tr>
+        {% endfor %}
+      </table>
+      </center>
+    </div>
+  </center>
+
+{% endblock %}

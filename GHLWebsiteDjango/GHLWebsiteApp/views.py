@@ -230,7 +230,6 @@ def skaters(request):
         skaterspims=Sum("pims"),
         skaterssog=Sum("sog"),
         skatersposs=Avg("poss_time"),
-        skatersbs=Avg("blocked_shots"),
         skatersppg=Sum("ppg"),
         skatersshg=Sum("shg"),
     ).order_by("-skaterspoints", "-skatersgoals", "-skatersgp", "skaterspims", "ea_player_num__username")
@@ -241,6 +240,41 @@ def skaters(request):
         "season": season
     }
     return render(request, "GHLWebsiteApp/skaters.html", context)
+
+def skatersAdvanced(request):
+    all_skaters = SkaterRecord.objects.filter(game_num__season_num=seasonSetting).exclude(position=0).values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(
+        sumsog=Sum("sog"),
+        sumshotatt=Sum("shot_attempts"),
+        sumpassatt=Sum("pass_att"),
+        skatersshotperc=Cast(Sum("goals"), models.FloatField())/Cast(Case(
+                When(sumsog=0, then=1),
+                default=Sum("sog"),
+                output_field=models.FloatField()
+            ), models.FloatField())*100,
+        skatersshoteffperc=Cast(Sum("sog"), models.FloatField())/Cast(Case(
+                When(sumshottatt=0, then=1),
+                default=Sum("shot_attempts"),
+                output_field=models.FloatField()
+            ), models.FloatField())*100,
+        skaterspassperc=Cast(Sum("pass_comp"), models.FloatField())/Cast(Case(
+                When(sumpassatt=0, then=1),
+                default=Sum("pass_att"),
+                output_field=models.FloatField()
+            ), models.FloatField())*100,
+        skaterstka=Avg("takeaways"),
+        skatersint=Avg("interceptions"),
+        skatersgva=Avg("giveaways"),
+        skaterspims=Avg("pims"),
+        skatersdrawn=Avg("pens_drawn"),
+        skatersbs=Avg("blocked_shots"),
+    ).order_by("ea_player_num__username")
+    season = Season.objects.get(season_num=seasonSetting)
+    context = {
+        "all_skaters": all_skaters,
+        "scoreboard": get_scoreboard(),
+        "season": season
+    }
+    return render(request, "GHLWebsiteApp/skatersAdvanced.html", context)
 
 def goalies(request):
     all_goalies = GoalieRecord.objects.filter(game_num__season_num=seasonSetting).values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(
