@@ -7,8 +7,7 @@
       <div class="header">Advanced Skater Stats: {{ season.season_text }}</div>
       <div><a href="{% url 'skaters' %}">Basic Stats</a></div>
       <table id="fullstandings" class="sortable">
-        <col style="width: 60px;"> <!-- Pos -->
-        <col style="width: 300px;"> <!-- Player -->
+        <col style="width: 240px;"> <!-- Player -->
         <col style="width: 80px;"> <!-- Team -->
         <col style="width: 80px;"> <!-- shot % -->
         <col style="width: 80px;"> <!-- shot effectiveness -->
@@ -20,7 +19,6 @@
         <col style="width: 80px;"> <!-- drawn / gp -->
         <col style="width: 80px;"> <!-- blocked shots -->
         <tr>
-          <th>Pos</th>
           <th>Player</th>
           <th>Team</th>
           <th>S%</th>
@@ -35,7 +33,6 @@
         </tr>
         {% for player in all_skaters %}
         <tr>
-          <td>{{ forloop.counter }}</td>
           <td><a href="{% url 'player' player.ea_player_num %}">{{ player.ea_player_num__username }}</a></td>
           <td>{{ player.ea_player_num__current_team__club_abbr }}</td>
           <td>{{ player.skatersshotperc|floatformat:1 }}</td>
