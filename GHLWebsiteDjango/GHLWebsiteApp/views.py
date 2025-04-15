@@ -274,7 +274,7 @@ def skatersAdvanced(request):
         "scoreboard": get_scoreboard(),
         "season": season
     }
-    return render(request, "GHLWebsiteApp/skatersAdvanced.html", context)
+    return render(request, "GHLWebsiteApp/advanced.html", context)
 
 def goalies(request):
     all_goalies = GoalieRecord.objects.filter(game_num__season_num=seasonSetting).values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(
