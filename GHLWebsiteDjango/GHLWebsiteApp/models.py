@@ -2,9 +2,10 @@ from django.db import models
 from decimal import *
 
 class Season(models.Model):
-    season_num = models.AutoField(primary_key=True)
-    season_text = models.CharField(max_length=50)
-    isPlayoff = models.BooleanField(default=0)
+    season_num = models.AutoField(primary_key=True, verbose_name="Autonum")
+    season_text = models.CharField(max_length=50, verbose_name="Season Name")
+    isPlayoff = models.BooleanField(default=False, verbose_name="Playoffs?", help_text="True = Playoffs, False = Regular Season")
+    start_date = models.DateField(verbose_name="Start Date", blank=True, null=True)
 
     def __str__(self):
         return self.season_text
@@ -31,8 +32,9 @@ class Game(models.Model):
 
 class AwardTitle(models.Model):
     award_num = models.IntegerField(primary_key=True)
-    award_Name = models.CharField(max_length=50)
-    award_Desc = models.TextField(blank=True)
+    award_Name = models.CharField(max_length=50, verbose_name="Name")
+    award_Desc = models.TextField(blank=True, verbose_name="Description")
+    assign_or_vote = models.BooleanField(default=False, verbose_name="Assign/Vote", help_text="True = Assign, False = Vote")
 
     def __str__(self):
         return self.award_Name
@@ -57,12 +59,12 @@ class Build(models.Model):
 
 class AwardAssign(models.Model):
     award_num = models.AutoField(primary_key=True)
-    ea_player_num = models.ForeignKey(Player, on_delete = models.CASCADE)
-    award_type = models.ForeignKey(AwardTitle, on_delete = models.CASCADE)
-    season_num = models.ForeignKey(Season, on_delete = models.CASCADE)
+    players = models.ManyToManyField(Player, blank=True, verbose_name="Players")
+    award_type = models.ForeignKey(AwardTitle, on_delete = models.CASCADE, verbose_name="Award")
+    season_num = models.ForeignKey(Season, on_delete = models.CASCADE, verbose_name="Season")
 
     def __str__(self):
-        return f"{self.season_num.season_text} - {self.award_type.award_Name} - {self.ea_player_num.username}"
+        return f"{self.season_num.season_text} - {self.award_type.award_Name}"
 
 class SkaterRecord(models.Model):
     ea_player_num = models.ForeignKey(Player, on_delete = models.CASCADE)
@@ -267,10 +269,13 @@ class Standing(models.Model):
         ordering = ['-points', '-wins', '-goalsfor', 'goalsagainst', 'team__club_full_name']
 
 class AwardVote(models.Model):
-    ea_player_num = models.ForeignKey(Player, on_delete=models.CASCADE)
-    award_num = models.ForeignKey(AwardTitle, on_delete=models.CASCADE)
-    season_num = models.ForeignKey(Season, on_delete=models.CASCADE)
-    votes_num = models.SmallIntegerField(default=0)
+    ea_player_num = models.ForeignKey(Player, on_delete=models.CASCADE, verbose_name="Player")
+    award_type = models.ForeignKey(AwardTitle, on_delete=models.CASCADE, verbose_name="Award")
+    season_num = models.ForeignKey(Season, on_delete=models.CASCADE, verbose_name="Season")
+    votes_num = models.SmallIntegerField(default=0, verbose_name="Votes")
+
+    def __str__(self):
+        return f"{self.season_num.season_text} - {self.award_type.award_Name} - {self.ea_player_num.username}"
 
 class Leader(models.Model):
     attribute = models.CharField(max_length=3)
