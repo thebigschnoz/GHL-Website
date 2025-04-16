@@ -3,10 +3,9 @@ from django.contrib import messages
 from .forms import UploadFileForm
 from datetime import datetime
 from GHLWebsiteApp.models import *
-from django.db.models import Sum, Count, Case, When, Avg, F
-from django.db.models.functions import Cast
+from django.db.models import Sum, Count, Case, When, Avg, F, Window
+from django.db.models.functions import Cast, Rank
 from django.http import JsonResponse
-from django.core import serializers
 from decimal import *
 from itertools import chain
 import random
@@ -558,19 +557,32 @@ def player(request, player):
 def draft(request):
     return render(request, "GHLWebsiteApp/draft.html")
 
-def awardsDef(request):
-    return render(request, "GHLWebsiteApp/awards.html", {"scoreboard": get_scoreboard()})
-
 def awards(request, awardnum):
     award = get_object_or_404(AwardTitle, pk=awardnum)
-    awardhistory = AwardAssign.objects.filter(award=awardnum).order_by("-season_num")
-    awardvotes = AwardVote.objects.filter(award=awardnum).order_by("-votes_num")[:3]
+    if award.assign_or_vote == True:
+        awardhistory = AwardAssign.objects.filter(award_num=awardnum).order_by("-season_num__start_date")
+    else:
+        awardhistory = (
+            AwardVote.objects.filter(award_num=awardnum)
+            .annotate(
+                rank=Window(
+                    expression=Rank(),
+                    partition_by=F('season'),
+                    order_by=F('-votes_num').desc()
+                )
+            )
+            .filter(rank__lte=3)  # Keep only the top 3 per season
+            .order_by('season', 'rank')  # Sort by season and rank
+        )
     return render(request, "GHLWebsiteApp/awards.html", {
+        "awardslist": AwardTitle.objects.all().order_by("award_num"),
         "award": award,
-        "awardvotes": awardvotes,
         "awardhistory": awardhistory,
         "scoreboard": get_scoreboard()
     })
+
+def awardsDef(request):
+    return awards(request, "1")
 
 def glossary(request):
     return render(request, "GHLWebsiteApp/glossary.html")
