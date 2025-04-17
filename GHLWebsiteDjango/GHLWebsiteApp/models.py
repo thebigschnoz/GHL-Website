@@ -60,7 +60,7 @@ class Build(models.Model):
 class AwardAssign(models.Model):
     award_num = models.AutoField(primary_key=True)
     players = models.ManyToManyField(Player, blank=True, verbose_name="Players")
-    team = models.ForeignKey(Team, on_delete = models.CASCADE, verbose_name="Team")
+    team = models.ForeignKey(Team, on_delete = models.CASCADE, verbose_name="Team", null=True)
     award_type = models.ForeignKey(AwardTitle, on_delete = models.CASCADE, verbose_name="Award")
     season_num = models.ForeignKey(Season, on_delete = models.CASCADE, verbose_name="Season")
 
@@ -271,7 +271,7 @@ class Standing(models.Model):
 
 class AwardVote(models.Model):
     ea_player_num = models.ForeignKey(Player, on_delete=models.CASCADE, verbose_name="Player")
-    team = models.ForeignKey(Team, on_delete=models.CASCADE, verbose_name="Team")
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, verbose_name="Team", null=True)
     award_type = models.ForeignKey(AwardTitle, on_delete=models.CASCADE, verbose_name="Award")
     season_num = models.ForeignKey(Season, on_delete=models.CASCADE, verbose_name="Season")
     votes_num = models.SmallIntegerField(default=0, verbose_name="Votes")
