@@ -568,24 +568,24 @@ def awards(request, awardnum):
             .annotate(
                 rank=Window(
                     expression=Rank(),
-                    partition_by=F('season'),
-                    order_by=F('-votes_num').desc()
+                    partition_by=F("season_num"),
+                    order_by=F("votes_num").desc()
                 )
             )
             .filter(rank__lte=1)  # Keep only the top one each season
-            .order_by('-season_num__start_date')  # Sort by season
+            .order_by("-season_num__start_date")  # Sort by season
         )[1:]
         awardrecent = (
             AwardVote.objects.filter(award_type=awardnum).exclude(season_num__start_date = None)
             .annotate(
                 rank=Window(
                     expression=Rank(),
-                    partition_by=F('season'),
-                    order_by=F('-votes_num').desc()
+                    partition_by=F("season_num"),
+                    order_by=F("votes_num").desc()
                 )
             )
             .filter(rank__lte=3)  # Keep only the top 3 each season
-            .order_by('-season_num__start_date', 'rank')[:3]
+            .order_by("-season_num__start_date", "rank")[:3]
         )
     return render(request, "GHLWebsiteApp/awards.html", {
         "awardslist": AwardTitle.objects.all().order_by("award_num"),
