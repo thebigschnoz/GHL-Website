@@ -2,19 +2,13 @@
 {% load static %}
 {% block body %}
 <center>
-    <div class="section section_lg"><center>
-        <div><h1>Awards</h1></div>
-        <div style="padding: 10px;">
-            <a>Placeholder for award voting</a>
-        </div>
-        <div class="header">
-            {{ award.award_Name }}
-        </div>
+    <div class="section section_lg"><center> 
         <div class="selectionmenu">
+            <a>Placeholder for award voting</a>
             <form>
                 <select id="awardselect" name="awardselect">
                     <optgroup>
-                        <option selected disabled value="">Choose an award...</option>
+                        <option selected disabled value="">Change award</option>
                         {% for x in awardslist %}
                         <option value="/awards/{{ x.award_num }}/">{{ x.award_Name }}</option>
                         {% endfor %}
@@ -31,6 +25,16 @@
                 });
             </script>
         </div>
+        <div style="padding: 10px;">
+            
+        </div>
+        <div class="header" style="font-size: 80px; line-height: 50px;">
+            {{ award.award_Name }}
+        </div>
+        <div id="desc" style="padding: 0px; font-style: italic;">
+            <p>{{ award.award_Desc }}</p>
+        </div>
+        {% if award.assign_or_vote == False %} <!-- Vote -->
         <div class="subsection-container">
             <table>
                 <col style="width: 25%;">
@@ -38,10 +42,10 @@
                 <col style="width: 50%;">
                 <tr class="no-bg">
                     <td>
-                        <img src="{% static 'GHLWebsiteApp/stock-user-photo.jpg' %}" width=220 height=220 />
+                        <img src="{% static 'GHLWebsiteApp/stock-user-photo.jpg' %}" width=220 height=220 /> <!-- winner's pic -->
                     </td>
                     <td>
-                        <img src="https://loodibee.com/wp-content/uploads/nhl-chicago-blackhawks-logo.png" width=220 height=220 />
+                        <img src="{{ awardrecent.first.team.team_logo_link }}" width=220 height=220 /> <!-- winner's team logo -->
                     </td>
                     <td>
                         <table class="standingstable">
@@ -51,27 +55,15 @@
                                 <th colspan=2>Team</th>
                                 <th>Votes</th>
                             </tr>
+                            {% for award in awardrecent %}
                             <tr>
-                                <td>1</td>
-                                <td class="points">Quality Yams</td>
-                                <td><img src="https://loodibee.com/wp-content/uploads/nhl-chicago-blackhawks-logo.png"  height="24" width="24" /></td>
-                                <td>Chicago Blackhawks</td>
-                                <td>22</td>
+                                <td>{{ forloop.counter }}</td>
+                                <td{% if forloop.first %} class="points"{% endif %}>{{ award.ea_player_num.username }}</td>
+                                <td><img src="{{ award.team.team_logo_link }}"  height="24" width="24" /></td>
+                                <td>{{ award.team.club_full_name }}</td>
+                                <td>{{ award.votes_num }}</td>
                             </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>Seanahue99</td>
-                                <td><img src="https://loodibee.com/wp-content/uploads/nhl-columbus-blue-jackets-logo.png"  height="24" width="24" /></td>
-                                <td>Columbus Blue Jackets</td>
-                                <td>5</td>
-                            </tr>
-                            <tr>
-                                <td>3</td>
-                                <td>Captain Frat</td>
-                                <td><img src="https://loodibee.com/wp-content/uploads/nhl-tampa-bay-lightning-logo.png"  height="24" width="24" /></td>
-                                <td>Tampa Bay Lightning</td>
-                                <td>3</td>
-                            </tr>
+                            {% endfor %}
                         </table>
                     </td>
                 </tr>
@@ -83,59 +75,122 @@
                 <table class="standingstable">
                     <tr>
                         <th>Season</th>
-                        <th>Player</th>
+                        <th>Winner</th>
                         <th colspan=2>Team</th>
                         <th>Votes</th>
                     </tr>
+                    {% for award in awardhistory %}
                     <tr>
-                        <td>7</td>
-                        <td class="points">Quality Yams</td>
-                        <td><img src="https://loodibee.com/wp-content/uploads/nhl-chicago-blackhawks-logo.png"  height="24" width="24" /></td>
-                        <td>Chicago Blackhawks</td>
-                        <td>22</td>
+                        <td>{{ award.season_num.season_text }}</td>
+                        <td class="points">{{ award.ea_player_num.username }}</td>
+                        <td><img src="{{ award.team.team_logo_link }}"  height="24" width="24" /></td>
+                        <td>{{ award.team.club_full_name }}</td>
+                        <td>{{ award.votes_num }}</td>
                     </tr>
-                    <tr>
-                        <td>6</td>
-                        <td class="points">Quality Yams</td>
-                        <td><img src="https://loodibee.com/wp-content/uploads/nhl-chicago-blackhawks-logo.png"  height="24" width="24" /></td>
-                        <td>Chicago Blackhawks</td>
-                        <td>22</td>
-                    </tr>
-                    <tr>
-                        <td>5</td>
-                        <td class="points">FloppyWha1eMeat</td>
-                        <td><img src="https://loodibee.com/wp-content/uploads/nhl-chicago-blackhawks-logo.png"  height="24" width="24" /></td>
-                        <td>Chicago Blackhawks</td>
-                        <td>22</td>
-                    </tr>
-                    <tr>
-                        <td>4</td>
-                        <td class="points">Yarmo</td>
-                        <td><img src="https://loodibee.com/wp-content/uploads/nhl-chicago-blackhawks-logo.png"  height="24" width="24" /></td>
-                        <td>Chicago Blackhawks</td>
-                        <td>22</td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td class="points">Drunkencomb</td>
-                        <td><img src="https://loodibee.com/wp-content/uploads/nhl-chicago-blackhawks-logo.png"  height="24" width="24" /></td>
-                        <td>Chicago Blackhawks</td>
-                        <td>22</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td class="points">Drunkencomb</td>
-                        <td><img src="https://loodibee.com/wp-content/uploads/nhl-chicago-blackhawks-logo.png"  height="24" width="24" /></td>
-                        <td>Chicago Blackhawks</td>
-                        <td>22</td>
-                    </tr>
-                    <tr>
-                        <td>1</td>
-                        <td colspan=4>Innaugural Season - No Awards</td>
-                    </tr>
+                    {% endfor %}
                 </table>
             </div>
         </div>
+        {% else %} <!-- Assign -->
+        <div class="subsection-container">
+            <table>
+                <col style="width: 25%; min-width: 400px;">
+                <col style="width: 25%;">
+                <col style="width: 50%;">
+                <tr class="no-bg">
+                    <td>
+                        {% if award.award_num == 1 or award.award_num == 2 %}
+                        <h1 style="font-style: normal; text-decoration-line: none;">{{ awardrecent.first.team.club_full_name }}</h1>
+                        {% else %}
+                        <img src="{% static 'GHLWebsiteApp/stock-user-photo.jpg' %}" width=220 height=220 /> <!-- winner's pic -->
+                        {% endif %}
+                    </td>
+                    <td>
+                        <img src="{{ awardrecent.first.team.team_logo_link }}" width=220 height=220 /> <!-- winner's team logo -->
+                    </td>
+                    <td>
+                        <table class="standingstable">
+                            <tr>
+                                {% if award.award_num == 1 or award.award_num == 2 %}
+                                <th>Winners</th>
+                                {% else %}
+                                <th>Winner</th>
+                                <th colspan=2>Team</th>
+                                {% endif %}
+                            </tr>
+                            {% if award.award_num == 1 or award.award_num == 2 %}
+                                {% for award in awardrecent %}
+                                <tr>
+                                    <td class="points" style="max-width: 600px; text-wrap: pretty;">
+                                    {% for player in award.players.all %}
+                                        {{ player.username }}{% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                {% for award in awardrecent %}
+                                <tr>
+                                    <td{% if forloop.first %} class="points"{% endif %}>{{ award.players.first.username }}</td>
+                                    <td><img src="{{ award.team.team_logo_link }}"  height="24" width="24" /></td>
+                                    <td>{{ award.team.club_full_name }}</td>
+                                </tr>
+                                {% endfor %}
+                            {% endif %}
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="subsection-container-vert">
+            <div class="header">Previous Winners</div>
+            <div class="subsection-container" style="width: 70%;">
+                <table class="standingstable">
+                    <colgroup>
+                        <col style="width: 15%;">
+                        <col style="max-width: 80%; text-wrap: pretty;">
+                        <col style="white-space: nowrap; width: 5%;">
+                        <col style="white-space: nowrap; width: 15%; padding: 15px;">
+                    </colgroup>
+                    <tr>
+                        
+                        <th>Season</th>
+                        <th style="max-width: 80%;">
+                            {% if award.award_num == 1 or award.award_num == 2 %}
+                            Winners
+                            {% else %}
+                            Winner
+                            {% endif %}
+                        </th>
+                        <th colspan=2>Team</th>
+                    </tr>
+                    {% if award.award_num == 1 or award.award_num == 2 %}
+                        {% for award in awardhistory %}
+                        <tr>
+                            <td>{{ award.season_num.season_text }}</td>
+                            <td class="points" style="max-width: 600px; text-wrap: pretty;">
+                                {% for player in award.players.all %}
+                                    {{ player.username }}{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td><img src="{{ award.team.team_logo_link }}"  height="24" width="24" /></td>
+                            <td>{{ award.team.club_full_name }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        {% for award in awardhistory %}
+                        <tr>
+                            <td>{{ award.season_num.season_text }}</td>
+                            <td class="points">{{ award.players.first.username }}</td>
+                            <td><img src="{{ award.team.team_logo_link }}"  height="24" width="24" /></td>
+                            <td>{{ award.team.club_full_name }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% endif %}
+                </table>
+            </div>
+        </div>
+        {% endif %}
     </center></div>
 </center>
 {% endblock %}
