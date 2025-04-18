@@ -559,11 +559,12 @@ def draft(request):
 
 def awards(request, awardnum):
     award = get_object_or_404(AwardTitle, pk=awardnum)
-    if award.assign_or_vote == True:
-        awardhistory = AwardAssign.objects.filter(award_num=awardnum).order_by("-season_num__start_date")
-    else:
-        awardhistory = (
-            AwardVote.objects.filter(award_num=awardnum)
+    if award.assign_or_vote == True: # Assigns
+        awardhistory = AwardAssign.objects.filter(award_type=awardnum).exclude(season_num__start_date = None).order_by("-season_num__start_date")[1:]
+        awardrecent = AwardAssign.objects.filter(award_type=awardnum).exclude(season_num__start_date = None).order_by("-season_num__start_date")[:1]
+    else: # Votes
+        awardhistory = ( # Wait, we only want the winners for the history. Not every top three. Or do we?
+            AwardVote.objects.filter(award_type=awardnum).exclude(season_num__start_date = None)
             .annotate(
                 rank=Window(
                     expression=Rank(),
@@ -571,13 +572,26 @@ def awards(request, awardnum):
                     order_by=F('-votes_num').desc()
                 )
             )
-            .filter(rank__lte=3)  # Keep only the top 3 per season
-            .order_by('season', 'rank')  # Sort by season and rank
+            .filter(rank__lte=1)  # Keep only the top one each season
+            .order_by('-season_num__start_date')  # Sort by season
+        )[1:]
+        awardrecent = (
+            AwardVote.objects.filter(award_type=awardnum).exclude(season_num__start_date = None)
+            .annotate(
+                rank=Window(
+                    expression=Rank(),
+                    partition_by=F('season'),
+                    order_by=F('-votes_num').desc()
+                )
+            )
+            .filter(rank__lte=3)  # Keep only the top 3 each season
+            .order_by('-season_num__start_date', 'rank')[:3]
         )
     return render(request, "GHLWebsiteApp/awards.html", {
         "awardslist": AwardTitle.objects.all().order_by("award_num"),
         "award": award,
         "awardhistory": awardhistory,
+        "awardrecent": awardrecent,
         "scoreboard": get_scoreboard()
     })
 
