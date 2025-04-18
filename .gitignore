@@ -21,3 +21,4 @@ db.sqlite3
 db.sqlite3-journal
 GHLWebsiteDjango/static/*
 GHLWebsiteDjango/GHLWebsiteDjango/__pycache__/
+GHLWebsiteDjango/GHLWebsiteApp/__pycache__/
