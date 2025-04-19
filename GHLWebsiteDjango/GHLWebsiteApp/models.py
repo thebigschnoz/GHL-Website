@@ -18,6 +18,9 @@ class Team(models.Model):
     team_logo_link = models.TextField(blank=True, null=True)
     isActive = models.BooleanField(default=True)
 
+    def __str__(self):
+        return self.club_full_name
+
 class Game(models.Model):
     game_num = models.AutoField(primary_key=True)
     season_num = models.ForeignKey(Season, on_delete=models.CASCADE)
@@ -51,6 +54,9 @@ class Player(models.Model):
     primarypos = models.ForeignKey(Position, on_delete = models.CASCADE, related_name="primary", blank=True, null=True)
     secondarypos = models.ManyToManyField(Position, related_name="secondary", blank=True)
     playerpic = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.username
 
 class Build(models.Model):
     ea_build = models.IntegerField(primary_key=True)
