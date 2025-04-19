@@ -29,6 +29,9 @@ class GoalieRecordAdmin(admin.ModelAdmin):
     list_filter = ("game_num__season_num__season_text", "ea_club_num__club_abbr", "game_num__played_time", "game_num__expected_time")
     search_fields = ("ea_player_num__username", "game_num__game_num")
 
+class AwardAssignAdmin(admin.ModelAdmin):
+    filter_horizontal = ("players",)
+
 admin.site.register(Season, SeasonsAdmin)
 admin.site.register(Game, GameAdmin)
 admin.site.register(AwardTitle)
@@ -36,7 +39,7 @@ admin.site.register(Team, TeamListAdmin)
 admin.site.register(Player, PlayerListAdmin)
 admin.site.register(Position)
 admin.site.register(Build, BuildsAdmin)
-admin.site.register(AwardAssign)
+admin.site.register(AwardAssign, AwardAssignAdmin)
 admin.site.register(SkaterRecord, SkaterRecordAdmin)
 admin.site.register(GoalieRecord, GoalieRecordAdmin)
 admin.site.register(TeamRecord)
