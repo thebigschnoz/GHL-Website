@@ -141,6 +141,7 @@ class Command(BaseCommand):
                     expected_time__date=game_date,
                     played_time = None # Make sure you're not using a game that's already been downloaded if a team plays same opponent twice in a day
                 ).order_by("expected_time")
+                matching_games_flipped = None
                 # If there is a matching game, use its expected time
                 if matching_games.exists():
                     expected_time = matching_games.first().expected_time
