@@ -141,25 +141,23 @@ class Command(BaseCommand):
                     expected_time__date=game_date,
                     played_time = None # Make sure you're not using a game that's already been downloaded if a team plays same opponent twice in a day
                 ).order_by("expected_time")
-                matching_games_flipped = None
-                # If there is a matching game, use its expected time
-                if matching_games.exists():
-                    expected_time = matching_games.first().expected_time
-                else:
-                    matching_games_flipped = Game.objects.filter(
+                matching_games_flipped = Game.objects.filter(
                         a_team_num=h_team_instance,
                         h_team_num=a_team_instance,
                         expected_time__date=game_date,
                         played_time = None # Make sure you're not using a game that's already been downloaded if a team plays same opponent twice in a day
-                    ).order_by("expected_time")
-                    if matching_games_flipped.exists():
+                ).order_by("expected_time")
+                # If there is a matching game, use its expected time
+                if matching_games.exists():
+                    expected_time = matching_games.first().expected_time
+                elif matching_games_flipped.exists():
                         expected_time = matching_games_flipped.first().expected_time
                         # Swap variables for flipped game
                         a_team_gf, h_team_gf = h_team_gf, a_team_gf
                         a_team_num, h_team_num = h_team_num, a_team_num
                         a_team_instance, h_team_instance = h_team_instance, a_team_instance
-                    else:
-                        expected_time = None
+                else:
+                    expected_time = None
 
                 # Create game record
                 game_obj = Game(
