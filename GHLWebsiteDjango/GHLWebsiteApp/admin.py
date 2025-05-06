@@ -48,6 +48,27 @@ class SeasonsAdmin(admin.ModelAdmin):
 class GameAdmin(admin.ModelAdmin):
     list_display = ("game_num", "season_num__season_text", "gamelength", "a_team_num__club_abbr", "h_team_num__club_abbr", "expected_time", "played_time", "dnf")
     list_filter = ("season_num__season_text", "dnf")
+    actions = ["merge_games"]
+
+    def merge_games(self, request, queryset):
+        # Ensure exactly two games are selected
+        if queryset.count() != 2:
+            messages.error(request, "Please select exactly two games to merge.")
+            return
+
+        # Get the game numbers
+        games = list(queryset.order_by("game_num"))
+        game_num = games[0].game_num
+        merge_game_num = games[1].game_num
+
+        try:
+            # Call the mergegame management command
+            call_command("mergegame", game_num=game_num, merge_game_num=merge_game_num)
+            messages.success(request, f"Successfully merged game {merge_game_num} into game {game_num}.")
+        except Exception as e:
+            messages.error(request, f"Error during merge: {str(e)}")
+
+    merge_games.short_description = "Merge selected games (order matters: first into second)"
 
 class SkaterRecordAdmin(admin.ModelAdmin):
     list_display = ("ea_player_num__username", "game_num__game_num", "game_num__played_time")
