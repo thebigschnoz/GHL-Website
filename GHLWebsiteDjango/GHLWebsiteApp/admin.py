@@ -5,6 +5,8 @@ from django.core.management import call_command
 from django.urls import reverse
 from django.contrib import messages
 from django.contrib.admin import AdminSite
+from django.contrib.auth.models import User, Group
+from django.contrib.auth.admin import UserAdmin, GroupAdmin
 
 from .models import *
 
@@ -74,3 +76,5 @@ custom_admin_site.register(TeamRecord)
 custom_admin_site.register(Standing)
 custom_admin_site.register(Leader)
 custom_admin_site.register(AwardVote)
+custom_admin_site.register(User, UserAdmin)
+custom_admin_site.register(Group, GroupAdmin)
