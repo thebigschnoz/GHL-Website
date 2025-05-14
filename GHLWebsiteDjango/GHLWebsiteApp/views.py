@@ -11,7 +11,7 @@ from itertools import chain
 import random
 import pandas as pd
 
-seasonSetting = 1 # Current season in GHL
+seasonSetting = 11 # Current season in GHL
 
 def get_seasonSetting():
     return seasonSetting
