@@ -15,24 +15,15 @@
                     <td>
                         <center>
                             <font style="font-weight: 700; font-size: 68px">{{ playernum.username }}</font>
-                            <div class="selectionmenu">
-                                <form>
-                                    <select id="seasonSel" name="season">
-                                        <optgroup>
-                                            <option selected value="">Season 0</option>
-                                        </optgroup>
-                                    </select>
-                                </form>
-                            </div>
                         </center>
                     </td>
                     <td>
-                        <a href="{% url 'team' sk_team_num %}"><img src="{{ playernum.current_team.team_logo_link }}" width=220 height=220 /></a>
+                        <a href="{% url 'team' playernum.current_team.ea_club_num %}"><img src="{{ playernum.current_team.team_logo_link }}" width=220 height=220 /></a>
                     </td>
                 </tr>
             </table>
         </div>
-        {% if sk_gp > 0 %}
+        {% if skater_season_totals %}
         <div class="subsection-container" style="width: 100%;">
             <table class="statsbar">
                 <colgroup>
@@ -85,27 +76,31 @@
                 </thead>
                 <tbody>
                     <tr class="no-bg statline">
-                        <td>{{ sk_gp }}</td>
-                        <td>{{ sk_g }}</td>
-                        <td>{{ sk_a }}</td>
-                        <td>{{ sk_p }}</td>
-                        <td>{{ sk_hits }}</td>
-                        <td>{{ sk_plus_minus }}</td>
-                        <td>{{ sk_pims }}</td>
-                        <td>{{ sk_pens_drawn }}</td>
-                        <td>{{ sk_pk_clears }}</td>
-                        <td>{{ sk_sog }}</td>
-                        <td>{{ sk_sht_perc|floatformat:1 }}</td>
-                        <td>{{ sk_sht_eff|floatformat:1 }}</td>
-                        <td>{{ sk_ppg }}</td>
-                        <td>{{ sk_shg }}</td>
-                        <td>{{ sk_pass_perc|floatformat:1 }}</td>
-                        <td>{{ sk_bs }}</td>
-                        <td>{{ sk_tk }}</td>
-                        <td>{{ sk_int }}</td>
-                        <td>{{ sk_gva }}</td>
-                        <td>{{ sk_poss_time }}</td>
-                        <td>{{ sk_fo_perc }}</td>
+                        {% for season in skater_season_totals %}
+                        {% if forloop.first %}
+                        <td>{{ season.sk_gp }}</td>
+                        <td>{{ season.sk_g }}</td>
+                        <td>{{ season.sk_a }}</td>
+                        <td>{{ season.sk_p }}</td>
+                        <td>{{ season.sk_hits }}</td>
+                        <td>{{ season.sk_plus_minus }}</td>
+                        <td>{{ season.sk_pims }}</td>
+                        <td>{{ season.sk_pens_drawn }}</td>
+                        <td>{{ season.sk_pk_clears }}</td>
+                        <td>{{ season.sk_sog }}</td>
+                        <td>{{ season.sk_shot_perc|floatformat:1 }}</td>
+                        <td>{{ season.sk_shot_eff|floatformat:1 }}</td>
+                        <td>{{ season.sk_ppg }}</td>
+                        <td>{{ season.sk_shg }}</td>
+                        <td>{{ season.sk_pass_perc|floatformat:1 }}</td>
+                        <td>{{ season.sk_bs }}</td>
+                        <td>{{ season.sk_tk }}</td>
+                        <td>{{ season.sk_int }}</td>
+                        <td>{{ season.sk_gva }}</td>
+                        <td>{{ season.sk_poss_time|floatformat:1 }}</td>
+                        <td>{{ season.sk_fo_perc|floatformat:1 }}</td>
+                        {% endif %}
+                        {% endfor %}
                     </tr>
                     <tr class="descriptor">
                         <td>games played</td>
@@ -134,7 +129,7 @@
             </table>
         </div>
         {% endif %}
-        {% if g_gp > 0 %}
+        {% if goalie_season_totals %}
         <div class="subsection-container" style="width: 100%;">
             <table class="statsbar">
                 <colgroup>
@@ -173,20 +168,24 @@
                 </thead>
                 <tbody>
                     <tr class="no-bg statline">
-                        <td>{{ g_gp }}</td>
-                        <td>{{ g_wins }}</td>
-                        <td>{{ g_losses }}</td>
-                        <td>{{ g_otlosses }}</td>
-                        <td>{{ g_ga }}</td>
-                        <td>{{ g_sha }}</td>
-                        <td>{{ g_svp|floatformat:1 }}</td>
-                        <td>{{ g_gaa|floatformat:2 }}</td>
-                        <td>{{ g_so }}</td>
-                        <td>{{ g_ps_sh }}</td>
-                        <td>{{ g_ps_perc }}</td>
-                        <td>{{ g_br_sh }}</td>
-                        <td>{{ g_br_perc }}</td>
-                        <td>{{ g_toi }}</td>
+                        {% for season in goalie_season_totals %}
+                        {% if forloop.first %}
+                        <td>{{ season.g_gp }}</td>
+                        <td>{{ season.g_wins }}</td>
+                        <td>{{ season.g_losses }}</td>
+                        <td>{{ season.g_otlosses }}</td>
+                        <td>{{ season.g_ga }}</td>
+                        <td>{{ season.g_sha }}</td>
+                        <td>{{ season.g_svp|floatformat:1 }}</td>
+                        <td>{{ season.g_gaa|floatformat:2 }}</td>
+                        <td>{{ season.g_so }}</td>
+                        <td>{{ season.g_ps_sh }}</td>
+                        <td>{{ season.g_ps_perc }}</td>
+                        <td>{{ season.g_br_sh }}</td>
+                        <td>{{ season.g_br_perc }}</td>
+                        <td>{{ season.g_toi|floatformat:0 }}</td>
+                        {% endif %}
+                        {% endfor %}
                     </tr>
                     <tr class="descriptor">
                         <td>games played</td>
@@ -256,6 +255,158 @@
                 </table>
             </div>
         </div>
+    </center></div>
+    {% endif %}
+    <div class="section section_lg" style="align-items: auto; width: 90%; overflow: scroll; margin-bottom: 10px;"><center>
+        <div class="header" style="width: 100%; text-align: center; margin-bottom: 1px;">
+            Historical Stats
+        </div><br>
+        {% if skater_season_totals %}
+        <div><table class="statsbar betweenrows">
+            <colgroup>
+                <col style="width: 150px;">
+                <col style="width: 80px;">
+                <col style="width: 80px;">
+                <col style="width: 80px;">
+                <col style="width: 80px;">
+                <col style="width: 80px;">
+                <col style="width: 80px;">
+                <col style="width: 80px;">
+                <col style="width: 80px;">
+                <col style="width: 80px;">
+                <col style="width: 80px;">
+                <col style="width: 80px;">
+                <col style="width: 80px;">
+                <col style="width: 80px;">
+                <col style="width: 80px;">
+                <col style="width: 80px;">
+                <col style="width: 80px;">
+                <col style="width: 80px;">
+                <col style="width: 80px;">
+                <col style="width: 80px;">
+                <col style="width: 80px;">
+                <col style="width: 80px;">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>Season</th>
+                    <th>GP</th>
+                    <th>G</th>
+                    <th>A</th>
+                    <th>PTS</th>
+                    <th>Hits</th>
+                    <th>+/-</th>
+                    <th>PIMs</th>
+                    <th>Drawn</th>
+                    <th>PK Clear</th>
+                    <th>S</th>
+                    <th>S%</th>
+                    <th>S Eff</th>
+                    <th>PPG</th>
+                    <th>SHG</th>
+                    <th>Pass %</th>
+                    <th>BS</th>
+                    <th>TK</th>
+                    <th>INT</th>
+                    <th>GVA</th>
+                    <th>TOP</th>
+                    <th>FO%</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for season in skater_season_totals %}
+                <tr class="no-bg">
+                    <td>{{ season.game_num__season_num__season_text }}</td>
+                    <td>{{ season.sk_gp }}</td>
+                    <td>{{ season.sk_g }}</td>
+                    <td>{{ season.sk_a }}</td>
+                    <td>{{ season.sk_p }}</td>
+                    <td>{{ season.sk_hits }}</td>
+                    <td>{{ season.sk_plus_minus }}</td>
+                    <td>{{ season.sk_pims }}</td>
+                    <td>{{ season.sk_pens_drawn }}</td>
+                    <td>{{ season.sk_pk_clears }}</td>
+                    <td>{{ season.sk_sog }}</td>
+                    <td>{{ season.sk_shot_perc|floatformat:1 }}</td>
+                    <td>{{ season.sk_shot_eff|floatformat:1 }}</td>
+                    <td>{{ season.sk_ppg }}</td>
+                    <td>{{ season.sk_shg }}</td>
+                    <td>{{ season.sk_pass_perc|floatformat:1 }}</td>
+                    <td>{{ season.sk_bs }}</td>
+                    <td>{{ season.sk_tk }}</td>
+                    <td>{{ season.sk_int }}</td>
+                    <td>{{ season.sk_gva }}</td>
+                    <td>{{ season.sk_poss_time|floatformat:1 }}</td>
+                    <td>{{ season.sk_fo_perc|floatformat:1 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table></div>
+    </center></div>
+    {% endif %}
+    {% if goalie_season_totals %}
+    <div class="section_lg" style="align-items: auto; width: 90%; overflow: scroll; margin-bottom: 10px;"><center>
+        <table class="statsbar betweenrows">
+            <col style="width: 150px;">
+            <col style="width: 80px;">
+            <col style="width: 80px;">
+            <col style="width: 80px;">
+            <col style="width: 80px;">
+            <col style="width: 80px;">
+            <col style="width: 80px;">
+            <col style="width: 80px;">
+            <col style="width: 80px;">
+            <col style="width: 80px;">
+            <col style="width: 80px;">
+            <col style="width: 80px;">
+            <col style="width: 80px;">
+            <col style="width: 80px;">
+            <col style="width: 80px;">
+            <thead>
+                <tr>
+                    <th>Season</th>
+                    <th>GP</th>
+                    <th>W</th>
+                    <th>L</th>
+                    <th>OTL</th>
+                    <th>GA</th>
+                    <th>SH</th>
+                    <th>SV%</th>
+                    <th>GAA</th>
+                    <th>SO</th>
+                    <th>PS</th>
+                    <th>PS%</th>
+                    <th>BRK</th>
+                    <th>BRK%</th>
+                    <th>MIN</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for season in goalie_season_totals %}
+                <tr class="no-bg">
+                    <td>{{ season.game_num__season_num__season_text }}</td>
+                    <td>{{ season.g_gp }}</td>
+                    <td>{{ season.g_wins }}</td>
+                    <td>{{ season.g_losses }}</td>
+                    <td>{{ season.g_otlosses }}</td>
+                    <td>{{ season.g_ga }}</td>
+                    <td>{{ season.g_sha }}</td>
+                    <td>{{ season.g_svp|floatformat:1 }}</td>
+                    <td>{{ season.g_gaa|floatformat:2 }}</td>
+                    <td>{{ season.g_so }}</td>
+                    <td>{{ season.g_ps_sh }}</td>
+                    <td>{{ season.g_ps_perc }}</td>
+                    <td>{{ season.g_br_sh }}</td>
+                    <td>{{ season.g_br_perc }}</td>
+                    <td>{{ season.g_toi|floatformat:0 }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan=25>No goalie stats recorded.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </center></div>
     {% endif %}
 </center>

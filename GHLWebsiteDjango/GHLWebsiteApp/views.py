@@ -4,7 +4,7 @@ from .forms import UploadFileForm
 from datetime import datetime
 from GHLWebsiteApp.models import *
 from django.db.models import Sum, Count, Case, When, Avg, F, Window
-from django.db.models.functions import Cast, Rank
+from django.db.models.functions import Cast, Rank, Round
 from django.http import JsonResponse
 from decimal import *
 from itertools import chain
@@ -415,91 +415,117 @@ def game(request, game):
 
 def player(request, player):
     playernum = get_object_or_404(Player, pk=player)
-    allskatergames = playernum.skaterrecord_set.filter(game_num__season_num=seasonSetting).exclude(position="0")
-    if not allskatergames:
-        sk_gp = sk_g = sk_a = sk_hits = sk_plus_minus = sk_sog = sk_shot_att = sk_ppg = sk_shg = sk_pass_att = sk_pass_comp = sk_bs = sk_tk = sk_int = sk_gva = sk_pens_drawn = sk_pims = sk_pk_clears = sk_poss_time = sk_sht_perc = sk_sht_eff = sk_pass_perc = sk_fo_perc = sk_fow = sk_fol = 0
-    else:
-        sk_gp = allskatergames.aggregate(Count("game_num"))["game_num__count"]
-        sk_g = allskatergames.aggregate(Sum("goals"))["goals__sum"]
-        sk_a = allskatergames.aggregate(Sum("assists"))["assists__sum"]
-        sk_hits = allskatergames.aggregate(Sum("hits"))["hits__sum"]
-        sk_plus_minus = allskatergames.aggregate(Sum("plus_minus"))["plus_minus__sum"]
-        sk_sog = allskatergames.aggregate(Sum("sog"))["sog__sum"]
-        sk_shot_att = allskatergames.aggregate(Sum("shot_attempts"))["shot_attempts__sum"]
-        sk_ppg = allskatergames.aggregate(Sum("ppg"))["ppg__sum"]
-        sk_shg = allskatergames.aggregate(Sum("shg"))["shg__sum"]
-        sk_pass_att = allskatergames.aggregate(Sum("pass_att"))["pass_att__sum"]
-        sk_pass_comp = allskatergames.aggregate(Sum("pass_comp"))["pass_comp__sum"]
-        sk_bs = allskatergames.aggregate(Sum("blocked_shots"))["blocked_shots__sum"]
-        sk_tk = allskatergames.aggregate(Sum("takeaways"))["takeaways__sum"]
-        sk_int = allskatergames.aggregate(Sum("interceptions"))["interceptions__sum"]
-        sk_gva = allskatergames.aggregate(Sum("giveaways"))["giveaways__sum"]
-        sk_pens_drawn = allskatergames.aggregate(Sum("pens_drawn"))["pens_drawn__sum"]
-        sk_pims = allskatergames.aggregate(Sum("pims"))["pims__sum"]
-        sk_pk_clears = allskatergames.aggregate(Sum("pk_clears"))["pk_clears__sum"]
-        sk_poss_time = round((allskatergames.aggregate(Sum("poss_time"))["poss_time__sum"])/sk_gp, 1)
-        sk_fow = allskatergames.aggregate(Sum("fow"))["fow__sum"]
-        sk_fol = allskatergames.aggregate(Sum("fol"))["fol__sum"]
-        if sk_shot_att > 0:
-            if sk_sog > 0:
-                sk_sht_perc = round((sk_g / sk_sog)*100, 1)
-            else:
-                sk_sht_perc = "-"
-            sk_sht_eff = round((sk_sog / sk_shot_att)*100, 1)
-        else:
-            sk_sht_perc = sk_sht_eff = "-"
 
-        sk_pass_perc = round((sk_pass_comp / sk_pass_att)*100, 1)
-        if sk_fol + sk_fow > 0:
-            sk_fo_perc = round((sk_fow / (sk_fow + sk_fol))* 100, 1) 
-        else:
-            sk_fo_perc = "-"
+    # Group and aggregate skater records by season
+    skater_season_totals = SkaterRecord.objects.filter(
+        ea_player_num=playernum
+    ).exclude(
+        game_num__season_num__season_text="Test Season"
+    ).exclude(
+        position="0"
+    ).values(
+        "game_num__season_num__season_text"
+    ).annotate(
+        sk_gp=Count("game_num"),
+        sk_g=Sum("goals"),
+        sk_a=Sum("assists"),
+        sk_p=Sum("points"),
+        sk_hits=Sum("hits"),
+        sk_plus_minus=Sum("plus_minus"),
+        sk_sog=Sum("sog"),
+        sk_shot_att=Sum("shot_attempts"),
+        sk_ppg=Sum("ppg"),
+        sk_shg=Sum("shg"),
+        sk_pass_att=Sum("pass_att"),
+        sk_pass_comp=Sum("pass_comp"),
+        sk_bs=Sum("blocked_shots"),
+        sk_tk=Sum("takeaways"),
+        sk_int=Sum("interceptions"),
+        sk_gva=Sum("giveaways"),
+        sk_pens_drawn=Sum("pens_drawn"),
+        sk_pims=Sum("pims"),
+        sk_pk_clears=Sum("pk_clears"),
+        sk_poss_time=Round(Avg("poss_time"),1),
+        sk_fow=Sum("fow"),
+        sk_fol=Sum("fol"),
+    ).order_by("-game_num__season_num")
 
-    allgoaliegames = playernum.goalierecord_set.filter(game_num__season_num=seasonSetting)
-    if not allgoaliegames:
-        g_gp = g_so = g_wins = g_losses = g_otlosses = g_toi = g_sha = g_sav = g_gaa = g_br_sh = g_br_sa = g_ps_sh = g_ps_sa = g_ga =  g_svp = g_br_perc = g_ps_perc = 0
-    else:
-        g_gp = allgoaliegames.aggregate(Count("game_num"))["game_num__count"]
-        g_sha = allgoaliegames.aggregate(Sum("shots_against"))["shots_against__sum"]
-        g_sav = allgoaliegames.aggregate(Sum("saves"))["saves__sum"]
-        g_br_sh = allgoaliegames.aggregate(Sum("breakaway_shots"))["breakaway_shots__sum"]
-        g_br_sa = allgoaliegames.aggregate(Sum("breakaway_saves"))["breakaway_saves__sum"]
-        g_ps_sh = allgoaliegames.aggregate(Sum("ps_shots"))["ps_shots__sum"]
-        g_ps_sa = allgoaliegames.aggregate(Sum("ps_saves"))["ps_saves__sum"]
-        g_ga = g_sha - g_sav
-        g_svp = round((g_sav / g_sha)*100,1)
-        if g_br_sh > 0:
-            g_br_perc = round((g_br_sa / g_br_sh)*100,1)
-        else:
-            g_br_perc = "n/a"
-        if g_ps_sh > 0:
-            g_ps_perc = round((g_ps_sa / g_ps_sh)*100,1)
-        else:
-            g_ps_perc = "n/a"
-        g_so = allgoaliegames.aggregate(g_so=Sum(Case(
+    # Calculated values for each season
+    for season in skater_season_totals:
+        season["sk_shot_perc"] = (
+            round((season["sk_g"] / season["sk_sog"]) * 100, 1)
+            if season["sk_sog"] > 0 else "-"
+        )
+        season["sk_shot_eff"] = (
+            round((season["sk_sog"] / season["sk_shot_att"]) * 100, 1)
+            if season["sk_shot_att"] > 0 else "-"
+        )
+        season["sk_pass_perc"] = (
+            round((season["sk_pass_comp"] / season["sk_pass_att"]) * 100, 1)
+            if season["sk_pass_att"] > 0 else "-"
+        )
+        season["sk_fo_perc"] = (
+            round((season["sk_fow"] / (season["sk_fow"] + season["sk_fol"])) * 100, 1)
+            if (season["sk_fow"] + season["sk_fol"]) > 0 else "-"
+        )
+
+
+    # Group and aggregate goalie records by season
+    goalie_season_totals = playernum.goalierecord_set.exclude(
+        game_num__season_num__season_text="Test Season"
+    ).values(
+        "game_num__season_num__season_text"
+    ).annotate(
+        g_gp=Count("game_num"),
+        g_sha=Sum("shots_against"),
+        g_sav=Sum("saves"),
+        g_br_sh=Sum("breakaway_shots"),
+        g_br_sa=Sum("breakaway_saves"),
+        g_ps_sh=Sum("ps_shots"),
+        g_ps_sa=Sum("ps_saves"),
+        g_so=Sum(Case(
             When(shutout=True, then=1),
             default=0,
             output_field=models.IntegerField()
-        )))["g_so"]
-        g_wins = allgoaliegames.aggregate(g_wins=Sum(Case(
+        )),
+        g_wins=Sum(Case(
             When(win=True, then=1),
             default=0,
             output_field=models.IntegerField()
-        )))["g_wins"]
-        g_losses = allgoaliegames.aggregate(g_losses=Sum(Case(
+        )),
+        g_losses=Sum(Case(
             When(loss=True, then=1),
             default=0,
             output_field=models.IntegerField()
-        )))["g_losses"]
-        g_otlosses = allgoaliegames.aggregate(g_otlosses=Sum(Case(
+        )),
+        g_otlosses=Sum(Case(
             When(otloss=True, then=1),
             default=0,
             output_field=models.IntegerField()
-        )))["g_otlosses"]
-        g_gaa = allgoaliegames.aggregate(g_gaa=((Cast(Sum("shots_against"), models.FloatField())-Cast(Sum("saves"), models.FloatField()))/Cast(Sum("game_num__gamelength"), models.FloatField()))*3600)["g_gaa"]
-        g_toi = allgoaliegames.aggregate(g_toi=Sum("game_num__gamelength")/60)["g_toi"]
+        )),
+        g_toi=(Sum("game_num__gamelength")/60),
+    ).order_by("-game_num__season_num")
 
-    sk_p = sk_g + sk_a
+    # Calculated values for each season
+    for season in goalie_season_totals:
+        season["g_ga"] = season["g_sha"] - season["g_sav"] if season["g_sha"] and season["g_sav"] else 0
+        season["g_svp"] = (
+            round((season["g_sav"] / season["g_sha"]) * 100, 1)
+            if season["g_sha"] > 0 else "-"
+        )
+        season["g_gaa"] = (
+            round((season["g_ga"] / (season["g_toi"] / 60)), 2)
+            if season["g_toi"] > 0 else "-"
+        )
+        season["g_br_perc"] = (
+            round((season["g_br_sa"] / season["g_br_sh"]) * 100, 1)
+            if season["g_br_sh"] > 0 else "-"
+        )
+        season["g_ps_perc"] = (
+            round((season["g_ps_sa"] / season["g_ps_sh"]) * 100, 1)
+            if season["g_ps_sh"] > 0 else "-"
+        )
+
     if not playernum.current_team:
         sk_team_num = 0
     else:
@@ -513,41 +539,8 @@ def player(request, player):
         all_games = []
     context = {
         "playernum": playernum, 
-        "sk_gp": sk_gp, 
-        "sk_g": sk_g, 
-        "sk_a": sk_a, 
-        "sk_p": sk_p,
-        "sk_hits": sk_hits, 
-        "sk_plus_minus": sk_plus_minus, 
-        "sk_sog": sk_sog, 
-        "sk_sht_perc": sk_sht_perc,
-        "sk_sht_eff": sk_sht_eff,
-        "sk_ppg": sk_ppg,
-        "sk_shg": sk_shg,
-        "sk_pass_perc": sk_pass_perc,
-        "sk_bs": sk_bs,
-        "sk_tk": sk_tk,
-        "sk_int": sk_int,
-        "sk_gva": sk_gva,
-        "sk_pens_drawn": sk_pens_drawn,
-        "sk_pims": sk_pims,
-        "sk_pk_clears": sk_pk_clears,
-        "sk_poss_time": sk_poss_time,
-        "sk_fo_perc": sk_fo_perc,
-        "g_gp": g_gp,
-        "g_ga": g_ga,
-        "g_sha": g_sha,
-        "g_svp": g_svp,
-        "g_br_sh": g_br_sh,
-        "g_ps_sh": g_ps_sh,
-        "g_br_perc": g_br_perc,
-        "g_ps_perc": g_ps_perc,
-        "g_so": g_so,
-        "g_wins": g_wins,
-        "g_losses": g_losses,
-        "g_otlosses": g_otlosses,
-        "g_gaa": g_gaa,
-        "g_toi": g_toi,
+        "skater_season_totals": skater_season_totals,
+        "goalie_season_totals": goalie_season_totals,
         "sk_team_num": sk_team_num,
         "games": all_games,
         "scoreboard": get_scoreboard()
