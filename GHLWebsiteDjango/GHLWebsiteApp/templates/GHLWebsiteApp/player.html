@@ -257,11 +257,11 @@
         </div>
     </center></div>
     {% endif %}
+    {% if skater_season_totals %}
     <div class="section section_lg" style="align-items: auto; width: 90%; overflow: scroll; margin-bottom: 10px;"><center>
         <div class="header" style="width: 100%; text-align: center; margin-bottom: 1px;">
-            Historical Stats
+            Skater History
         </div><br>
-        {% if skater_season_totals %}
         <div><table class="statsbar betweenrows">
             <colgroup>
                 <col style="width: 150px;">
@@ -345,8 +345,11 @@
     </center></div>
     {% endif %}
     {% if goalie_season_totals %}
-    <div class="section_lg" style="align-items: auto; width: 90%; overflow: scroll; margin-bottom: 10px;"><center>
-        <table class="statsbar betweenrows">
+    <div class="section section_lg" style="align-items: auto; width: 90%; overflow: scroll; margin-bottom: 10px;"><center>
+        <div class="header" style="width: 100%; text-align: center; margin-bottom: 1px;">
+            Goalie History
+        </div><br>
+        <div><table class="statsbar betweenrows">
             <col style="width: 150px;">
             <col style="width: 80px;">
             <col style="width: 80px;">
@@ -400,13 +403,9 @@
                     <td>{{ season.g_br_perc }}</td>
                     <td>{{ season.g_toi|floatformat:0 }}</td>
                 </tr>
-                {% empty %}
-                <tr>
-                    <td colspan=25>No goalie stats recorded.</td>
-                </tr>
                 {% endfor %}
             </tbody>
-        </table>
+        </table></div>
     </center></div>
     {% endif %}
 </center>
