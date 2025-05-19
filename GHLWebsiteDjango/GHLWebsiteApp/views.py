@@ -613,8 +613,6 @@ def upload_file(request):
                             "a_team_num": Team.objects.get(ea_club_num=row['Away Team']),
                             "h_team_num": Team.objects.get(ea_club_num=row['Home Team']),
                             "expected_time": expected_time,
-                            "a_team_gf": "",
-                            "h_team_gf": "",
                         }
                     )
                     if created:
