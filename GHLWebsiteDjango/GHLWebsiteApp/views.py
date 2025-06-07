@@ -594,6 +594,10 @@ def awardsDef(request):
 def glossary(request):
     return render(request, "GHLWebsiteApp/glossary.html")
 
+def playerlist(request):
+    all_players = Player.objects.all().order_by("username")
+    render(request, "GHLWebsiteApp/playerlist.html", {"all_players": all_players, "scoreboard": get_scoreboard()})
+
 def upload_file(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
