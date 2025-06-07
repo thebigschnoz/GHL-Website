@@ -13,6 +13,16 @@ class Season(models.Model):
     isActive = models.BooleanField(default=True, verbose_name="Is Active Season", help_text="Only one season can be active at a time")
     start_date = models.DateField(verbose_name="Start Date", blank=True, null=True)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['isActive'],
+                condition=models.Q(isActive=True),
+                name='unique_active_season',
+                violation_error_message="There can only be one active season at a time."
+            )
+        ]
+
     def __str__(self):
         return self.season_text
 
