@@ -10,7 +10,7 @@ class Season(models.Model):
     season_num = models.AutoField(primary_key=True, verbose_name="Autonum")
     season_text = models.CharField(max_length=50, verbose_name="Season Name")
     season_type = models.CharField(max_length=20, choices=SEASON_CHOICES, default='preseason', verbose_name="Season Type", help_text="Preseason, Regular Season, or Playoffs")
-    isActive = models.BooleanField(default=True, verbose_name="Is Active Season", help_text="Only one season can be active at a time")
+    isActive = models.BooleanField(default=False, verbose_name="Is Active Season", help_text="Only one season can be active at a time")
     start_date = models.DateField(verbose_name="Start Date", blank=True, null=True)
 
     class Meta:
