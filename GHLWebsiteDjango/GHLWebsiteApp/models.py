@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models.functions import Lower
 from decimal import *
 
 class Season(models.Model):
@@ -22,7 +23,7 @@ class Season(models.Model):
                 violation_error_message="There can only be one active season at a time."
             )
         ]
-        
+
     def __str__(self):
         return self.season_text
 
@@ -36,6 +37,9 @@ class Team(models.Model):
 
     def __str__(self):
         return self.club_full_name
+    
+    class Meta:
+        ordering = [Lower('club_full_name')]
 
 class Game(models.Model):
     game_num = models.AutoField(primary_key=True)
@@ -73,6 +77,9 @@ class Player(models.Model):
 
     def __str__(self):
         return self.username
+    
+    class Meta:
+        ordering = [Lower('username')]
 
 class Build(models.Model):
     ea_build = models.IntegerField(primary_key=True)
