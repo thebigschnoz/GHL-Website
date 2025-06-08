@@ -43,7 +43,7 @@ class PlayerListAdmin(admin.ModelAdmin):
     list_display = ("username", "current_team__club_full_name")
 
 class SeasonsAdmin(admin.ModelAdmin):
-    list_display = ("season_text", "start_date","season_num", "isPlayoff")
+    list_display = ("season_text", "start_date", "season_type", "season_num", "isActive")
 
 class GameAdmin(admin.ModelAdmin):
     list_display = ("game_num", "season_num__season_text", "gamelength", "a_team_num__club_abbr", "h_team_num__club_abbr", "expected_time", "played_time", "dnf")
