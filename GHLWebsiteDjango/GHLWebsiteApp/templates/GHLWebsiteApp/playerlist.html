@@ -1,0 +1,18 @@
+{% extends "GHLWebsiteApp/layout.html" %}
+{% load static %}
+{% block body %}
+<center><div class="section section_lg"><center>
+    <div class="header">Player List</div>
+    <div class="playerlist-container">
+        {% for player in all_players %}
+            <div>
+                <a href="{% url 'player' player.ea_player_num %}">
+                    <div>{{ player.username }}</div>
+                </a>
+            </div>
+        {% empty %}
+            <p>No players found.</p>
+        {% endfor %}
+    </div>
+</center></div></center>
+{% endblock %}
