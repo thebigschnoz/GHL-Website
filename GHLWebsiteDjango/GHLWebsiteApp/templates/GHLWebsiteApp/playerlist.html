@@ -5,7 +5,7 @@
     <div class="header">Player List</div>
     <div class="playerlist-container">
         {% for player in all_players %}
-            <div>
+            <div class="playerlist-child">
                 <a href="{% url 'player' player.ea_player_num %}">
                     <div>{{ player.username }}</div>
                 </a>
