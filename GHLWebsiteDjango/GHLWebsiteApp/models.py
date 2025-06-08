@@ -22,7 +22,7 @@ class Season(models.Model):
                 violation_error_message="There can only be one active season at a time."
             )
         ]
-
+        
     def __str__(self):
         return self.season_text
 
