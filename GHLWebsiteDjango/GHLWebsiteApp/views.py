@@ -4,7 +4,7 @@ from .forms import UploadFileForm
 from datetime import datetime
 from GHLWebsiteApp.models import *
 from django.db.models import Sum, Count, Case, When, Avg, F, Window
-from django.db.models.functions import Cast, Rank, Round
+from django.db.models.functions import Cast, Rank, Round, Lower
 from django.http import JsonResponse
 from decimal import *
 from itertools import chain
@@ -595,7 +595,7 @@ def glossary(request):
     return render(request, "GHLWebsiteApp/glossary.html")
 
 def playerlist(request):
-    all_players = Player.objects.all().order_by("username")
+    all_players = Player.objects.all().order_by(Lower("username"))
     return render(request, "GHLWebsiteApp/playerlist.html", {"all_players": all_players, "scoreboard": get_scoreboard()})
 
 def upload_file(request):
