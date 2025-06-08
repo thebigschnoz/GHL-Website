@@ -596,7 +596,7 @@ def glossary(request):
 
 def playerlist(request):
     all_players = Player.objects.all().order_by("username")
-    render(request, "GHLWebsiteApp/playerlist.html", {"all_players": all_players, "scoreboard": get_scoreboard()})
+    return render(request, "GHLWebsiteApp/playerlist.html", {"all_players": all_players, "scoreboard": get_scoreboard()})
 
 def upload_file(request):
     if request.method == 'POST':
