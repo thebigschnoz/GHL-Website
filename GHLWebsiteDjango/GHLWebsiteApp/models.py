@@ -298,9 +298,17 @@ class Standing(models.Model):
     class Meta:
         ordering = ['-points', '-wins', '-goalsfor', 'goalsagainst', 'team__club_full_name']
 
+class PlayoffRound(models.Model):
+    season = models.ForeignKey(Season, on_delete=models.CASCADE, verbose_name="Season")
+    round_num = models.PositiveSmallIntegerField(verbose_name="Round Number")  # e.g., 1 for first round, etc.
+    round_name = models.CharField(max_length=50, verbose_name="Round Name", help_text="Name of the playoff round (e.g., Quarterfinals, Semifinals, Finals)")
+
+    def __str__(self):
+        return f"{self.season.season_text}, Round {self.round_num}"
+
 class PlayoffSeries(models.Model):
     season = models.ForeignKey(Season, on_delete=models.CASCADE, verbose_name="Season")
-    round_num = models.PositiveIntegerField(verbose_name="Round Number")  # e.g., 1 for Quarterfinals, 2 for Semifinals, etc.
+    round_num = models.ForeignKey(PlayoffRound, on_delete=models.CASCADE, verbose_name="Round Number", related_name="series_in_round")
     low_seed = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="low_seed_series", verbose_name="Low Seed")
     high_seed = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="high_seed_series", verbose_name="High Seed")
     low_seed_num = models.PositiveSmallIntegerField(default=0, verbose_name="Low Seed Number", help_text="1 for lowest seed, 2 for second lowest, etc.")
