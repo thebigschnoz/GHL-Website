@@ -83,6 +83,13 @@ class GoalieRecordAdmin(admin.ModelAdmin):
 class AwardAssignAdmin(admin.ModelAdmin):
     filter_horizontal = ("players",)
 
+class PlayoffRoundAdmin(admin.ModelAdmin):
+    list_display = ("round_name", "season_num", "round_num")
+
+class PlayoffSeriesAdmin(admin.ModelAdmin):
+    list_display = ("season", "low_seed_num__club_abbr", "high_seed_num__club_abbr")
+    list_filter = ("season__season_text")
+
 custom_admin_site.register(Season, SeasonsAdmin)
 custom_admin_site.register(Game, GameAdmin)
 custom_admin_site.register(AwardTitle)
@@ -99,3 +106,5 @@ custom_admin_site.register(Leader)
 custom_admin_site.register(AwardVote)
 custom_admin_site.register(User, UserAdmin)
 custom_admin_site.register(Group, GroupAdmin)
+custom_admin_site.register(PlayoffRound, PlayoffRoundAdmin)
+custom_admin_site.register(PlayoffSeries, PlayoffSeriesAdmin)
