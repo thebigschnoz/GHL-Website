@@ -191,9 +191,11 @@ def standings(request):
     season = Season.objects.get(season_num=get_seasonSetting())
     if not season.season_type == "playoffs":
         standings = Standing.objects.filter(season=season).order_by('-points', '-wins', '-goalsfor', 'goalsagainst', 'team__club_full_name')
+        rounds = None
     else:
         standings = PlayoffSeries.objects.filter(season=season).order_by('round_num', 'low_seed_num')
-    return render(request, "GHLWebsiteApp/standings.html", {"standings": standings, "scoreboard": get_scoreboard(), "season": season})
+        rounds = PlayoffRound.objects.filter(season=season).order_by('round_num')
+    return render(request, "GHLWebsiteApp/standings.html", {"standings": standings, "scoreboard": get_scoreboard(), "season": season, "rounds": rounds})
 
 def leaders(request):
     season = get_seasonSetting()
