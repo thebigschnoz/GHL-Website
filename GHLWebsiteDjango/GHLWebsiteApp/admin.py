@@ -84,11 +84,11 @@ class AwardAssignAdmin(admin.ModelAdmin):
     filter_horizontal = ("players",)
 
 class PlayoffRoundAdmin(admin.ModelAdmin):
-    list_display = ("round_name", "season_num", "round_num")
+    list_display = ("round_name", "season", "round_num")
 
 class PlayoffSeriesAdmin(admin.ModelAdmin):
-    list_display = ("season", "low_seed_num__club_abbr", "high_seed_num__club_abbr")
-    list_filter = ("season__season_text")
+    list_display = ("season__season_text", "low_seed__club_abbr", "high_seed__club_abbr")
+    list_filter = ("season__season_text",)
 
 custom_admin_site.register(Season, SeasonsAdmin)
 custom_admin_site.register(Game, GameAdmin)
