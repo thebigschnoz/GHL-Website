@@ -328,7 +328,7 @@ class PlayoffSeries(models.Model):
         self.save()
 
     def __str__(self):
-        return f"Round {self.round_num}: {self.team_a.club_full_name} vs {self.team_b.club_full_name}"
+        return f"Round {self.round_num}: {self.low_seed.club_full_name} vs {self.high_seed.club_full_name}"
 
 class AwardVote(models.Model):
     ea_player_num = models.ForeignKey(Player, on_delete=models.CASCADE, verbose_name="Player")
