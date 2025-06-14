@@ -4,78 +4,134 @@
   <center>
     <div class="section section_lg">
       <center>
-      <div class="header">Team Standings: {{ season.season_text }}</div>
-      <table id="fullstandings">
-        <col style="width: 60px;">
-        <col style="width: 70px;">
-        <col style="width: 60px;">
-        <col style="width: 300px;">
-        <col style="width: 80px;">
-        <col style="width: 80px;">
-        <col style="width: 80px;">
-        <col style="width: 80px;">
-        <col style="width: 80px;">
-        <col style="width: 80px;">
-        <col style="width: 80px;">
-        <col style="width: 80px;">
-        <col style="width: 80px;">
-        <col style="width: 80px;">
-        <col style="width: 80px;">
-        <col style="width: 80px;">
-        <tr>
-          <th>Pos</th>
-          <th>&nbsp;</th> <!-- playoff clinch status: class="clinched" -->
-          <th>&nbsp;</th> <!-- team logo-->
-          <th>Team</th>
-          <th>GP</th>
-          <th>W</th>
-          <th>L</th>
-          <th>OTL</th>
-          <th>Pct</th>
-          <th>GF</th>
-          <th>GA</th>
-          <th>PP%</th>
-          <th>PK%</th>
-          <th>L10</th>
-          <th>Str</th>
-          <th>Pts</th>
-        </tr>
-        {% for standing in standings %}
-        <tr>
-          <td>{{ forloop.counter }}</td>
-          <td>&nbsp;</td>
-          {% if standing.team.team_logo_link %}
-          <td><img src="{{ standing.team.team_logo_link }}" height=24 width=24></img></td>
-          {% else %}
-          <td>&nbsp;</td>
-          {% endif %}
-          <td><a href="{% url 'team' standing.team.ea_club_num %}">{{ standing.team.club_full_name }}</a></td>
-          <td>{{ standing.gp }}</td>
-          <td>{{ standing.wins }}</td>
-          <td>{{ standing.losses }}</td>
-          <td>{{ standing.otlosses }}</td>
-          <td>{{ standing.winperc|floatformat:1 }}</td>
-          <td>{{ standing.goalsfor }}</td>
-          <td>{{ standing.goalsagainst }}</td>
-          <td>{{ standing.ppperc }}%</td>
-          <td>{{ standing.pkperc }}%</td>
-          <td>{{ standing.lastten }}</td>
-          <td>{{ standing.streak }}</td>
-          <td class="points">{{ standing.points }}</td>
-        </tr>
-        {% empty %}
-        <tr>
-          <td colspan="16">No games recorded.</td>
-        </tr>
-        {% endfor %}
-      </table>
-      <div id="playoffInfo">
-        x - clinched Playoff spot<br />
-        y - clinched Division<br />
-        z - clinched Conference<br />
-        p - clinched Presidents' Trophy
-      </div>
-      </center>
+      {% if not season.season_type == "playoffs" %}
+        <div class="header">
+          Team Standings: {{ season.season_text }}
+        </div>
+        <table id="fullstandings">
+          <col style="width: 60px;">
+          <col style="width: 70px;">
+          <col style="width: 60px;">
+          <col style="width: 300px;">
+          <col style="width: 80px;">
+          <col style="width: 80px;">
+          <col style="width: 80px;">
+          <col style="width: 80px;">
+          <col style="width: 80px;">
+          <col style="width: 80px;">
+          <col style="width: 80px;">
+          <col style="width: 80px;">
+          <col style="width: 80px;">
+          <col style="width: 80px;">
+          <col style="width: 80px;">
+          <col style="width: 80px;">
+          <tr>
+            <th>Pos</th>
+            <th>&nbsp;</th> <!-- playoff clinch status: class="clinched" -->
+            <th>&nbsp;</th> <!-- team logo-->
+            <th>Team</th>
+            <th>GP</th>
+            <th>W</th>
+            <th>L</th>
+            <th>OTL</th>
+            <th>Pct</th>
+            <th>GF</th>
+            <th>GA</th>
+            <th>PP%</th>
+            <th>PK%</th>
+            <th>L10</th>
+            <th>Str</th>
+            <th>Pts</th>
+          </tr>
+          {% for standing in standings %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>&nbsp;</td>
+            {% if standing.team.team_logo_link %}
+            <td><img src="{{ standing.team.team_logo_link }}" height=24 width=24></img></td>
+            {% else %}
+            <td>&nbsp;</td>
+            {% endif %}
+            <td><a href="{% url 'team' standing.team.ea_club_num %}">{{ standing.team.club_full_name }}</a></td>
+            <td>{{ standing.gp }}</td>
+            <td>{{ standing.wins }}</td>
+            <td>{{ standing.losses }}</td>
+            <td>{{ standing.otlosses }}</td>
+            <td>{{ standing.winperc|floatformat:1 }}</td>
+            <td>{{ standing.goalsfor }}</td>
+            <td>{{ standing.goalsagainst }}</td>
+            <td>{{ standing.ppperc }}%</td>
+            <td>{{ standing.pkperc }}%</td>
+            <td>{{ standing.lastten }}</td>
+            <td>{{ standing.streak }}</td>
+            <td class="points">{{ standing.points }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="16">No games recorded.</td>
+          </tr>
+          {% endfor %}
+        </table>
+        <div id="playoffInfo">
+          x - clinched Playoff spot<br />
+          y - clinched Division<br />
+          z - clinched Conference<br />
+          p - clinched Presidents' Trophy
+        </div>
+        </center>
+
+      {% else %}
+        <div class="header">
+          <h2>{{ season.season_text }}</h2>
+        </div>
+        <div class="container">
+          <div class="tournament-bracket tournament-bracket--rounded"> <!-- Whole bracket, do not touch -->
+            {% for round in rounds %}
+            <div class="tournament-bracket__round tournament-bracket__round--{{round.round_name|lower}}"> <!-- Round -->
+              <h3 class="tournament-bracket__round-title">{{round.round_name}}</h3> <!-- Round title -->
+              <ul class="tournament-bracket__list"> <!-- Lists all the matchups in the round --> 
+                {% for matchup in standings %}
+                <li class="tournament-bracket__item"> <!-- Individual matchups -->
+                  <div class="tournament-bracket__match">
+                    <table class="tournament-bracket__table">
+                      <caption class="tournament-bracket__caption">
+                      </caption>
+                      <thead class="sr-only">
+                        <tr>
+                          <th>Team</th>
+                          <th>Score</th>
+                        </tr>
+                      </thead>  
+                      <tbody class="tournament-bracket__content">
+                        <tr class="tournament-bracket__team no-bg {% if high_seed_wins == 4 %}tournament-bracket__team--winner{% endif %}">
+                          <td class="tournament-bracket__country">
+                            <abbr class="tournament-bracket__code" title="{{matchup.high_seed.club_full_name}}">{{matchup.high_seed.club_abbr}}</abbr>
+                            <span class="tournament-bracket__flag"><img src="{{matchup.high_seed.team_logo_link}}"></span>
+                          </td>
+                          <td class="tournament-bracket__score">
+                            <span class="tournament-bracket__number">{{matchup.high_seed_wins}}</span>
+                          </td>
+                        </tr>
+                        <tr class="tournament-bracket__team no-bg {% if high_seed_wins == 4 %}tournament-bracket__team--winner{% endif %}">
+                          <td class="tournament-bracket__country">
+                            <abbr class="tournament-bracket__code" title="{{matchup.low_seed.club_full_name}}">{{matchup.low_seed.club_abbr}}</abbr>
+                            <span class="tournament-bracket__flag"><img src="{{matchup.low_seed.team_logo_link}}"></span>
+                          </td>
+                          <td class="tournament-bracket__score">
+                            <span class="tournament-bracket__number">{{matchup.low_seed_wins}}</span>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
     </div>
   </center>
 {% endblock %}
