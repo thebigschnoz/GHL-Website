@@ -8,6 +8,7 @@
                 <div class="section">
                     <center>
                         <div class="header">Current Standings</div>
+                        {% if not season.season_type == "playoffs" %}
                         <table class="standingstable">
                             <colgroup>
                                 <col style="width: 60px">
@@ -40,6 +41,9 @@
                                 {% endfor %}
                             </tbody>
                         </table>
+                        {% else %}
+                        <a href="{% url 'standings' %}" style="text-decoration: none;">Click here for playoff tree</a>
+                        {% endif %}
                     </center>
                 </div>
                 <div class="section">
