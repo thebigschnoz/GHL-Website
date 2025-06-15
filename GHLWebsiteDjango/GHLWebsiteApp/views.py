@@ -432,7 +432,7 @@ def game(request, game):
     return render(request, "GHLWebsiteApp/game.html", context)
 
 def player(request, player):
-    season = get_seasonSetting()
+    seasonSetting = get_seasonSetting()
     playernum = get_object_or_404(Player, pk=player)
 
     # Group and aggregate skater records by season
@@ -550,8 +550,8 @@ def player(request, player):
     else:
         sk_team_num = playernum.current_team.ea_club_num
 
-    skater_games = Game.objects.filter(skaterrecord__ea_player_num=playernum, season_num=season)
-    goalie_games = Game.objects.filter(goalierecord__ea_player_num=playernum, season_num=season)
+    skater_games = Game.objects.filter(skaterrecord__ea_player_num=playernum, season_num=seasonSetting)
+    goalie_games = Game.objects.filter(goalierecord__ea_player_num=playernum, season_num=seasonSetting)
     if skater_games.exists() or goalie_games.exists():
         all_games = skater_games.union(goalie_games).order_by("-expected_time")
     else:
