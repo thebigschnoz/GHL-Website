@@ -35,6 +35,7 @@ custom_admin_site = CustomAdminSite(name='custom_admin')
 # Register your models here.
 class TeamListAdmin(admin.ModelAdmin):
     list_display = ("club_full_name", "ea_club_num", "club_abbr", "isActive")
+    list_filter = ("isActive",)
 
 class BuildsAdmin(admin.ModelAdmin):
     list_display = ("build", "buildShort")
@@ -90,6 +91,9 @@ class PlayoffSeriesAdmin(admin.ModelAdmin):
     list_display = ("season__season_text", "low_seed__club_abbr", "high_seed__club_abbr")
     list_filter = ("season__season_text",)
 
+class ScheduleAdmin(admin.ModelAdmin):
+    list_display = ("schedule_num", "season_num", "start_date", "total_games", "active")
+
 custom_admin_site.register(Season, SeasonsAdmin)
 custom_admin_site.register(Game, GameAdmin)
 custom_admin_site.register(AwardTitle)
@@ -108,3 +112,4 @@ custom_admin_site.register(User, UserAdmin)
 custom_admin_site.register(Group, GroupAdmin)
 custom_admin_site.register(PlayoffRound, PlayoffRoundAdmin)
 custom_admin_site.register(PlayoffSeries, PlayoffSeriesAdmin)
+custom_admin_site.register(Schedule, ScheduleAdmin)
