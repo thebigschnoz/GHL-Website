@@ -2,7 +2,7 @@ from django.db import models
 from django.db.models.functions import Lower
 from decimal import *
 
-class Field(models.TextChoices):
+class Field(models.TextChoices): 
     A = "A"
     B = "B"
     C = "C"
