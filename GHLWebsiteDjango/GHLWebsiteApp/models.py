@@ -53,6 +53,31 @@ class Game(models.Model):
     a_team_gf = models.IntegerField(verbose_name="Away Score", default="0", blank=True)
     h_team_gf = models.IntegerField(verbose_name="Home Score", default="0", blank=True)
 
+class Schedule(models.Model):
+    schedule_num = models.AutoField(primary_key=True)
+    season_num = models.ForeignKey(Season, on_delete=models.CASCADE, verbose_name="Season")
+    total_games = models.PositiveIntegerField(verbose_name="Total Games", default=10)
+    start_date = models.DateField(verbose_name="Start Date", blank=True, null=True)
+    end_date = models.DateField(verbose_name="End Date", blank=True, null=True)
+    game_length = models.PositiveIntegerField(verbose_name="Game Length in minutes", default="30", blank=True, null=True)
+    half_time = models.PositiveIntegerField(verbose_name="Half Time in minutes", default="0", blank=True, null=True)
+    time_between_games = models.PositiveIntegerField(verbose_name="Time Between Games in minutes", default="15", blank=True, null=True)
+    concurrent_games = models.PositiveSmallIntegerField(verbose_name="Concurrent Games Allowed", default=2)
+    active = models.BooleanField(default=False, verbose_name="Is Active Schedule", help_text="Only one schedule can be active at a time")
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['active'],
+                condition=models.Q(active=True),
+                name='unique_active_season',
+                violation_error_message="There can only be one active season at a time."
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.season_num.season_text}"
+
 class AwardTitle(models.Model):
     award_num = models.IntegerField(primary_key=True)
     award_Name = models.CharField(max_length=50, verbose_name="Name")
