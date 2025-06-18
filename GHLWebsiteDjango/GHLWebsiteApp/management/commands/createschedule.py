@@ -74,18 +74,16 @@ class ScheduleGenerator:
         # Checks if either team in the match is a "Bye Week" team and returns True if so.
         return match[0].name == "Bye Week" or match[1].name == "Bye Week"
 
-    def increment_matchday(self, matchday: int, increment_by_days: int = 7) -> datetime.datetime:
+    def increment_matchday(self, current_date: datetime.date) -> datetime.date:
         # Increments the matchday by a specified number of days and returns the new date.
-        return self.schedule.start_date + datetime.timedelta(days=increment_by_days * (matchday - 1))
+        next_date = current_date + datetime.timedelta(days=1)
+        while next_date.weekday() in (4, 5):  # Skip Friday (4) and Saturday (5)
+            next_date += datetime.timedelta(days=1)
+        return next_date
 
-    def determine_start_time(self, matchday: int, match_count: int) -> datetime.datetime:
+    def determine_start_times(self, base_date: datetime.date) -> list[datetime.datetime]:
         # Determines the start time for a game based on the matchday and match count.
-        game_date = self.increment_matchday(matchday)
-        if match_count <= self.schedule.concurrent_games:
-            return game_date
-        increment_by = self.schedule.game_length + self.schedule.half_time + self.schedule.time_between_games
-        minute_increment = increment_by * ((match_count - 1) // self.schedule.concurrent_games)
-        return game_date + datetime.timedelta(minutes=minute_increment)
+        return [datetime.datetime.combine(base_date, t) for t in self.allowed_times]
 
     def create_matchups(self, matchday: int, teams: list[Team]) -> list[tuple[Team, Team]]:
         # Creates matchups (aka pairings) for the given matchday based on the teams.
@@ -102,23 +100,19 @@ class ScheduleGenerator:
             matchups = list(zip(home, away))
         return matchups
 
-    def create_games(self, matchday: int, round_number: int, teams: list[Team]) -> list[Game]:
+    def create_games(self, matchday: int, round_number: int, teams: list[Team], date: datetime.date) -> list[Game]:
         # Creates games for the given matchday and round number based on the teams.
         matchups = self.create_matchups(matchday, teams)
         games = []
-        for count, match in enumerate(matchups, start=1):
-            # TODO: Make sure Game creation fits my model
+        for count, match in enumerate(matchups):
             home, away = self.home_or_away(round_number, match)
             games.append(Game(
-                schedule=self.schedule,
-                season=self.schedule.season,
-                league=self.schedule.league,
-                home_team=home,
-                away_team=away,
-                bye_week=self.check_for_bye(match),
-                matchday=matchday,
-                date=self.determine_start_time(matchday, count),
-                field=self.determine_field(count),
+                game_num = count + 1,
+                season_num = self.schedule.season_num,
+                h_team_num = home,
+                a_team_num = away,
+                game_length = int(None),
+                expected_time = self.determine_start_times(matchday, count),
             ))
         return games
 
@@ -138,7 +132,8 @@ class ScheduleGenerator:
         all_games: list[Game] = []
         for matchday in range(1, self.total_games - remaining + 1):
             round_number = matchday // len(teams) + 1
-            matchday_games = self.create_games(matchday, round_number, teams)
+            current_date = self.increment_matchday(current_date)
+            matchday_games = self.create_games(matchday, round_number, teams, current_date)
             all_games.extend(matchday_games)
 
         if not dry_run:
