@@ -2,20 +2,6 @@ from django.db import models
 from django.db.models.functions import Lower
 from decimal import *
 
-class Field(models.TextChoices): 
-    A = "A"
-    B = "B"
-    C = "C"
-    D = "D"
-    E = "E"
-    F = "F"
-    G = "G"
-    H = "H"
-    I = "I"
-    J = "J"
-    K = "K"
-    L = "L"
-
 class Season(models.Model):
     SEASON_CHOICES = [
         ('preseason', 'Preseason'),
@@ -42,12 +28,12 @@ class Season(models.Model):
         return self.season_text
 
 class Team(models.Model):
-    ea_club_num = models.IntegerField(primary_key=True)
-    club_full_name = models.CharField(max_length=50)
-    club_abbr = models.CharField(max_length=3)
-    club_location = models.CharField(max_length=25)
-    team_logo_link = models.TextField(blank=True, null=True)
-    isActive = models.BooleanField(default=True)
+    ea_club_num = models.IntegerField(primary_key=True, verbose_name="EA Club Number")
+    club_full_name = models.CharField(max_length=50, verbose_name="Full Club Name")
+    club_abbr = models.CharField(max_length=3, verbose_name="Club Abbreviation", help_text="3-letter abbreviation for the club")
+    team_logo_link = models.TextField(blank=True, null=True, verbose_name="Team Logo Link", help_text="Link to the team logo image")
+    isActive = models.BooleanField(default=True, verbose_name="Is Active Team", help_text="Indicates if the team is currently active in the league")
+    team_color = models.CharField(max_length=7, default="#000000", verbose_name="Team Color", help_text="Hex color code for the team's primary color")
 
     def __str__(self):
         return self.club_full_name
@@ -62,32 +48,17 @@ class Game(models.Model):
     expected_time = models.DateTimeField(verbose_name="Expected Game Time", blank=True, null=True)
     played_time = models.DateTimeField(verbose_name="Actual Game Time", blank=True, null=True)
     dnf = models.BooleanField(default=False, verbose_name="DNF", blank=True, null=True)
-    a_team_num = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="a_team")
-    h_team_num = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="h_team")
+    a_team_num = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="a_team", verbose_name="Away Team")
+    h_team_num = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="h_team", verbose_name="Home Team")
     a_team_gf = models.IntegerField(verbose_name="Away Score", default="0", blank=True)
     h_team_gf = models.IntegerField(verbose_name="Home Score", default="0", blank=True)
 
 class Schedule(models.Model):
+
     schedule_num = models.AutoField(primary_key=True)
     season_num = models.ForeignKey(Season, on_delete=models.CASCADE, verbose_name="Season")
-    total_games = models.PositiveIntegerField(verbose_name="Total Games", default=10)
+    games_per_matchup = models.PositiveIntegerField(verbose_name="Home Games per Matchup", default=8)
     start_date = models.DateField(verbose_name="Start Date", blank=True, null=True)
-    end_date = models.DateField(verbose_name="End Date", blank=True, null=True)
-    game_length = models.PositiveIntegerField(verbose_name="Game Length in minutes", default="30", blank=True, null=True)
-    half_time = models.PositiveIntegerField(verbose_name="Half Time in minutes", default="0", blank=True, null=True)
-    time_between_games = models.PositiveIntegerField(verbose_name="Time Between Games in minutes", default="15", blank=True, null=True)
-    concurrent_games = models.PositiveSmallIntegerField(verbose_name="Concurrent Games Allowed", default=2)
-    active = models.BooleanField(default=False, verbose_name="Is Active Schedule", help_text="Only one schedule can be active at a time")
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=['active'],
-                condition=models.Q(active=True),
-                name='unique_active_season',
-                violation_error_message="There can only be one active season at a time."
-            )
-        ]
 
     def __str__(self):
         return f"{self.season_num.season_text}"
