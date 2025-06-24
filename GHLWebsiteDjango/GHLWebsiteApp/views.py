@@ -286,10 +286,10 @@ def skatersAdvanced(request):
         skatersbs=Avg("blocked_shots"),
         skatersfo=Case(
             When(
-            total_fow__isnull=False,
-            total_fol__isnull=False,
-            then=Cast(F("total_fow") * 100.0 / (F("total_fow") + F("total_fol")), FloatField())
-        ),default=0, output_field=FloatField()),
+                total_fow__isnull=False,
+                total_fol__isnull=False,
+                then=Cast(F("total_fow") * 100.0 / (F("total_fow") + F("total_fol")), FloatField())
+        ),default=0, output_field=FloatField()), # TODO: Find out why players without fow/fol are showing up with blanks
     ).order_by("ea_player_num__username")
     season = Season.objects.get(season_num=season)
     context = {
