@@ -93,18 +93,21 @@ class PlayoffSeriesAdmin(admin.ModelAdmin):
 
 class ScheduleAdmin(admin.ModelAdmin):
     list_display = ("schedule_num", "season_num", "start_date")
-
+    actions = ["run_scheduler"]
+    
     def run_scheduler(self, request, queryset):
         if queryset.count() != 1:
             messages.error(request, "Please select exactly one schedule to run.")
             return
 
-        schedule = queryset.first()
-        try:
+        schedule = queryset[0]
+        try: 
             call_command("createschedule", schedule_id=schedule)
             messages.success(request, f"Schedule {schedule} has been successfully run.")
         except Exception as e:
             messages.error(request, f"Error running schedule: {str(e)}")
+
+    run_scheduler.short_description = "Run selected schedule"
 
 custom_admin_site.register(Season, SeasonsAdmin)
 custom_admin_site.register(Game, GameAdmin)
