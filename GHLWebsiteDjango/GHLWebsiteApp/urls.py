@@ -15,9 +15,9 @@ urlpatterns = [
     path('awards/', views.awardsDef, name="awardsDef"),
     path('awards/<int:awardnum>/', views.awards, name="awards"),
     path('draft/', views.draft, name="draft"),
-    # path('game/', views.calendar, name="calendar"),
     path('game/<int:game>/', views.game, name="game"),
     path('gameapi/', views.GamesRequest, name="gamesrequest"),
     path('uploadcsvforgames/', views.upload_file, name="upload_file"),
     path('glossary/', views.glossary, name="glossary"),
+    path('export/team/<int:team>/', views.export_team, name="export_team"),
 ]
