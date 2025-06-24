@@ -34,6 +34,7 @@ class Team(models.Model):
     team_logo_link = models.TextField(blank=True, null=True, verbose_name="Team Logo Link", help_text="Link to the team logo image")
     isActive = models.BooleanField(default=True, verbose_name="Is Active Team", help_text="Indicates if the team is currently active in the league")
     team_color = models.CharField(max_length=7, default="#000000", verbose_name="Team Color", help_text="Hex color code for the team's primary color")
+    team_code = models.CharField(max_length=6, verbose_name="Game Matchup Code", help_text="GHL specific matchup code to be used in EA NHL games", blank=True, null=True)
 
     def __str__(self):
         return self.club_full_name
