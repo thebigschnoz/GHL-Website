@@ -1,143 +1,130 @@
 import datetime
-from collections import deque
-from itertools import chain
 from random import shuffle
 
 from django.core.management.base import BaseCommand, CommandError
-from django.db import transaction
 
-from GHLWebsiteApp.models import Game, Schedule, Team, Field
+from GHLWebsiteApp.models import Game, Schedule, Team
 
 class Command(BaseCommand):
     help = "Generate and save games for a given schedule ID."
-    # TODO: Determine how game totals are being calculated and add logic
 
     def add_arguments(self, parser):
         parser.add_argument("schedule_id", type=int, help="ID of the schedule to generate games for")
-        parser.add_argument("--no-shuffle", action="store_true", help="Disable team shuffle")
-        parser.add_argument("--dry-run", action="store_true", help="Do not write to DB")
 
     def handle(self, *args, **options):
         schedule_id = options["schedule_id"]
-        shuffle_order = not options["no_shuffle"]
-        dry_run = options["dry_run"]
 
         try:
-            schedule = Schedule.objects.select_related("league", "season").get(id=schedule_id)
-            # TODO: Address select_related
-            # TODO: Possibly change schedule ID
+            schedule = Schedule.objects.get(schedule_num=schedule_id)
         except Schedule.DoesNotExist:
             raise CommandError(f"Schedule with ID {schedule_id} does not exist.")
 
-        generator = ScheduleGenerator(schedule)
-        games = generator.generate_and_save_games(shuffle_order=shuffle_order, dry_run=dry_run)
+        generator = ScheduleGenerator(schedule, self.stdout)
+        games = generator.generate_and_save_games()
         self.stdout.write(self.style.SUCCESS(f"Generated {len(games)} games."))
 
 
 class ScheduleGenerator:
-    def __init__(self, schedule: Schedule, blackout_dates: list[datetime.datetime] | None = None):
+    def __init__(self, schedule: Schedule, stdout=None, blackout_dates: list[datetime.datetime] | None = None):
         self.schedule = schedule
         self.blackout_dates = blackout_dates
-
-    @property
-    def total_games(self) -> int:
-        # Returns the total number of games based on the schedule's properties.
-        return self.schedule.total_games
+        self.allowed_times = [datetime.time(21, 0), datetime.time(21, 45)]
+        self.stdout = stdout
 
     @property
     def teams(self) -> list[Team]:
         # Fetches all teams associated with the league of the schedule.
         teams = Team.objects.filter(isActive=True)
         if not teams:
-            raise ValueError("The league does not have any teams associated.")
+            raise ValueError("The league does not have any active teams.")
         return list(teams)
 
-    def split_teams(self, teams: list[Team]) -> tuple[list[Team], list[Team]]:
+    @property
+    def total_games(self) -> int:
+        # Returns the total number of games based on the schedule's properties.
+        total_games = len(self.teams) * self.schedule.games_per_matchup / 2
+        return total_games
+
+    '''def split_teams(self, teams: list[Team]) -> tuple[list[Team], list[Team]]:
         # Splits the list of teams into two equal halves and returns them.
         if len(teams) % 2 != 0:
             raise ValueError("List length must be even.")
         mid = len(teams) // 2
-        return teams[:mid], teams[mid:]
+        return teams[:mid], teams[mid:]'''
 
-    def determine_field(self, match_count: int, concurrent_games: int | None = None) -> str:
-        fields = [f.name for f in Field]
-        concurrent_games = concurrent_games or self.schedule.concurrent_games
-        if match_count == 1 or match_count > concurrent_games:
-            return fields[0]
-        return fields[match_count - 1]
+    def increment_matchday(self, current_date: datetime.date, time_counter: int) -> tuple[datetime.date,int]:
+        # Increments the matchday and returns the new datetime.
+        day_counter = len(self.allowed_times)
+        time_counter += 1
+        if time_counter >= day_counter:
+            time_counter = 0
+            current_date += datetime.timedelta(days=1)
+        while current_date.weekday() in (4, 5):  # Skip Friday (4) and Saturday (5)
+            current_date += datetime.timedelta(days=1)
+            
+        current_date = datetime.datetime.combine(current_date, self.allowed_times[time_counter])
+        return current_date, time_counter
 
-    def home_or_away(self, round_number: int, match: tuple[Team, Team]) -> tuple[Team, Team]:
-        # Determines the home and away teams based on the round number.
-        return match if round_number % 2 == 0 else match[::-1]
-
-    def check_for_bye(self, match: tuple[Team, Team]) -> bool:
-        # Checks if either team in the match is a "Bye Week" team and returns True if so.
-        return match[0].name == "Bye Week" or match[1].name == "Bye Week"
-
-    def increment_matchday(self, current_date: datetime.date) -> datetime.date:
-        # Increments the matchday by a specified number of days and returns the new date.
-        next_date = current_date + datetime.timedelta(days=1)
-        while next_date.weekday() in (4, 5):  # Skip Friday (4) and Saturday (5)
-            next_date += datetime.timedelta(days=1)
-        return next_date
-
-    def determine_start_times(self, base_date: datetime.date) -> list[datetime.datetime]:
-        # Determines the start time for a game based on the matchday and match count.
-        return [datetime.datetime.combine(base_date, t) for t in self.allowed_times]
-
-    def create_matchups(self, matchday: int, teams: list[Team]) -> list[tuple[Team, Team]]:
-        # Creates matchups (aka pairings) for the given matchday based on the teams.
-        if len(teams) % 2 != 0:
-            teams.append(Team(name="Bye Week"))  # Not persisted
-        home, away = self.split_teams(teams)
-        matchups = list(zip(home, away))
-        if matchday != 1:
-            rotation = deque(chain(*matchups))
-            anchor = rotation.popleft()
-            rotation.rotate(matchday)
-            rotation.appendleft(anchor)
-            home, away = self.split_teams(list(rotation))
-            matchups = list(zip(home, away))
+    def create_all_matchups(self, teams: list[Team]) -> list[tuple[Team, Team]]:
+        # Creates all possible matchups from the list of teams.
+        matchups = []
+        for n in range(0, self.schedule.games_per_matchup):
+            for i in range(0, len(teams)):
+                opponents = list(team for team in teams if team != teams[i])
+                for opponent in range(0, len(opponents)):
+                    matchups.append((teams[i], opponents[opponent]))
+        # Shuffle the matchups to randomize the order.
+        shuffle(matchups)
         return matchups
+    
+    def generate_and_save_games(self) -> list[Game]:
+        # Generates and saves games based on the schedule and teams.
+        if not self.teams:
+            raise ValueError("No active teams available to generate games.")
 
-    def create_games(self, matchday: int, round_number: int, teams: list[Team], date: datetime.date) -> list[Game]:
-        # Creates games for the given matchday and round number based on the teams.
-        matchups = self.create_matchups(matchday, teams)
+        matchups = self.create_all_matchups(self.teams)
         games = []
-        for count, match in enumerate(matchups):
-            home, away = self.home_or_away(round_number, match)
-            games.append(Game(
-                game_num = count + 1,
-                season_num = self.schedule.season_num,
-                h_team_num = home,
-                a_team_num = away,
-                game_length = int(None),
-                expected_time = self.determine_start_times(matchday, count),
-            ))
+        current_date = datetime.datetime.combine(self.schedule.start_date, self.allowed_times[0]) # Sets the starting date and time for the schedule
+        time_counter = 0
+
+        while len(matchups) > 0: # Ensure we generate games until all matchups are used
+            remaining_teams = set(self.teams) # Make a variable set of remaining teams to use in logic
+            daily_matchups = [] # Initialize daily matchups for the current date
+
+            # First, create the daily matchups for the schedule
+            while len(remaining_teams) > 1:
+                # Randomly select a matchup from the remaining teams
+                remaining_teams_list = list(remaining_teams)
+                shuffle(remaining_teams_list)
+                random_team = remaining_teams_list[0]
+                # Find a valid opponent for the selected team
+                random_game = next(
+                    (matchup for matchup in matchups if random_team in matchup and 
+                    matchup[0] in remaining_teams and matchup[1] in remaining_teams), 
+                    None
+                )
+                daily_matchups.append(random_game)
+                matchups.remove(random_game)  # Remove the matchup from the available matchups
+                # Remove the teams from the remaining teams set
+                remaining_teams.remove(random_game[0])
+                remaining_teams.remove(random_game[1])
+                self.stdout.write(f"Chosen matchup: {random_game[0].club_abbr} vs {random_game[1].club_abbr}")
+
+
+            # Then create the Games
+            self.stdout.write(f"Creating games for date: {current_date.strftime('%Y-%m-%d %H:%M')}")
+            for matchup in daily_matchups:
+                game = Game(
+                    season_num=self.schedule.season_num,
+                    expected_time=current_date,
+                    a_team_num=matchup[0],
+                    h_team_num=matchup[1], 
+                )
+                games.append(game)
+            self.stdout.write(f"Length of matchups: {len(matchups)}")
+
+            current_date, time_counter = self.increment_matchday(current_date, time_counter)
+
+        Game.objects.bulk_create(games)
         return games
-
-    def generate_and_save_games(self, shuffle_order: bool = True, dry_run: bool = False) -> list[Game]:
-        # Generates and saves games for the schedule, optionally shuffling teams or performing a dry run.
-        if self.schedule.games.exists():
-            raise ValueError("Schedule already has games...")
-
-        teams = self.teams
-        if shuffle_order:
-            shuffle(teams)
-
-        rounds, remaining = divmod(self.total_games, len(teams))
-        if rounds == 0:
-            raise ValueError("Not enough matchdays for all teams to play each other.")
-
-        all_games: list[Game] = []
-        for matchday in range(1, self.total_games - remaining + 1):
-            round_number = matchday // len(teams) + 1
-            current_date = self.increment_matchday(current_date)
-            matchday_games = self.create_games(matchday, round_number, teams, current_date)
-            all_games.extend(matchday_games)
-
-        if not dry_run:
-            with transaction.atomic():
-                Game.objects.bulk_create(all_games)
-
-        return all_games
+        
