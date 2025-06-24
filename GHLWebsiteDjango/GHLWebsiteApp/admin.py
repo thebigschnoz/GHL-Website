@@ -35,6 +35,7 @@ custom_admin_site = CustomAdminSite(name='custom_admin')
 # Register your models here.
 class TeamListAdmin(admin.ModelAdmin):
     list_display = ("club_full_name", "ea_club_num", "club_abbr", "isActive")
+    list_filter = ("isActive",)
 
 class BuildsAdmin(admin.ModelAdmin):
     list_display = ("build", "buildShort")
@@ -90,6 +91,24 @@ class PlayoffSeriesAdmin(admin.ModelAdmin):
     list_display = ("season__season_text", "low_seed__club_abbr", "high_seed__club_abbr")
     list_filter = ("season__season_text",)
 
+class ScheduleAdmin(admin.ModelAdmin):
+    list_display = ("schedule_num", "season_num", "start_date")
+    actions = ["run_scheduler"]
+    
+    def run_scheduler(self, request, queryset):
+        if queryset.count() != 1:
+            messages.error(request, "Please select exactly one schedule to run.")
+            return
+
+        schedule = queryset[0]
+        try: 
+            call_command("createschedule", schedule_id=schedule)
+            messages.success(request, f"Schedule {schedule} has been successfully run.")
+        except Exception as e:
+            messages.error(request, f"Error running schedule: {str(e)}")
+
+    run_scheduler.short_description = "Run selected schedule"
+
 custom_admin_site.register(Season, SeasonsAdmin)
 custom_admin_site.register(Game, GameAdmin)
 custom_admin_site.register(AwardTitle)
@@ -108,3 +127,4 @@ custom_admin_site.register(User, UserAdmin)
 custom_admin_site.register(Group, GroupAdmin)
 custom_admin_site.register(PlayoffRound, PlayoffRoundAdmin)
 custom_admin_site.register(PlayoffSeries, PlayoffSeriesAdmin)
+custom_admin_site.register(Schedule, ScheduleAdmin)
