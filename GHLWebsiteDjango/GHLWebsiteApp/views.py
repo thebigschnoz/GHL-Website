@@ -3,7 +3,7 @@ from django.contrib import messages
 from .forms import UploadFileForm
 from datetime import datetime
 from GHLWebsiteApp.models import *
-from django.db.models import Sum, Count, Case, When, Avg, F, Window
+from django.db.models import Sum, Count, Case, When, Avg, F, Window, FloatField
 from django.db.models.functions import Cast, Rank, Round, Lower
 from django.http import JsonResponse
 from decimal import *
@@ -257,6 +257,9 @@ def skaters(request):
 def skatersAdvanced(request):
     season = get_seasonSetting()
     all_skaters = SkaterRecord.objects.filter(game_num__season_num=season).exclude(position=0).values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(
+        total_fow=Sum("fow"),
+        total_fol=Sum("fol"),
+    ).annotate(
         sumsog=Sum("sog"),
         sumshotatt=Sum("shot_attempts"),
         sumpassatt=Sum("pass_att"),
@@ -281,6 +284,12 @@ def skatersAdvanced(request):
         skaterspims=Avg("pims"),
         skatersdrawn=Avg("pens_drawn"),
         skatersbs=Avg("blocked_shots"),
+        skatersfo=Case(
+            When(
+            total_fow__isnull=False,
+            total_fol__isnull=False,
+            then=Cast(F("total_fow") * 100.0 / (F("total_fow") + F("total_fol")), FloatField())
+        ),default=0, output_field=FloatField()),
     ).order_by("ea_player_num__username")
     season = Season.objects.get(season_num=season)
     context = {
