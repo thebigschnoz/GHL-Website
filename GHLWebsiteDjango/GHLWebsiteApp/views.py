@@ -13,6 +13,7 @@ import pandas as pd
 import csv
 import pytz
 from django.utils.timezone import localtime
+from points_table_simulator import PointsTableSimulator
 
 def get_seasonSetting():
     seasonSetting = Season.objects.filter(isActive=True).first().season_num
@@ -83,7 +84,7 @@ def calculate_standings():
     for team in teams:
         gamelist = Game.objects.filter(season_num=season, a_team_num__isActive=True, a_team_num=team).exclude(played_time=None).count() + Game.objects.filter(season_num=season, h_team_num__isActive=True, h_team_num=team).exclude(played_time=None).count()
         if not gamelist:
-            standing, created = Standing.objects.update_or_create(team=team, season=Season.objects.get(season_num=season), defaults={"wins":0, "losses":0, "otlosses":0, "points":0, "goalsfor":0, "goalsagainst":0, "gp":0, "winperc":Decimal(0), "ppperc":Decimal(0), "pkperc":Decimal(0), "lastten":"0-0-0"})
+            standing, created = Standing.objects.update_or_create(team=team, season=Season.objects.get(season_num=season), defaults={"wins":0, "losses":0, "otlosses":0, "points":0, "goalsfor":0, "goalsagainst":0, "gp":0, "winperc":Decimal(0), "ppperc":Decimal(0), "pkperc":Decimal(0), "lastten":"0-0-0", "playoffs": ""})
         else:
             wins = Game.objects.filter(season_num=season, a_team_num__isActive=True, a_team_num=team, a_team_gf__gt=F("h_team_gf")).exclude(played_time=None).count() + Game.objects.filter(season_num=season, h_team_num__isActive=True, h_team_num=team, h_team_gf__gt=F("a_team_gf")).exclude(played_time=None).count()
             losses = Game.objects.filter(season_num=season, a_team_num__isActive=True, a_team_num=team, gamelength__lte=3600, a_team_gf__lt=F("h_team_gf")).exclude(played_time=None).count() + Game.objects.filter(season_num=season, h_team_num__isActive=True, h_team_num=team, gamelength__lte=3600, h_team_gf__lt=F("a_team_gf")).exclude(played_time=None).count()
@@ -145,7 +146,47 @@ def calculate_standings():
                         else:
                             break
                 streak = f"{streak_type}{streak_count}"
-            standing, created = Standing.objects.update_or_create(team=team, season=Season.objects.get(season_num=season), defaults={'wins': wins, 'losses': losses, 'otlosses': otlosses, 'points': points, 'goalsfor': goalsfor, 'goalsagainst': goalsagainst, "gp": gp, "winperc": winperc, "ppperc": ppperc, "pkperc": pkperc, "lastten": lastten, "streak": streak})
+            standing, created = Standing.objects.update_or_create(team=team, season=Season.objects.get(season_num=season), defaults={'wins': wins, 'losses': losses, 'otlosses': otlosses, 'points': points, 'goalsfor': goalsfor, 'goalsagainst': goalsagainst, "gp": gp, "winperc": winperc, "ppperc": ppperc, "pkperc": pkperc, "lastten": lastten, "streak": streak, "playoffs": ""})
+
+    # Compile schedule for PointsTableSimulator
+    '''games = Game.objects.filter(season_num=season).values(
+        "game_num", 
+        "h_team_num__club_full_name", 
+        "a_team_num__club_full_name", 
+        "played_time", 
+        "h_team_gf", 
+        "a_team_gf"
+    )
+
+    # Prepare CSV data
+    csv_data = [["match_number", "home", "away", "winner"]]
+    for game in games:
+        if game["played_time"]:
+            if game["h_team_gf"] > game["a_team_gf"]:
+                winner = game["h_team_num__club_full_name"]
+            elif game["h_team_gf"] < game["a_team_gf"]:
+                winner = game["a_team_num__club_full_name"]
+            else:
+                winner = "draw"
+        else:
+            winner = "no result"
+        csv_data.append([game["game_num"], game["h_team_num__club_full_name"], game["a_team_num__club_full_name"], winner])
+
+    # Run the simulator
+    simulator = PointsTableSimulator(
+        tournament_schedule=csv_data,
+        points_for_a_win=2,
+        points_for_a_loss=0,
+    )
+    standings_table = simulator.current_points_table
+
+    # Update playoff status in Standing objects
+    for standing in Standing.objects.filter(season=season):
+        if standing.team.club_full_name in playoff_locks:
+            standing.playoffs = "x"  # Clinched Playoff Spot
+        if standing.team.club_full_name == presidents_trophy_winner:
+            standing.playoffs = "p"  # President's Trophy
+        standing.save()'''
 
 def get_scoreboard():
     season = get_seasonSetting()
