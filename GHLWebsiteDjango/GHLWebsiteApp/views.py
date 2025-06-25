@@ -5,11 +5,14 @@ from datetime import datetime
 from GHLWebsiteApp.models import *
 from django.db.models import Sum, Count, Case, When, Avg, F, Window, FloatField
 from django.db.models.functions import Cast, Rank, Round, Lower
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from decimal import *
 from itertools import chain
 import random
 import pandas as pd
+import csv
+import pytz
+from django.utils.timezone import localtime
 
 def get_seasonSetting():
     seasonSetting = Season.objects.filter(isActive=True).first().season_num
@@ -658,3 +661,32 @@ def upload_file(request):
     else:
         form = UploadFileForm()
     return render(request, 'GHLWebsiteApp/upload.html', {'form': form})
+
+def export_team(request, team_id):
+    team = get_object_or_404(Team, ea_club_num=team_id)
+    games = Game.objects.filter(
+        models.Q(a_team_num=team) | models.Q(h_team_num=team), season_num = get_seasonSetting()
+    ).exclude(played_time__isnull = False).order_by('expected_time')
+
+    # Create the HTTP response with CSV content
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="{team.club_abbr}_games.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Expected Time', 'H or A', 'Opponent', 'Matchup Code'])
+
+    for game in games:
+        if game.h_team_num == team:
+            role = 'Home'
+            opponent = game.a_team_num.club_abbr
+        else:
+            role = 'Away'
+            opponent = game.h_team_num.club_abbr
+        writer.writerow([
+            localtime(game.expected_time.astimezone(pytz.timezone('US/Eastern'))).strftime('%m/%d %I:%M'),
+            role,
+            opponent,
+            game.h_team_num.team_code,
+        ])
+
+    return response
