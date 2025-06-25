@@ -13,7 +13,7 @@ import pandas as pd
 import csv
 import pytz
 from django.utils.timezone import localtime
-from points_table_simulator import PointsTableSimulator
+# from points_table_simulator import PointsTableSimulator
 
 def get_seasonSetting():
     seasonSetting = Season.objects.filter(isActive=True).first().season_num
