@@ -291,6 +291,14 @@ class TeamRecord(models.Model):
     shot_att_team = models.PositiveSmallIntegerField(default="0")
     
 class Standing(models.Model):
+    PLAYOFF_STATUS_CHOICES = [
+        ("x", "Clinched Playoff Spot"),
+        ("y", "Clinched Division"),
+        ("z", "Clinched Conference"),
+        ("p", "President's Trophy"),
+        ("", "No Status"),
+    ]
+
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     season = models.ForeignKey(Season, on_delete=models.CASCADE)
     wins = models.IntegerField(default=0)
@@ -305,6 +313,7 @@ class Standing(models.Model):
     pkperc = models.DecimalField(max_digits=4, decimal_places=1, default=0)
     lastten = models.CharField(max_length=8, default="n/a")
     streak = models.CharField(max_length=4, default="n/a")
+    playoffs = models.CharField(max_length=1, choices=PLAYOFF_STATUS_CHOICES, default="", verbose_name="Playoff Status", help_text="Indicates playoff status of the team")
 
     class Meta:
         ordering = ['-points', '-wins', '-goalsfor', 'goalsagainst', 'team__club_full_name']
