@@ -3,13 +3,17 @@ from django.contrib import messages
 from .forms import UploadFileForm
 from datetime import datetime
 from GHLWebsiteApp.models import *
-from django.db.models import Sum, Count, Case, When, Avg, F, Window
+from django.db.models import Sum, Count, Case, When, Avg, F, Window, FloatField
 from django.db.models.functions import Cast, Rank, Round, Lower
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from decimal import *
 from itertools import chain
 import random
 import pandas as pd
+import csv
+import pytz
+from django.utils.timezone import localtime
+# from points_table_simulator import PointsTableSimulator
 
 def get_seasonSetting():
     seasonSetting = Season.objects.filter(isActive=True).first().season_num
@@ -80,7 +84,7 @@ def calculate_standings():
     for team in teams:
         gamelist = Game.objects.filter(season_num=season, a_team_num__isActive=True, a_team_num=team).exclude(played_time=None).count() + Game.objects.filter(season_num=season, h_team_num__isActive=True, h_team_num=team).exclude(played_time=None).count()
         if not gamelist:
-            standing, created = Standing.objects.update_or_create(team=team, season=Season.objects.get(season_num=season), defaults={"wins":0, "losses":0, "otlosses":0, "points":0, "goalsfor":0, "goalsagainst":0, "gp":0, "winperc":Decimal(0), "ppperc":Decimal(0), "pkperc":Decimal(0), "lastten":"0-0-0"})
+            standing, created = Standing.objects.update_or_create(team=team, season=Season.objects.get(season_num=season), defaults={"wins":0, "losses":0, "otlosses":0, "points":0, "goalsfor":0, "goalsagainst":0, "gp":0, "winperc":Decimal(0), "ppperc":Decimal(0), "pkperc":Decimal(0), "lastten":"0-0-0", "playoffs": ""})
         else:
             wins = Game.objects.filter(season_num=season, a_team_num__isActive=True, a_team_num=team, a_team_gf__gt=F("h_team_gf")).exclude(played_time=None).count() + Game.objects.filter(season_num=season, h_team_num__isActive=True, h_team_num=team, h_team_gf__gt=F("a_team_gf")).exclude(played_time=None).count()
             losses = Game.objects.filter(season_num=season, a_team_num__isActive=True, a_team_num=team, gamelength__lte=3600, a_team_gf__lt=F("h_team_gf")).exclude(played_time=None).count() + Game.objects.filter(season_num=season, h_team_num__isActive=True, h_team_num=team, gamelength__lte=3600, h_team_gf__lt=F("a_team_gf")).exclude(played_time=None).count()
@@ -142,7 +146,47 @@ def calculate_standings():
                         else:
                             break
                 streak = f"{streak_type}{streak_count}"
-            standing, created = Standing.objects.update_or_create(team=team, season=Season.objects.get(season_num=season), defaults={'wins': wins, 'losses': losses, 'otlosses': otlosses, 'points': points, 'goalsfor': goalsfor, 'goalsagainst': goalsagainst, "gp": gp, "winperc": winperc, "ppperc": ppperc, "pkperc": pkperc, "lastten": lastten, "streak": streak})
+            standing, created = Standing.objects.update_or_create(team=team, season=Season.objects.get(season_num=season), defaults={'wins': wins, 'losses': losses, 'otlosses': otlosses, 'points': points, 'goalsfor': goalsfor, 'goalsagainst': goalsagainst, "gp": gp, "winperc": winperc, "ppperc": ppperc, "pkperc": pkperc, "lastten": lastten, "streak": streak, "playoffs": ""})
+
+    # Compile schedule for PointsTableSimulator
+    '''games = Game.objects.filter(season_num=season).values(
+        "game_num", 
+        "h_team_num__club_full_name", 
+        "a_team_num__club_full_name", 
+        "played_time", 
+        "h_team_gf", 
+        "a_team_gf"
+    )
+
+    # Prepare CSV data
+    csv_data = [["match_number", "home", "away", "winner"]]
+    for game in games:
+        if game["played_time"]:
+            if game["h_team_gf"] > game["a_team_gf"]:
+                winner = game["h_team_num__club_full_name"]
+            elif game["h_team_gf"] < game["a_team_gf"]:
+                winner = game["a_team_num__club_full_name"]
+            else:
+                winner = "draw"
+        else:
+            winner = "no result"
+        csv_data.append([game["game_num"], game["h_team_num__club_full_name"], game["a_team_num__club_full_name"], winner])
+
+    # Run the simulator
+    simulator = PointsTableSimulator(
+        tournament_schedule=csv_data,
+        points_for_a_win=2,
+        points_for_a_loss=0,
+    )
+    standings_table = simulator.current_points_table
+
+    # Update playoff status in Standing objects
+    for standing in Standing.objects.filter(season=season):
+        if standing.team.club_full_name in playoff_locks:
+            standing.playoffs = "x"  # Clinched Playoff Spot
+        if standing.team.club_full_name == presidents_trophy_winner:
+            standing.playoffs = "p"  # President's Trophy
+        standing.save()'''
 
 def get_scoreboard():
     season = get_seasonSetting()
@@ -257,6 +301,9 @@ def skaters(request):
 def skatersAdvanced(request):
     season = get_seasonSetting()
     all_skaters = SkaterRecord.objects.filter(game_num__season_num=season).exclude(position=0).values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(
+        total_fow=Sum("fow"),
+        total_fol=Sum("fol"),
+    ).annotate(
         sumsog=Sum("sog"),
         sumshotatt=Sum("shot_attempts"),
         sumpassatt=Sum("pass_att"),
@@ -281,6 +328,12 @@ def skatersAdvanced(request):
         skaterspims=Avg("pims"),
         skatersdrawn=Avg("pens_drawn"),
         skatersbs=Avg("blocked_shots"),
+        skatersfo=Case(
+            When(
+                total_fow__isnull=False,
+                total_fol__isnull=False,
+                then=Cast(F("total_fow") * 100.0 / (F("total_fow") + F("total_fol")), FloatField())
+        ),default=0, output_field=FloatField()), # TODO: Find out why players without fow/fol are showing up with blanks
     ).order_by("ea_player_num__username")
     season = Season.objects.get(season_num=season)
     context = {
@@ -649,3 +702,32 @@ def upload_file(request):
     else:
         form = UploadFileForm()
     return render(request, 'GHLWebsiteApp/upload.html', {'form': form})
+
+def export_team(request, team_id):
+    team = get_object_or_404(Team, ea_club_num=team_id)
+    games = Game.objects.filter(
+        models.Q(a_team_num=team) | models.Q(h_team_num=team), season_num = get_seasonSetting()
+    ).exclude(played_time__isnull = False).order_by('expected_time')
+
+    # Create the HTTP response with CSV content
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="{team.club_abbr}_games.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Expected Time', 'H or A', 'Opponent', 'Matchup Code'])
+
+    for game in games:
+        if game.h_team_num == team:
+            role = 'Home'
+            opponent = game.a_team_num.club_abbr
+        else:
+            role = 'Away'
+            opponent = game.h_team_num.club_abbr
+        writer.writerow([
+            localtime(game.expected_time.astimezone(pytz.timezone('US/Eastern'))).strftime('%m/%d %I:%M'),
+            role,
+            opponent,
+            game.h_team_num.team_code,
+        ])
+
+    return response

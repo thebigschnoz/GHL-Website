@@ -34,6 +34,7 @@ class Team(models.Model):
     team_logo_link = models.TextField(blank=True, null=True, verbose_name="Team Logo Link", help_text="Link to the team logo image")
     isActive = models.BooleanField(default=True, verbose_name="Is Active Team", help_text="Indicates if the team is currently active in the league")
     team_color = models.CharField(max_length=7, default="#000000", verbose_name="Team Color", help_text="Hex color code for the team's primary color")
+    team_code = models.CharField(max_length=6, verbose_name="Game Matchup Code", help_text="GHL specific matchup code to be used in EA NHL games", blank=True, null=True)
 
     def __str__(self):
         return self.club_full_name
@@ -290,6 +291,14 @@ class TeamRecord(models.Model):
     shot_att_team = models.PositiveSmallIntegerField(default="0")
     
 class Standing(models.Model):
+    PLAYOFF_STATUS_CHOICES = [
+        ("x", "Clinched Playoff Spot"),
+        ("y", "Clinched Division"),
+        ("z", "Clinched Conference"),
+        ("p", "President's Trophy"),
+        ("", "No Status"),
+    ]
+
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     season = models.ForeignKey(Season, on_delete=models.CASCADE)
     wins = models.IntegerField(default=0)
@@ -304,6 +313,7 @@ class Standing(models.Model):
     pkperc = models.DecimalField(max_digits=4, decimal_places=1, default=0)
     lastten = models.CharField(max_length=8, default="n/a")
     streak = models.CharField(max_length=4, default="n/a")
+    playoffs = models.CharField(max_length=1, choices=PLAYOFF_STATUS_CHOICES, default="", verbose_name="Playoff Status", help_text="Indicates playoff status of the team")
 
     class Meta:
         ordering = ['-points', '-wins', '-goalsfor', 'goalsagainst', 'team__club_full_name']

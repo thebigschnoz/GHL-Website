@@ -18,6 +18,7 @@
         <col style="width: 80px;"> <!-- pims / gp -->
         <col style="width: 80px;"> <!-- drawn / gp -->
         <col style="width: 80px;"> <!-- blocked shots -->
+        <col style="width: 80px;"> <!-- faceoff % -->
         <tr>
           <th>Player</th>
           <th>Team</th>
@@ -30,6 +31,7 @@
           <th>PIM/G</th>
           <th>Drawn/G</th>
           <th>BS/G</th>
+          <th>FO%</th>
         </tr>
         {% for player in all_skaters %}
         <tr>
@@ -44,6 +46,7 @@
           <td>{{ player.skaterspims|floatformat:2 }}</td>
           <td>{{ player.skatersdrawn|floatformat:2 }}</td>
           <td>{{ player.skatersbs|floatformat:2 }}</td>
+          <td>{{ player.skatersfo|floatformat:1 }}</td>
         </tr>
         {% empty %}
         <tr>
