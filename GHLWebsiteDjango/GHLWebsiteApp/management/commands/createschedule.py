@@ -149,5 +149,6 @@ class ScheduleGenerator:
             current_date, time_counter = self.increment_matchday(current_date, time_counter)
 
         Game.objects.bulk_create(games)
+        self.stdout.write(f"Successfully created {len(games)} games for {self.season}.")
         return games
         
