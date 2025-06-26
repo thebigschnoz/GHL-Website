@@ -87,68 +87,68 @@ class ScheduleGenerator:
         current_date = datetime.datetime.combine(self.schedule.start_date, self.allowed_times[0]) # Sets the starting date and time for the schedule
         time_counter = 0
 
-        backtrack_stack = []
+        stack = []
         while matchups:
             remaining_teams = set(self.teams)
             daily_matchups = []
-            backtrack_stack = []
+            stack = []  # Each entry: (daily_matchups, matchups, remaining_teams, tried_pairs)
 
             while len(remaining_teams) > 1:
-                found = False
-                attempted = set()
+                made_progress = False
+                team_list = list(remaining_teams)
+                shuffle(team_list)
+                current_team = team_list[0]
 
-                for team in list(remaining_teams):
-                    possible = [
-                        m for m in matchups
-                        if team in m and m[0] in remaining_teams and m[1] in remaining_teams
-                    ]
+                # Generate matchups for current team that are still valid
+                possible_games = [
+                    m for m in matchups
+                    if current_team in m and m[0] in remaining_teams and m[1] in remaining_teams
+                ]
 
-                    # Remove already tried matchups to avoid loops
-                    possible = [m for m in possible if m not in attempted]
+                # Try each possible game, tracking which were attempted
+                tried = set()
+                if stack:
+                    _, _, _, tried = stack[-1]
 
-                    if not possible:
+                for game in possible_games:
+                    if game in tried or (game[1], game[0]) in tried:
                         continue
 
-                    shuffle(possible)
-                    matchup = possible[0]
-
-                    # Save state before committing
-                    backtrack_stack.append((
+                    # Push state before making the move
+                    stack.append((
                         daily_matchups.copy(),
                         matchups.copy(),
-                        remaining_teams.copy()
+                        remaining_teams.copy(),
+                        tried | {game}
                     ))
 
-                    daily_matchups.append(matchup)
-                    matchups.remove(matchup)
-                    remaining_teams.remove(matchup[0])
-                    remaining_teams.remove(matchup[1])
+                    daily_matchups.append(game)
+                    matchups.remove(game)
+                    remaining_teams.remove(game[0])
+                    remaining_teams.remove(game[1])
+                    self.stdout.write(f"Chosen matchup: {game[0].club_abbr} vs {game[1].club_abbr}")
+                    made_progress = True
+                    break
 
-                    self.stdout.write(f"Chosen matchup: {matchup[0].club_abbr} vs {matchup[1].club_abbr}")
-                    found = True
-                    break  # Only assign one matchup per iteration
-
-                if not found:
+                if not made_progress:
                     self.stdout.write("No valid matchup found. Backtracking...")
-                    if not backtrack_stack:
-                        raise RuntimeError("Backtracking failed: no valid schedule possible.")
-                    daily_matchups, matchups, remaining_teams = backtrack_stack.pop()
+                    if not stack:
+                        raise RuntimeError("Backtracking failed. Cannot complete schedule.")
+                    daily_matchups, matchups, remaining_teams, _ = stack.pop()
 
-            # Commit the day's games
+            # Save the day’s games
             self.stdout.write(f"Creating games for date: {current_date.strftime('%Y-%m-%d %H:%M')}")
             for matchup in daily_matchups:
-                game = Game(
+                games.append(Game(
                     season_num=self.schedule.season_num,
                     expected_time=current_date,
                     a_team_num=matchup[0],
                     h_team_num=matchup[1],
-                )
-                games.append(game)
+                ))
 
             self.stdout.write(f"Remaining matchups: {len(matchups)}")
             current_date, time_counter = self.increment_matchday(current_date, time_counter)
 
         Game.objects.bulk_create(games)
-        self.stdout.write(f"Successfully created {len(games)} games for {self.season}.")
+        self.stdout.write(f"Total games created: {len(games)} for {self.schedule.season_num}")
         return games
-        
