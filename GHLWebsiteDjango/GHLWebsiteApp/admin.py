@@ -34,7 +34,7 @@ custom_admin_site = CustomAdminSite(name='custom_admin')
 
 # Register your models here.
 class TeamListAdmin(admin.ModelAdmin):
-    list_display = ("club_full_name", "ea_club_num", "club_abbr", "isActive")
+    list_display = ("club_full_name", "ea_club_num", "club_abbr", "isActive", "team_color", "team_code")
     list_filter = ("isActive",)
 
 class BuildsAdmin(admin.ModelAdmin):
