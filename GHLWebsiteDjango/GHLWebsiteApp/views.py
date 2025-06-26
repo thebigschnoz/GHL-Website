@@ -734,8 +734,16 @@ def export_team(request, team_id):
     return response
 
 def export_player_data(request):
-    player_data = SkaterRecord.objects.all().values()
-    goalie_data = GoalieRecord.objects.all().values()
+    player_data = SkaterRecord.objects.all().values(
+        "ea_player_num__username",  # Replace ea_player_num with username
+        "ea_club_num__club_full_name",  # Replace ea_club_num with club full name
+        "position__positionShort", "build__buildShort", "goals", "assists", "points", "hits", "plus_minus", "pims", "sog", "shot_attempts", "deflections", "ppg", "shg", "pass_att", "pass_comp", "saucer_pass", "blocked_shots", "takeaways", "interceptions", "giveaways", "pens_drawn", "pk_clears", "poss_time", "fow", "fol"  # Include other fields as needed
+    )
+    goalie_data = GoalieRecord.objects.all().values(
+        "ea_player_num__username",  # Replace ea_player_num with username
+        "ea_club_num__club_full_name",  # Replace ea_club_num with club full name
+        "saves", "shots_against", "win", "loss", "otloss", "shutout", "breakaway_shots", "breakaway_saves", "ps_shots", "ps_saves"  # Include other fields as needed
+    )
     player_df = pd.DataFrame(list(player_data))
     goalie_df = pd.DataFrame(list(goalie_data))
     output = BytesIO()
