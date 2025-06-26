@@ -20,4 +20,5 @@ urlpatterns = [
     path('uploadcsvforgames/', views.upload_file, name="upload_file"),
     path('glossary/', views.glossary, name="glossary"),
     path('export/team/<int:team_id>/', views.export_team, name="export_team"),
+    path('export/playerdata/', views.export_player_data, name="export_player_data"),
 ]

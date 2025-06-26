@@ -10,6 +10,7 @@ from decimal import *
 from itertools import chain
 import random
 import pandas as pd
+from io import BytesIO
 import csv
 import pytz
 from django.utils.timezone import localtime
@@ -729,5 +730,20 @@ def export_team(request, team_id):
             opponent,
             game.h_team_num.team_code,
         ])
+
+    return response
+
+def export_player_data(request):
+    player_data = SkaterRecord.objects.all().values()
+    goalie_data = GoalieRecord.objects.all().values()
+    player_df = pd.DataFrame(list(player_data))
+    goalie_df = pd.DataFrame(list(goalie_data))
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+        player_df.to_excel(writer, sheet_name='Player Data', index=False)
+        goalie_df.to_excel(writer, sheet_name='Goalie Data', index=False)
+    output.seek(0)
+    response = HttpResponse(output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="ghl_data.xlsx"'
 
     return response
