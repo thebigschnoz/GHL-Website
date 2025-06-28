@@ -276,8 +276,9 @@ def leaders(request):
     }
     return render(request, "GHLWebsiteApp/leaders.html", context)
 
-def skaters(request):
-    season = get_seasonSetting()
+def skaters(request, season=None):
+    if season is None:
+        season = get_seasonSetting()
     all_skaters = SkaterRecord.objects.filter(game_num__season_num=season).exclude(position=0).values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(
         skatersgp=Count("game_num"),
         skatersgoals=Sum("goals"),
@@ -292,15 +293,18 @@ def skaters(request):
         skatersshg=Sum("shg"),
     ).order_by("-skaterspoints", "-skatersgoals", "-skatersgp", "skaterspims", "ea_player_num__username")
     season = Season.objects.get(season_num=season)
+    seasonlist = Season.objects.exclude(season_type="preseason").order_by("-start_date")
     context = {
         "all_skaters": all_skaters,
         "scoreboard": get_scoreboard(),
-        "season": season
+        "season": season,
+        "seasonlist": seasonlist,
     }
     return render(request, "GHLWebsiteApp/skaters.html", context)
 
-def skatersAdvanced(request):
-    season = get_seasonSetting()
+def skatersAdvanced(request, season=None):
+    if season is None:
+        season = get_seasonSetting()
     all_skaters = SkaterRecord.objects.filter(game_num__season_num=season).exclude(position=0).values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(
         total_fow=Sum("fow"),
         total_fol=Sum("fol"),
@@ -337,15 +341,18 @@ def skatersAdvanced(request):
         ),default=0, output_field=FloatField()), # TODO: Find out why players without fow/fol are showing up with blanks
     ).order_by("ea_player_num__username")
     season = Season.objects.get(season_num=season)
+    seasonlist = Season.objects.exclude(season_type="preseason").order_by("-start_date")
     context = {
         "all_skaters": all_skaters,
         "scoreboard": get_scoreboard(),
-        "season": season
+        "season": season,
+        "seasonlist": seasonlist,
     }
     return render(request, "GHLWebsiteApp/advanced.html", context)
 
-def goalies(request):
-    season = get_seasonSetting()
+def goalies(request, season=None):
+    if season is None:
+        season = get_seasonSetting()
     all_goalies = GoalieRecord.objects.filter(game_num__season_num=season).values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(
         goaliesgp = Count("game_num"),
         goaliesshots = Sum("shots_against"),
@@ -375,10 +382,12 @@ def goalies(request):
         )),
     ).order_by("-goaliessvp", "-goalieswins", "-goaliesshutouts", "ea_player_num__username")
     season = Season.objects.get(season_num=season)
+    seasonlist = Season.objects.exclude(season_type="preseason").order_by("-start_date")
     context = {
         "all_goalies": all_goalies,
         "scoreboard": get_scoreboard(),
-        "season": season
+        "season": season,
+        "seasonlist": seasonlist,
     }
     return render(request, "GHLWebsiteApp/goalies.html", context)
 

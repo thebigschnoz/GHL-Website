@@ -5,6 +5,27 @@
     <div class="section section_lg" style="flex-direction: column;">
       <center>
       <div class="header">Advanced Skater Stats: {{ season.season_text }}</div>
+      <div class="selectionmenu">
+        <form>
+            <select id="seasonSel" name="season">
+                <optgroup>
+                    <option selected disabled value="">Select Season</option>
+                    {% for x in seasonlist %}
+                    <option value="/skaters/advanced/{{ x.season_num }}/">{{ x.season_text }}</option>
+                    {% endfor %}
+                </optgroup>
+            </select>
+        </form>
+        <script>
+          const dropdown = document.getElementById('seasonSel');
+          dropdown.addEventListener('change', function() {
+              const selectedValue = dropdown.value;
+              if (selectedValue) {
+                  window.location.href = selectedValue;
+              }
+          });
+        </script>
+      </div>
       <div><a href="{% url 'skaters' %}"><i>(Return to Basic Stats)</i></a></div>
       <table id="fullstandings" class="sortable">
         <col style="width: 240px;"> <!-- Player -->
