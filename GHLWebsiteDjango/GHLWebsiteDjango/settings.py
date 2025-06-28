@@ -32,6 +32,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'django_crontab',
     'corsheaders',
     'GHLWebsiteApp',
     'django.contrib.admin',
@@ -41,6 +42,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+]
+
+CRONJOBS = [
+    ('*/10 21-23 * * 0-4', 'GHLWebsiteApp.run_poll_api'),
 ]
 
 MIDDLEWARE = [
