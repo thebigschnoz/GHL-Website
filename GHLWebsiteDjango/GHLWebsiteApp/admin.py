@@ -23,7 +23,7 @@ class CustomAdminSite(AdminSite):
     def run_poll_api(self, request):
         try:
             # Call the management command
-            call_command('poll_api')
+            call_command('poll_api', force=True)
             messages.success(request, "Poll API command executed successfully!")
         except Exception as e:
             messages.error(request, f"Error: {str(e)}")
