@@ -1,7 +1,8 @@
 from GHLWebsiteApp.views import get_seasonSetting, calculate_leaders, calculate_standings
+from GHLWebsiteApp.models import Game
 import httpx
 from GHLWebsiteApp.models import *
-from datetime import datetime, time
+from datetime import datetime, time, date
 import pytz
 from django.core.management.base import BaseCommand, CommandError
 
@@ -9,6 +10,13 @@ BASE_API_URL = "https://proclubs.ea.com/api/nhl/clubs/matches?matchType=club_pri
                
 class Command(BaseCommand):
     help = "Polls the EA API for game data and updates the database"
+
+    # TODO: Only update on playing days
+    # TODO: Add --force option to update even on days off
+
+    def add_arguments(self, parser):
+        parser.add_argument('--force', action='store_true', help='Force the script to run even if no games are scheduled')
+
 
     def fetch_and_process_games(self, team_id):
         c = httpx.Client(http2=True)
@@ -330,6 +338,11 @@ class Command(BaseCommand):
         
 
     def handle(self, *args, **options):
+        today = date.today()
+        games_today = Game.objects.filter(expected_time__date=today, played_time=None).exists()
+        if not games_today and not options['force']:
+            self.stdout.write("No games scheduled for today. Use --force to override.")
+            return
         self.stdout.write("Polling EA API for game data...")
         self.stdout.write("Getting active teamlist...")
         active_teams = Team.objects.filter(isActive=True) # Gets active teams
