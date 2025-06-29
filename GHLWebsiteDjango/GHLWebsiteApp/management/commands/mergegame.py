@@ -138,6 +138,7 @@ class Command(BaseCommand):
                 merge_goalie.game_num = survivor_game
                 merge_goalie.save()
                 self.stdout.write(self.style.WARNING(f"GoalieRecord {merge_goalie.ea_player_num} from game {merge_game_num} was not found in game {game_num}. Reassigned to game {game_num}."))
+            # TODO: Save goalies again after merging to calculate W/L/OTL/SO
             
 
         survivor_game.save() # Save the survivor game
