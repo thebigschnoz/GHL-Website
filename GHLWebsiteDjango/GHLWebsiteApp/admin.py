@@ -64,7 +64,7 @@ class GameAdmin(admin.ModelAdmin):
 
         try:
             # Call the mergegame management command
-            call_command("mergegame", game_num=game_num, merge_game_num=merge_game_num)
+            call_command("mergegame", game_num, merge_game_num)
             messages.success(request, f"Successfully merged game {merge_game_num} into game {game_num}.")
         except Exception as e:
             messages.error(request, f"Error during merge: {str(e)}")
@@ -100,12 +100,15 @@ class ScheduleAdmin(admin.ModelAdmin):
             messages.error(request, "Please select exactly one schedule to run.")
             return
 
-        schedule = queryset[0]
-        try: 
-            call_command("createschedule", schedule_id=schedule)
+        schedule = queryset[0].schedule_num
+        if not schedule:
+            messages.error(request, "No valid schedule selected.")
+            return
+        try:
+            call_command("createschedule", schedule)
             messages.success(request, f"Schedule {schedule} has been successfully run.")
         except Exception as e:
-            messages.error(request, f"Error running schedule: {str(e)}")
+            messages.error(request, f"Error running schedule {schedule}: {str(e)}")
 
     run_scheduler.short_description = "Run selected schedule"
 
