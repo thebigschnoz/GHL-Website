@@ -27,23 +27,23 @@
 					</div>
 					<div class="info-split">
 						<div class="team__container">
-							{% if game.a_team_gf > game.h_team_gf %}
+							{% if game.a_team_gf >= game.h_team_gf %}
 							<div class="team">
 							{% else%}
 							<div class="team losing-team">
 							{% endif %}
 								<img class="team__logo" src="{{ game.a_team_num.team_logo_link }}" />
 								<p class="team__name">{{ game.a_team_num.club_abbr }}</p>
-								<p class="team__score">{{ game.a_team_gf }}</p>
+								<p class="team__score">{% if game.a_team_gf != 0 and game.h_team_gf != 0 %}{{ game.a_team_gf }}{% else %}&nbsp;{% endif %}</p>
 							</div>
-							{% if game.h_team_gf > game.a_team_gf %}
+							{% if game.h_team_gf >= game.a_team_gf %}
 							<div class="team">
 							{% else %}
 							<div class="team losing-team">
 							{% endif %}
 								<img class="team__logo" src="{{ game.h_team_num.team_logo_link }}" />
 								<p class="team__name">{{ game.h_team_num.club_abbr }}</p>
-								<p class="team__score">{{ game.h_team_gf }}</p>
+								<p class="team__score">{% if game.a_team_gf != 0 and game.h_team_gf != 0 %}{{ game.h_team_gf }}{% else %}&nbsp;{% endif %}</p>
 							</div>
 						</div>
 					</div>
