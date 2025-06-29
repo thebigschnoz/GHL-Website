@@ -11,9 +11,6 @@ BASE_API_URL = "https://proclubs.ea.com/api/nhl/clubs/matches?matchType=club_pri
 class Command(BaseCommand):
     help = "Polls the EA API for game data and updates the database"
 
-    # TODO: Only update on playing days
-    # TODO: Add --force option to update even on days off
-
     def add_arguments(self, parser):
         parser.add_argument('--force', action='store_true', help='Force the script to run even if no games are scheduled')
 
