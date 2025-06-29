@@ -141,7 +141,7 @@ class Command(BaseCommand):
             
 
         survivor_game.save() # Save the survivor game
-        merge_game.season_num = Season.objects.get(season_num=2) # Move merged game to test season (so it doesn't show up in the standings and doesn't download again)
+        merge_game.season_num = Season.objects.get(season_text__icontains="Test") # Move merged game to test season (so it doesn't show up in the standings and doesn't download again)
         merge_game.save()
 
         self.stdout.write(self.style.SUCCESS(f"Successfully merged game {merge_game_num} into game {game_num}."))
