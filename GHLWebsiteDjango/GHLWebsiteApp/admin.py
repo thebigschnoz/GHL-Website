@@ -106,7 +106,7 @@ class ScheduleAdmin(admin.ModelAdmin):
             return
         try:
             call_command("createschedule", schedule)
-            messages.success(request, f"Schedule {schedule} has been successfully run.")
+            messages.success(request, f"Schedule {schedule} has been successfully generated.")
         except Exception as e:
             messages.error(request, f"Error running schedule {schedule}: {str(e)}")
 
