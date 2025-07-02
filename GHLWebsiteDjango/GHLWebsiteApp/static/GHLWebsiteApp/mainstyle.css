@@ -374,6 +374,7 @@ td.points {
   background-color: white;
   border-right: 1px solid gray;
   font-size: 12px;
+  overflow: hidden;
 }
 @media (max-width: 576px) {
   .game__container {
