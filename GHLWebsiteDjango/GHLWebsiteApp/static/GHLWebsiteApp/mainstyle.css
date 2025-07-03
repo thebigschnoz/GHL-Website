@@ -541,7 +541,7 @@ td.points {
   position: absolute;
   display: block;
   max-width: 313px;
-  opacity: 7%;
+  opacity: 15%;
   right: -100px;
   top: -70px;
   width: calc(140% + 3rem);
