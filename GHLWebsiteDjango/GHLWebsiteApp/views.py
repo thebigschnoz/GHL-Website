@@ -463,6 +463,8 @@ def team(request, team, season=None):
     roster = Player.objects.filter(current_team=teamnum).order_by(Lower("username"))
     seasons = Season.objects.filter(
         models.Q(game__a_team_num=team) | models.Q(game__h_team_num=team)
+    ).exclude(
+        season_text__icontains="Test"  # Exclude seasons where season_text contains "Test"
     ).distinct()
     context = {"team": teamnum, "scoreboard": get_scoreboard(), "skaterrecords": skaterrecords, "goalierecords": goalierecords, "teamgames": teamgames, "roster": roster, "seasons": seasons}  
     return render(request, "GHLWebsiteApp/team.html", context)
