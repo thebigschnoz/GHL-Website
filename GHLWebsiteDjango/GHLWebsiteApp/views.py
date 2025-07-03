@@ -698,7 +698,7 @@ def playerlist(request):
             "total_seasons": len(combined_seasons),
             "total_games": total_games,
         })
-        return render(request, "GHLWebsiteApp/playerlist.html", {"all_players": player_data, "scoreboard": get_scoreboard()})
+    return render(request, "GHLWebsiteApp/playerlist.html", {"all_players": player_data, "scoreboard": get_scoreboard()})
 
 def upload_file(request):
     season = get_seasonSetting()
