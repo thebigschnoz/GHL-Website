@@ -677,24 +677,28 @@ def glossary(request):
     return render(request, "GHLWebsiteApp/glossary.html", {"scoreboard": get_scoreboard()})
 
 def playerlist(request):
-    all_players = Player.objects.annotate(
-        total_seasons=Count(
-            'skaterrecord__game_num__season_num',
-            filter=Q(skaterrecord__game_num__season_num__season_type='regular') |
-                   Q(goalierecord__game_num__season_num__season_type='regular'),
-            distinct=True  # Ensure distinct seasons are counted across both relationships
-        ),
-        total_games=Count(
-            'skaterrecord__game_num',
-            filter=Q(skaterrecord__game_num__season_num__season_type='regular'),
-              distinct=True  # Count games in regular season
-        ) + Count(
-            'goalierecord__game_num',
-            filter=Q(goalierecord__game_num__season_num__season_type='regular'),
-              distinct=True  # Include goalie games in regular season
+    players = Player.objects.all().order_by(Lower("username"))
+    player_data = []
+
+    for player in players:
+        # Combine distinct regular season_nums from both records
+        skater_seasons = set(player.skaterrecord_set.filter(game_num__season_num__season_type='regular')
+                            .values_list('game_num__season_num', flat=True))
+        goalie_seasons = set(player.goalierecord_set.filter(game_num__season_num__season_type='regular')
+                            .values_list('game_num__season_num', flat=True))
+        combined_seasons = skater_seasons.union(goalie_seasons)
+
+        total_games = (
+            player.skaterrecord_set.filter(game_num__season_num__season_type='regular').values('game_num').distinct().count()
+            + player.goalierecord_set.filter(game_num__season_num__season_type='regular').values('game_num').distinct().count()
         )
-    ).order_by(Lower("username"))
-    return render(request, "GHLWebsiteApp/playerlist.html", {"all_players": all_players, "scoreboard": get_scoreboard()})
+
+        player_data.append({
+            "player": player,
+            "total_seasons": len(combined_seasons),
+            "total_games": total_games,
+        })
+        return render(request, "GHLWebsiteApp/playerlist.html", {"all_players": player_data, "scoreboard": get_scoreboard()})
 
 def upload_file(request):
     season = get_seasonSetting()
