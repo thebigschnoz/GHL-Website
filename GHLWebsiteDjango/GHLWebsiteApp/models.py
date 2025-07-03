@@ -372,3 +372,13 @@ class Leader(models.Model):
     attribute = models.CharField(max_length=3)
     player = models.ForeignKey(Player, blank=True, null=True, on_delete=models.CASCADE)
     stat = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+
+class BannedUser(models.Model):
+    """Model to store banned users."""
+    user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name="Banned User")
+    reason = models.TextField(verbose_name="Reason for Ban", help_text="Reason why the user was banned")
+    ban_date = models.DateTimeField(auto_now_add=True, verbose_name="Ban Date", help_text="Date and time when the user was banned")
+    ban_duration = models.DurationField(verbose_name="Ban Duration", help_text="Duration of the ban. Use '0' for permanent bans.", default=None, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.user.username}"
