@@ -6,9 +6,48 @@
     <div class="playerlist-container">
         {% for player in all_players %}
             <div class="playerlist-child">
-                <a href="{% url 'player' player.ea_player_num %}">
-                    <div>{{ player.username }}</div>
-                </a>
+                <div class = "playerlist-shell">
+                    <a class="playerlist-link group" style="background-color: {{ player.current_team.team_color }}; --tw-bg-opacity: 1;" href="{% url 'player' player.ea_player_num %}">
+                        <div class="playerlist-bgimg-overlay">
+                            <div class="playerlist-bgimg-offset">
+                                <div class="playerlist-bgimg">
+                                    <img alt="{{ player.current_team.club_full_name }}" draggable="false" loading="lazy" decoding="async" data-nimg="fill" style="position:absolute;height:100%;width:100%;left:0;top:0;right:0;bottom:0;color:transparent" src="{{ player.current_team.team_logo_link }}" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="playerlist-details-bottom">
+                            <span class"playerlist-details-bottom" style="color: white;">{{ player.total_seasons }} Season{{ player.total_seasons|pluralize }}</span>
+                        </div>
+                        <span class="playerlist-details-top">{{ player.total_games }} Game{{ player.total_games|pluralize}}</span>
+                        <div class="namenum-container">
+                            <div class="namenum-container-inner">
+                                <div class="num-outer">
+                                    <div class="num-inner">
+                                        <span class="num-individual jerseynumber">
+                                            00
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="namecontract-container">
+                                    <div class="name-container">
+                                        <div class="name">
+                                            {{ player.username }}
+                                        </div>
+                                    </div>
+                                    <div class="contract-container">
+                                        <div class="contract">
+                                            <span class="contract-abbr">$950K</span>
+                                            <span class="contract-full">$950,000</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bottom-contract">
+                            <span class="contract-tiny">$950K</span>
+                        </div>
+                    </a>
+                </div>
             </div>
         {% empty %}
             <p>No players found.</p>
