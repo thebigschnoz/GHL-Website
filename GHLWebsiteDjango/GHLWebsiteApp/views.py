@@ -3,7 +3,7 @@ from django.contrib import messages
 from .forms import UploadFileForm
 from datetime import datetime
 from GHLWebsiteApp.models import *
-from django.db.models import Sum, Count, Case, When, Avg, F, Window, FloatField
+from django.db.models import Sum, Count, Case, When, Avg, F, Window, FloatField, Q
 from django.db.models.functions import Cast, Rank, Round, Lower
 from django.http import JsonResponse, HttpResponse
 from decimal import *
@@ -677,7 +677,24 @@ def glossary(request):
     return render(request, "GHLWebsiteApp/glossary.html", {"scoreboard": get_scoreboard()})
 
 def playerlist(request):
-    all_players = Player.objects.all().order_by(Lower("username"))
+    all_players = Player.objects.annotate(
+        total_seasons=Count(
+            'skaterrecord__game_num__season_num',
+            filter=Q(skaterrecord__game_num__season_num__season_type='regular'),
+            distinct=True  # Ensure distinct seasons are counted
+        ) + Count(
+            'goalierecord__game_num__season_num',
+            filter=Q(goalierecord__game_num__season_num__season_type='regular'),
+            distinct=True  # Ensure distinct seasons are counted
+        ),
+        total_games=Count(
+            'skaterrecord__game_num',
+            filter=Q(skaterrecord__game_num__season_num__season_type='regular')  # Count games in regular season
+        ) + Count(
+            'goalierecord__game_num',
+            filter=Q(goalierecord__game_num__season_num__season_type='regular')  # Include goalie games in regular season
+        )
+    ).order_by(Lower("username"))
     return render(request, "GHLWebsiteApp/playerlist.html", {"all_players": all_players, "scoreboard": get_scoreboard()})
 
 def upload_file(request):
