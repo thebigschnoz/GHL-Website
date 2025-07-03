@@ -375,7 +375,7 @@ class Leader(models.Model):
 
 class BannedUser(models.Model):
     """Model to store banned users."""
-    user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name="Banned User")
+    user = models.OneToOneField(Player, on_delete=models.CASCADE, verbose_name="Banned User")
     reason = models.TextField(verbose_name="Reason for Ban", help_text="Reason why the user was banned")
     ban_date = models.DateTimeField(auto_now_add=True, verbose_name="Ban Date", help_text="Date and time when the user was banned")
     ban_duration = models.DurationField(verbose_name="Ban Duration", help_text="Duration of the ban. Use '0' for permanent bans.", default=None, null=True, blank=True)
