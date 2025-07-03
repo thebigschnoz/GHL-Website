@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models.functions import Lower
 from decimal import *
+from django.contrib.auth.models import AbstractUser
 
 class Season(models.Model):
     SEASON_CHOICES = [
@@ -91,6 +92,13 @@ class Player(models.Model):
     
     class Meta:
         ordering = [Lower('username')]
+
+class User(AbstractUser):
+    """Custom user model for GHL Website"""
+    player_link = models.OneToOneField(Player, on_delete=models.DO_NOTHING, blank=True, null=True, verbose_name="Link to your player stats", help_text="Link to the player's profile in the GHL database")
+
+    def __str__(self):
+        return self.username
 
 class Build(models.Model):
     ea_build = models.IntegerField(primary_key=True)

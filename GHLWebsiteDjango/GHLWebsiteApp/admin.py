@@ -5,8 +5,9 @@ from django.core.management import call_command
 from django.urls import reverse
 from django.contrib import messages
 from django.contrib.admin import AdminSite
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group
 from django.contrib.auth.admin import UserAdmin, GroupAdmin
+from .models import User
 
 from .models import *
 

@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-#8uol1ab_ikdu3ufqb_)6%a+&wb@9qot6yn=8ece1ol!k$yjca'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -114,6 +114,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = 'GHLWebsiteApp.User'
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
