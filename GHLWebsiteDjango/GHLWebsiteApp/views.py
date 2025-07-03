@@ -682,7 +682,7 @@ def playerlist(request):
 
     for player in players:
         # Combine distinct regular season_nums from both records
-        skater_seasons = set(player.skaterrecord_set.filter(game_num__season_num__season_type='regular')
+        skater_seasons = set(player.skaterrecord_set.filter(game_num__season_num__season_type='regular').exclude(position=0)
                             .values_list('game_num__season_num', flat=True))
         goalie_seasons = set(player.goalierecord_set.filter(game_num__season_num__season_type='regular')
                             .values_list('game_num__season_num', flat=True))
