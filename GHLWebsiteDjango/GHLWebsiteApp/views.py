@@ -689,7 +689,7 @@ def playerlist(request):
         combined_seasons = skater_seasons.union(goalie_seasons)
 
         total_games = (
-            player.skaterrecord_set.filter(game_num__season_num__season_type='regular').values('game_num').distinct().count()
+            player.skaterrecord_set.filter(game_num__season_num__season_type='regular').exclude(position=0).values('game_num').distinct().count()
             + player.goalierecord_set.filter(game_num__season_num__season_type='regular').values('game_num').distinct().count()
         )
 
