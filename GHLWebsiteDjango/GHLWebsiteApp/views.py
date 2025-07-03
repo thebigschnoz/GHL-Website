@@ -460,7 +460,7 @@ def team(request, team, season=None):
         chain (awaygames, homegames),
         key=lambda game: (game.expected_time is None, game.expected_time or game.game_num),
     )
-    roster = Player.objects.filter(current_team=teamnum).exclude(user__banneduser__isnull=False).order_by(Lower("username"))
+    roster = Player.objects.filter(current_team=teamnum).exclude(player__banneduser__isnull=False).order_by(Lower("username"))
     seasons = Season.objects.filter(
         models.Q(game__a_team_num=team) | models.Q(game__h_team_num=team)
     ).exclude(
@@ -687,7 +687,7 @@ def glossary(request):
     return render(request, "GHLWebsiteApp/glossary.html", {"scoreboard": get_scoreboard()})
 
 def playerlist(request):
-    players = Player.objects.all().exclude(user__banneduser__isnull=False).order_by(Lower("username"))
+    players = Player.objects.all().exclude(player__banneduser__isnull=False).order_by(Lower("username"))
     player_data = []
 
     for player in players:
