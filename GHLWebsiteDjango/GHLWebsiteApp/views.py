@@ -456,7 +456,8 @@ def team(request, team):
         chain (awaygames, homegames),
         key=lambda game: (game.expected_time is None, game.expected_time or game.game_num),
     )
-    context = {"team": teamnum, "scoreboard": get_scoreboard(), "skaterrecords": skaterrecords, "goalierecords": goalierecords, "teamgames": teamgames}  
+    roster = Player.objects.filter(current_team=teamnum).order_by(Lower("username"))
+    context = {"team": teamnum, "scoreboard": get_scoreboard(), "skaterrecords": skaterrecords, "goalierecords": goalierecords, "teamgames": teamgames, "roster": roster}  
     return render(request, "GHLWebsiteApp/team.html", context)
 
 def game(request, game):

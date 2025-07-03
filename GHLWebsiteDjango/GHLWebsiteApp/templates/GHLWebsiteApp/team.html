@@ -28,11 +28,67 @@
                             </div>
                         </center>
                     </td>
-                    
                 </tr>
             </table>
         </div>
-        <div class="section_lg" style="align-items: auto; width: 90%; overflow: scroll; margin-bottom: 10px;"><center>
+        <div class="header">
+            Current Roster
+        </div>
+        <div class="subsection-container">
+            <div class="playerlist-container">
+                {% for player in roster %}
+                    <div class="playerlist-child">
+                        <div class = "playerlist-shell">
+                            <a class="playerlist-link group" style="background-color: {{ player.current_team.team_color }}; --tw-bg-opacity: 1;" href="{% url 'player' player.ea_player_num %}">
+                                <div class="playerlist-bgimg-overlay">
+                                    <div class="playerlist-bgimg-offset">
+                                        <div class="playerlist-bgimg">
+                                            <img alt="{{ player.current_team.club_full_name }}" draggable="false" loading="lazy" decoding="async" data-nimg="fill" style="position:absolute;height:100%;width:100%;left:0;top:0;right:0;bottom:0;color:transparent" src="{{ player.current_team.team_logo_link }}" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="playerlist-details-bottom">
+                                    <span class"playerlist-details-bottom" style="color: white;">Secondary</span>
+                                </div>
+                                <span class="playerlist-details-top">Primary</span>
+                                <div class="namenum-container">
+                                    <div class="namenum-container-inner">
+                                        <div class="num-outer">
+                                            <div class="num-inner">
+                                                <span class="num-individual jerseynumber">
+                                                    00
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="namecontract-container">
+                                            <div class="name-container">
+                                                <div class="name">
+                                                    {{ player.username }}
+                                                </div>
+                                            </div>
+                                            <div class="contract-container">
+                                                <div class="contract">
+                                                    <span class="contract-abbr">$$$$K</span>
+                                                    <span class="contract-full">$$$$,$$$</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bottom-contract">
+                                    <span class="contract-tiny">$$$$K</span>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p>No players found.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </center></div>
+    <div class="section section_lg"><center>
+        <div class="section_lg" style="align-items: auto; width: 90%; overflow: scroll; overflow-y: hidden; margin-bottom: 10px;"><center>
             <table class="statsbar betweenrows">
                 <colgroup>
                     <col style="width: 240px;"><!-- Player -->
@@ -124,7 +180,7 @@
                 </tbody>
             </table>
         </center></div>
-        <div class="section_lg" style="align-items: auto; width: 90%; overflow: scroll; margin-bottom: 10px;"><center>
+        <div class="section_lg" style="align-items: auto; width: 90%; overflow: scroll; overflow-y: hidden; margin-bottom: 10px;"><center>
             <table class="statsbar betweenrows">
                 <col style="width: 240px;"><!-- Player -->
                 <col style="width: 80px;"><!-- Shots Against -->
@@ -175,7 +231,7 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan=25>No goalie stats recorded.</td>
+                        <td colspan=13>No goalie stats recorded.</td>
                     </tr>
                     {% endfor %}
                 </tbody>

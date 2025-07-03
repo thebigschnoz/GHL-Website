@@ -481,7 +481,6 @@ td.points {
   align-items: center;
   justify-content: center;
   width: 100%;
-  max-width: 1530px;
   margin: auto;
 }
 
@@ -521,11 +520,13 @@ td.points {
   --tw-border-opacity: 1;
   border-color: rgb(156 163 175 / var(--tw-border-opacity));
   --tw-text-opacity: 1 !important;
+  /* For stroke
   text-shadow:
-        1px 0 0 black, /* Right shadow */
-        0 1px 0 black, /* Bottom shadow */
-        -1px 0 0 black, /* Left shadow */
-        0 -1px 0 black; /* Top shadow */
+        1px 0 0 black,
+        0 1px 0 black,
+        -1px 0 0 black,
+        0 -1px 0 black;
+        */
 }
 
 .playerlist-bgimg-overlay {
@@ -639,6 +640,7 @@ span.playerlist-details-bottom {
   display: flex;
   align-items: center;
   gap: 3px;
+  text-align: left;
 }
 
 .num-outer {
@@ -757,6 +759,20 @@ span.contract-tiny {
   span.contract-tiny {
     display: none;
   }
+}
+
+.roster-container {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.25rem;
+}
+
+.roster-column {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 0.25rem;
 }
 
 .sr-only {
