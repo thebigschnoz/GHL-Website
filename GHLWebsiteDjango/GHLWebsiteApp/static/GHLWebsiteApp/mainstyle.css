@@ -23,6 +23,22 @@ a {
   font-weight: 600;
 }
 
+a.noline {
+  text-decoration: none;
+}
+
+a.noline:hover {
+  text-decoration: underline;
+}
+
+col.name {
+  width: 160px;
+}
+
+col.stat {
+  width: 60px;
+}
+
 .selectionmenu {
   padding: 3px;
   overflow: hidden;
@@ -38,7 +54,6 @@ table.statsbar {
   border-spacing: 0px;
   border-collapse: collapse;
   table-layout: fixed;
-  width: 90%;
 }
 
 table.statsbar th {
