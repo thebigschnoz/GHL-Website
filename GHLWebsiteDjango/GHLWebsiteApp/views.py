@@ -391,8 +391,12 @@ def goalies(request, season=None):
     }
     return render(request, "GHLWebsiteApp/goalies.html", context)
 
-def team(request, team):
-    season = get_seasonSetting()
+def team(request, team, season=None):
+    season_id = request.GET.get('season')  # Retrieve season ID from query parameters
+    if season_id:
+        season = get_object_or_404(Season, pk=season_id)  # Use the provided season
+    else:
+        season = get_seasonSetting()  # Default to the active season
     teamnum = get_object_or_404(Team, pk=team)
     skaterrecords = SkaterRecord.objects.filter(ea_club_num=teamnum.ea_club_num, game_num__season_num=season).exclude(position="0").values("ea_player_num", "ea_player_num__username").annotate(
         skatersgp=Count("game_num"),
@@ -457,7 +461,10 @@ def team(request, team):
         key=lambda game: (game.expected_time is None, game.expected_time or game.game_num),
     )
     roster = Player.objects.filter(current_team=teamnum).order_by(Lower("username"))
-    context = {"team": teamnum, "scoreboard": get_scoreboard(), "skaterrecords": skaterrecords, "goalierecords": goalierecords, "teamgames": teamgames, "roster": roster}  
+    seasons = Season.objects.filter(
+        models.Q(game__a_team_num=team) | models.Q(game__h_team_num=team)
+    ).distinct()
+    context = {"team": teamnum, "scoreboard": get_scoreboard(), "skaterrecords": skaterrecords, "goalierecords": goalierecords, "teamgames": teamgames, "roster": roster, "seasons": seasons}  
     return render(request, "GHLWebsiteApp/team.html", context)
 
 def game(request, game):

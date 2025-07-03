@@ -18,10 +18,22 @@
                                 <form>
                                     <select id="seasonSel" name="season">
                                         <optgroup>
-                                            <option selected value="">Season Dropdown (WIP)</option>
+                                            <option selected value="">Choose Another Season</option>
+                                            {% for season in seasons %}
+                                            <option value="/team/{{ team.ea_club_num }}/seasonnum-{{ season.season_num }}">{{ season.season_text }}</option>
+                                            {% endfor %}
                                         </optgroup>
                                     </select>
                                 </form>
+                                <script>
+                                    const dropdown = document.getElementById('seasonSel');
+                                    dropdown.addEventListener('change', function() {
+                                        const selectedValue = dropdown.value;
+                                        if (selectedValue) {
+                                            window.location.href = selectedValue;
+                                        }
+                                    });
+                                </script>
                             </div>
                             <div style="font-size: 12px; font-weight: 400; margin-top: 5px;">
                                 <a href="{% url 'export_team' team.ea_club_num %}">Get Upcoming Schedule CSV</a>

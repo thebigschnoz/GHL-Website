@@ -12,6 +12,7 @@ urlpatterns = [
     path('goalies/', views.goalies, name="goalies"),
     path('goalies/<int:season>/', views.goalies, name="goalies_season"),
     path('team/<int:team>/', views.team, name="team"),
+    path('team/<int:team>/seasonnum-<int:season>', views.team, name="team_season"),
     path('player/', views.skaters, name="playernonum"),
     path('player/<int:player>/', views.player, name="player"),
     path('playerlist/', views.playerlist, name="playerlist"),
