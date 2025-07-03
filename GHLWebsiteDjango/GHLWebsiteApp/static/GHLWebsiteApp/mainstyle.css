@@ -355,6 +355,10 @@ td.points {
   color: white;
 }
 
+.hidden {
+  display: none !important;
+}
+
 .scoreboard__container {
   display: flex;
   overflow: auto;

@@ -22,7 +22,7 @@
 		<div class="scoreboard__container">
 		{% endif %}
 			<a href="{% url 'game' game.game_num %}">
-				<div class="game__container">
+				<div class="game__container" data-index="{{ forloop.counter }}">
 					<div class="game__top-bar">
 						<span class="game__time">{{ game.expected_time|date:"D M j" }}, {{ game.expected_time|time:"g:i" }}</span>
 					</div>
@@ -58,6 +58,25 @@
 			No games played yet this season.
 		</div>
 		{% endfor %}
+		<script>
+			function adjustGameDisplay() {
+			  const games = document.querySelectorAll('.game__container');
+			  const maxGames = 6;
+			  const screenWidth = window.innerWidth;
+		  
+			  games.forEach((game, index) => {
+				if (screenWidth < 640 && index >= maxGames) {
+				  game.classList.add('hidden');
+				} else {
+				  game.classList.remove('hidden');
+				}
+			  });
+			}
+		  
+			// Run on page load and on window resize
+			window.addEventListener('load', adjustGameDisplay);
+			window.addEventListener('resize', adjustGameDisplay);
+		</script>
 		<div id="menu">
 			<a href="{% url 'index' %}">Home</a> | 
 			<a href="{% url 'standings' %}">Standings</a> | 
