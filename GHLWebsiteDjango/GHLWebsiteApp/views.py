@@ -680,12 +680,9 @@ def playerlist(request):
     all_players = Player.objects.annotate(
         total_seasons=Count(
             'skaterrecord__game_num__season_num',
-            filter=Q(skaterrecord__game_num__season_num__season_type='regular'),
-            distinct=True  # Ensure distinct seasons are counted
-        ) + Count(
-            'goalierecord__game_num__season_num',
-            filter=Q(goalierecord__game_num__season_num__season_type='regular'),
-            distinct=True  # Ensure distinct seasons are counted
+            filter=Q(skaterrecord__game_num__season_num__season_type='regular') |
+                   Q(goalierecord__game_num__season_num__season_type='regular'),
+            distinct=True  # Ensure distinct seasons are counted across both relationships
         ),
         total_games=Count(
             'skaterrecord__game_num',
