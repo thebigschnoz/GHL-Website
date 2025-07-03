@@ -689,10 +689,12 @@ def playerlist(request):
         ),
         total_games=Count(
             'skaterrecord__game_num',
-            filter=Q(skaterrecord__game_num__season_num__season_type='regular')  # Count games in regular season
+            filter=Q(skaterrecord__game_num__season_num__season_type='regular'),
+              distinct=True  # Count games in regular season
         ) + Count(
             'goalierecord__game_num',
-            filter=Q(goalierecord__game_num__season_num__season_type='regular')  # Include goalie games in regular season
+            filter=Q(goalierecord__game_num__season_num__season_type='regular'),
+              distinct=True  # Include goalie games in regular season
         )
     ).order_by(Lower("username"))
     return render(request, "GHLWebsiteApp/playerlist.html", {"all_players": all_players, "scoreboard": get_scoreboard()})
