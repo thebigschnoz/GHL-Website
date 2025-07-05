@@ -78,19 +78,31 @@
 			window.addEventListener('load', adjustGameDisplay);
 			window.addEventListener('resize', adjustGameDisplay);
 		</script>
-		<div id="menu">
-			<a href="{% url 'index' %}">Home</a> | 
-			<a href="{% url 'standings' %}">Standings</a> | 
-			<a href="{% url 'leaders' %}">League Leaders</a> | 
-			<a href="{% url 'skaters' %}">Skater Stats</a> | 
-			<a href="{% url 'goalies' %}">Goalie Stats</a> | 
-			<!-- <a href="{% url 'draft' %}">Draft</a> | -->
-			<a href="{% url 'awardsDef' %}">Awards</a> | 
-			<a href="{% url 'glossary' %}">Glossary</a> | 
-			<a href="{% url 'playerlist' %}">Playerlist</a> | 
-			<a href="https://roadmap.sh/r/ghl-website">Site Roadmap</a>
-		</div>
 		</center>
+		<div id="menu-container">
+			<div id="menu" style="text-align: -webkit-center; place-self: center;">
+				<a href="{% url 'index' %}">Home</a> | 
+				<a href="{% url 'standings' %}">Standings</a> | 
+				<a href="{% url 'leaders' %}">League Leaders</a> | 
+				<a href="{% url 'skaters' %}">Skater Stats</a> | 
+				<a href="{% url 'goalies' %}">Goalie Stats</a> | 
+				<!-- <a href="{% url 'draft' %}">Draft</a> | -->
+				<a href="{% url 'awardsDef' %}">Awards</a> | 
+				<a href="{% url 'glossary' %}">Glossary</a> | 
+				<a href="{% url 'playerlist' %}">Playerlist</a> | 
+				<a href="https://roadmap.sh/r/ghl-website">Site Roadmap</a>
+			</div>
+			<div id="auth">
+				{% if user.is_authenticated %}
+					<form id="logout-form" method="post" action="{% url 'logout' %}">
+						{% csrf_token %}
+						User: {{ user.get_username }} | <a href="#" class="logout-link" onclick="document.getElementById('logout-form').submit();">Logout</a>
+					</form>
+				{% else %}
+					<a href="{% url 'login' %}?next={{ request.path }}">Login</a>
+				{% endif %}
+			</div>
+		</div>
 		<div id="divider"></div>
 		{% block body %}
 		{% endblock %}	
