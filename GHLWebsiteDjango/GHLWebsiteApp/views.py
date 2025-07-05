@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from .forms import UploadFileForm
 from datetime import datetime
 from GHLWebsiteApp.models import *
@@ -702,6 +703,10 @@ def playerlist(request):
             "total_games": total_games,
         })
     return render(request, "GHLWebsiteApp/playerlist.html", {"all_players": player_data,})
+
+@login_required
+def user_profile(request):
+    pass
 
 def upload_file(request):
     season = get_seasonSetting()

@@ -25,4 +25,5 @@ urlpatterns = [
     path('glossary/', views.glossary, name="glossary"),
     path('export/team/<int:team_id>/', views.export_team, name="export_team"),
     path('export/playerdata/', views.export_player_data, name="export_player_data"),
+    path('profile/', views.user_profile, name="user_profile"),
 ]
