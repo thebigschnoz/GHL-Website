@@ -43,6 +43,7 @@ class BuildsAdmin(admin.ModelAdmin):
 
 class PlayerListAdmin(admin.ModelAdmin):
     list_display = ("username", "current_team__club_full_name")
+    search_fields = ("username",)
 
 class SeasonsAdmin(admin.ModelAdmin):
     list_display = ("season_text", "start_date", "season_type", "season_num", "isActive")
@@ -113,6 +114,17 @@ class ScheduleAdmin(admin.ModelAdmin):
 
     run_scheduler.short_description = "Run selected schedule"
 
+class CustomUserAdmin(UserAdmin):
+    model = User
+    fieldsets = UserAdmin.fieldsets + (
+        (None, {"fields": ("player_link",)}),
+    )
+    add_fieldsets = UserAdmin.add_fieldsets + (
+        (None, {"fields": ("player_link",)}),
+    )
+    list_display = UserAdmin.list_display + ("player_link",)
+    autocomplete_fields = ["player_link"]
+
 custom_admin_site.register(Season, SeasonsAdmin)
 custom_admin_site.register(Game, GameAdmin)
 custom_admin_site.register(AwardTitle)
@@ -127,7 +139,7 @@ custom_admin_site.register(TeamRecord)
 custom_admin_site.register(Standing)
 custom_admin_site.register(Leader)
 custom_admin_site.register(AwardVote)
-custom_admin_site.register(User, UserAdmin)
+custom_admin_site.register(User, CustomUserAdmin)
 custom_admin_site.register(Group, GroupAdmin)
 custom_admin_site.register(PlayoffRound, PlayoffRoundAdmin)
 custom_admin_site.register(PlayoffSeries, PlayoffSeriesAdmin)
