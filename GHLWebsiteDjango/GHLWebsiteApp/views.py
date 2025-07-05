@@ -229,8 +229,7 @@ def index(request):
     season = Season.objects.get(season_num=get_seasonSetting())
     standings = Standing.objects.filter(season=season).order_by('-points', '-wins', '-goalsfor', 'goalsagainst', 'team__club_full_name')
     leaders = Leader.objects.all().values("attribute", "stat", "player__username")
-    scoreboard = get_scoreboard()
-    context = {"standings": standings, "leaders": leaders, "thisseason": thisseason, "username": username, "gp": gp, "goals": goals, "assists": assists, "plusminus": plusminus, "pims": pims, "season": season, "scoreboard": scoreboard}
+    context = {"standings": standings, "leaders": leaders, "thisseason": thisseason, "username": username, "gp": gp, "goals": goals, "assists": assists, "plusminus": plusminus, "pims": pims, "season": season}
     return render(request, "GHLWebsiteApp/index.html", context)
 
 def standings(request):
@@ -241,7 +240,7 @@ def standings(request):
     else:
         standings = PlayoffSeries.objects.filter(season=season).order_by('round_num', 'low_seed_num')
         rounds = PlayoffRound.objects.filter(season=season).order_by('round_num')
-    return render(request, "GHLWebsiteApp/standings.html", {"standings": standings, "scoreboard": get_scoreboard(), "season": season, "rounds": rounds})
+    return render(request, "GHLWebsiteApp/standings.html", {"standings": standings, "season": season, "rounds": rounds})
 
 def leaders(request):
     season = get_seasonSetting()
@@ -272,7 +271,6 @@ def leaders(request):
         "leaders_shutouts": leaders_shutouts,
         "leaders_wins": leaders_wins,
         "leaders_gaa": leaders_gaa,
-        "scoreboard": get_scoreboard()
     }
     return render(request, "GHLWebsiteApp/leaders.html", context)
 
@@ -296,7 +294,6 @@ def skaters(request, season=None):
     seasonlist = Season.objects.exclude(season_type="preseason").order_by("-start_date")
     context = {
         "all_skaters": all_skaters,
-        "scoreboard": get_scoreboard(),
         "season": season,
         "seasonlist": seasonlist,
     }
@@ -344,7 +341,6 @@ def skatersAdvanced(request, season=None):
     seasonlist = Season.objects.exclude(season_type="preseason").order_by("-start_date")
     context = {
         "all_skaters": all_skaters,
-        "scoreboard": get_scoreboard(),
         "season": season,
         "seasonlist": seasonlist,
     }
@@ -385,7 +381,6 @@ def goalies(request, season=None):
     seasonlist = Season.objects.exclude(season_type="preseason").order_by("-start_date")
     context = {
         "all_goalies": all_goalies,
-        "scoreboard": get_scoreboard(),
         "season": season,
         "seasonlist": seasonlist,
     }
@@ -466,7 +461,7 @@ def team(request, team, season=None):
     ).exclude(
         season_text__icontains="Test"  # Exclude seasons where season_text contains "Test"
     ).distinct()
-    context = {"team": teamnum, "scoreboard": get_scoreboard(), "skaterrecords": skaterrecords, "goalierecords": goalierecords, "teamgames": teamgames, "roster": roster, "seasons": seasons}  
+    context = {"team": teamnum, "skaterrecords": skaterrecords, "goalierecords": goalierecords, "teamgames": teamgames, "roster": roster, "seasons": seasons}  
     return render(request, "GHLWebsiteApp/team.html", context)
 
 def game(request, game):
@@ -501,7 +496,7 @@ def game(request, game):
                "h_team_record": h_team_record,
                "a_team_toa": a_team_toa_formatted,
                "h_team_toa": h_team_toa_formatted,
-               "scoreboard": get_scoreboard()}
+    }
     return render(request, "GHLWebsiteApp/game.html", context)
 
 def player(request, player):
@@ -635,7 +630,6 @@ def player(request, player):
         "goalie_season_totals": goalie_season_totals,
         "sk_team_num": sk_team_num,
         "games": all_games,
-        "scoreboard": get_scoreboard()
         }
     return render(request, "GHLWebsiteApp/player.html", context)
 
@@ -677,14 +671,13 @@ def awards(request, awardnum):
         "award": award,
         "awardhistory": awardhistory,
         "awardrecent": awardrecent,
-        "scoreboard": get_scoreboard()
     })
 
 def awardsDef(request):
     return awards(request, "1")
 
 def glossary(request):
-    return render(request, "GHLWebsiteApp/glossary.html", {"scoreboard": get_scoreboard()})
+    return render(request, "GHLWebsiteApp/glossary.html")
 
 def playerlist(request):
     players = Player.objects.all().exclude(banneduser__isnull=False).order_by(Lower("username"))
@@ -708,7 +701,7 @@ def playerlist(request):
             "total_seasons": len(combined_seasons),
             "total_games": total_games,
         })
-    return render(request, "GHLWebsiteApp/playerlist.html", {"all_players": player_data, "scoreboard": get_scoreboard()})
+    return render(request, "GHLWebsiteApp/playerlist.html", {"all_players": player_data,})
 
 def upload_file(request):
     season = get_seasonSetting()
