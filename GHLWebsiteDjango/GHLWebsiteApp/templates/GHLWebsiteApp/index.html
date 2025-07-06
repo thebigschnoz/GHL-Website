@@ -79,7 +79,7 @@
                         {% if announcement %}
                             {% for announcement in announcement %}
                             <div class="announcement">
-                                <p>{{ announcement.content|tag_players|linebreaks }}</p>
+                                <p>{{ announcement.content|tag_players|linebreaks|safe }}</p>
                                 <p style="font-size: 11px;"><i>- {{ announcement.author.username|default:"GHLBot" }}, {{ announcement.created_at|date:"D M j, Y @ g:i A" }}</i></p>
                             </div>
                             {% endfor %}
