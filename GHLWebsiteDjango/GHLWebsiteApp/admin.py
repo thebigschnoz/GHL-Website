@@ -125,6 +125,10 @@ class CustomUserAdmin(UserAdmin):
     list_display = UserAdmin.list_display + ("player_link",)
     autocomplete_fields = ["player_link"]
 
+class AnnouncementAdmin(admin.ModelAdmin):
+    list_display = ("created_at","author")
+    list_filter = ("author",)
+
 custom_admin_site.register(Season, SeasonsAdmin)
 custom_admin_site.register(Game, GameAdmin)
 custom_admin_site.register(AwardTitle)
@@ -145,3 +149,4 @@ custom_admin_site.register(PlayoffRound, PlayoffRoundAdmin)
 custom_admin_site.register(PlayoffSeries, PlayoffSeriesAdmin)
 custom_admin_site.register(Schedule, ScheduleAdmin)
 custom_admin_site.register(BannedUser)
+custom_admin_site.register(Announcement, AnnouncementAdmin)

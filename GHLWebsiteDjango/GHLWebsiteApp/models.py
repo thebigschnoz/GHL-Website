@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 from django.db.models.functions import Lower
 from decimal import *
 from django.contrib.auth.models import AbstractUser
@@ -382,3 +383,12 @@ class BannedUser(models.Model):
 
     def __str__(self):
         return f"{self.user.username}"
+    
+class Announcement(models.Model):
+    """Model to store announcements."""
+    content = models.TextField(verbose_name="Announcement Content", help_text="Content of the announcement")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At", help_text="Date and time when the announcement was created")
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, verbose_name="Author", help_text="User who created the announcement", default=timezone.now, null=True)
+
+    def __str__(self):
+        return f"Announcement by {self.author.username} on {self.created_at.strftime('%Y-%m-%d')}"

@@ -1,5 +1,6 @@
 {% extends "GHLWebsiteApp/layout.html" %}
 {% load static %}
+{% load player_tags %}
 {% block body %}
 <center>
     <table>
@@ -74,11 +75,27 @@
             <td id="rightside">
                 <div class="section">
                     <h1>Announcements</h1>
-                        <div class="bodytext">
-                            The season starts Sunday, 7/6/25. Make sure to read your rules and notify your owners before season start!
-                            <p />
-                            - Schnoz
-                        </div>
+                    <div class="bodytext">
+                        {% if announcement %}
+                            {% for announcement in announcement %}
+                            <div class="announcement">
+                                <p>{{ announcement.content|tag_players|linebreaks }}</p>
+                                <p><small>- {{ announcement.author.username|default:"GHLBot" }}, {{ announcement.created_at|date:"M d, Y H:i" }}</small></p>
+                            </div>
+                            {% endfor %}
+                            <div class="pagination">
+                                {% if announcement.has_previous %}
+                                <a href="?page={{ announcement_page.previous_page_number }}">Previous</a>
+                                {% endif %}
+                                Page {{ announcement_page.number }} of {{ announcement_page.paginator.num_pages }}
+                                {% if announcement_page.has_next %}
+                                    <a href="?page={{ announcement_page.next_page_number }}">Next</a>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <p>No announcements at this time.</p>
+                        {% endif %}
+                    </div>
                 </div>
                 <div class="section">
                     <div class="header">Player Focus</div>

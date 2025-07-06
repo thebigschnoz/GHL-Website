@@ -15,6 +15,7 @@ from io import BytesIO
 import csv
 import pytz
 from django.utils.timezone import localtime
+from django.core.paginator import Paginator
 # from points_table_simulator import PointsTableSimulator
 
 def get_seasonSetting():
@@ -230,7 +231,11 @@ def index(request):
     season = Season.objects.get(season_num=get_seasonSetting())
     standings = Standing.objects.filter(season=season).order_by('-points', '-wins', '-goalsfor', 'goalsagainst', 'team__club_full_name')
     leaders = Leader.objects.all().values("attribute", "stat", "player__username")
-    context = {"standings": standings, "leaders": leaders, "thisseason": thisseason, "username": username, "gp": gp, "goals": goals, "assists": assists, "plusminus": plusminus, "pims": pims, "season": season}
+    announcements = Announcement.objects.order_by('-created_at')
+    paginator = Paginator(announcements, 1)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    context = {"standings": standings, "leaders": leaders, "thisseason": thisseason, "username": username, "gp": gp, "goals": goals, "assists": assists, "plusminus": plusminus, "pims": pims, "season": season, "announcement": page_obj}
     return render(request, "GHLWebsiteApp/index.html", context)
 
 def standings(request):
