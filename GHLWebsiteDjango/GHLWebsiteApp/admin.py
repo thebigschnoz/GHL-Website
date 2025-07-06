@@ -7,7 +7,9 @@ from django.contrib import messages
 from django.contrib.admin import AdminSite
 from django.contrib.auth.models import Group
 from django.contrib.auth.admin import UserAdmin, GroupAdmin
+from django.utils.html import format_html
 from .models import User
+from django.contrib.contenttypes.models import ContentType
 
 from .models import *
 
@@ -116,14 +118,53 @@ class ScheduleAdmin(admin.ModelAdmin):
 
 class CustomUserAdmin(UserAdmin):
     model = User
-    fieldsets = UserAdmin.fieldsets + (
-        (None, {"fields": ("player_link",)}),
+
+    # Remove unwanted fields from the user change form
+    fieldsets = (
+        (None, {"fields": ("username", "password", "player_link")}),
+        ("Permissions", {"fields": ("is_active", "is_staff", "is_superuser", "groups", "user_permissions")}),
     )
-    add_fieldsets = UserAdmin.add_fieldsets + (
-        (None, {"fields": ("player_link",)}),
+    add_fieldsets = (
+        (None, {
+            "classes": ("wide",),
+            "fields": ("username", "password1", "password2", "player_link", "is_staff", "is_superuser", "groups"),
+        }),
     )
-    list_display = UserAdmin.list_display + ("player_link",)
+
+    list_display = (
+        "username",
+        "is_superuser",
+        "is_admin_group",
+        "is_media_group",
+        "is_team_manager_group",
+        "linked_player",
+    )
+
     autocomplete_fields = ["player_link"]
+
+    def is_in_group(self, obj, group_name):
+        return obj.groups.filter(name=group_name).exists()
+
+    @admin.display(boolean=True, description='Admin Group')
+    def is_admin_group(self, obj):
+        return self.is_in_group(obj, "Admins")
+
+    @admin.display(boolean=True, description='Media Group')
+    def is_media_group(self, obj):
+        return self.is_in_group(obj, "Media")
+
+    @admin.display(boolean=True, description='Team Managers Group')
+    def is_team_manager_group(self, obj):
+        return self.is_in_group(obj, "Team Managers")
+
+    @admin.display(description="Linked Player")
+    def linked_player(self, obj):
+        if obj.player_link:
+            ct = ContentType.objects.get_for_model(obj.player_link)
+            url_name = f"custom_admin:{ct.app_label}_{ct.model}_change"
+            url = reverse(url_name, args=[obj.player_link.ea_player_num])
+            return format_html('<a href="{}">{}</a>', url, obj.player_link.username)
+        return "-"
 
 class AnnouncementAdmin(admin.ModelAdmin):
     list_display = ("created_at","author")
