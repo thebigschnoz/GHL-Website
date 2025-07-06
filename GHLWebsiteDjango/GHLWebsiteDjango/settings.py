@@ -118,7 +118,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-AUTH_USER_MODEL = 'GHLWebsiteApp.User'
+AUTH_USER_MODEL = 'ghlwebsiteapp.User'
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
