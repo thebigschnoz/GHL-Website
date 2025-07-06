@@ -114,6 +114,7 @@
 									{% if user|has_group:"Media" %}
 									<li>Media Page</li>
 									{% endif %}
+									<li><a href="{% url 'user_profile' %}">Profile</a></li>
 									<li>
 										<form id="logout-form" method="post" action="{% url 'logout' %}">
 											{% csrf_token %}

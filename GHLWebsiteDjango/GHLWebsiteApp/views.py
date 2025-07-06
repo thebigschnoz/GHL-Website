@@ -711,6 +711,7 @@ def playerlist(request):
 
 @login_required
 def user_profile(request):
+    # TODO: Add user profile functionality here
     pass
 
 def upload_file(request):
