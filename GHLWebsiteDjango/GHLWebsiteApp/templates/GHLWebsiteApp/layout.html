@@ -80,26 +80,32 @@
 		</script>
 		</center>
 		<div id="menu-container">
-			<div id="menu" style="text-align: -webkit-center; place-self: center;">
-				<a href="{% url 'index' %}">Home</a> | 
-				<a href="{% url 'standings' %}">Standings</a> | 
-				<a href="{% url 'leaders' %}">League Leaders</a> | 
-				<a href="{% url 'skaters' %}">Skater Stats</a> | 
-				<a href="{% url 'goalies' %}">Goalie Stats</a> | 
-				<!-- <a href="{% url 'draft' %}">Draft</a> | -->
-				<a href="{% url 'awardsDef' %}">Awards</a> | 
-				<a href="{% url 'glossary' %}">Glossary</a> | 
-				<a href="{% url 'playerlist' %}">Playerlist</a> | 
-				<a href="https://roadmap.sh/r/ghl-website">Site Roadmap</a>
-			</div>
+			<nav role="navigation" class="primary-navigation" id="menu" style="text-align: -webkit-center; place-self: center;">
+				<ul>
+					<li><a href="{% url 'index' %}">Home</a></li>
+					<li><a href="{% url 'standings' %}">Standings</a></li>
+					<li style="font-weight: 600;">Statistics
+						<ul class="dropdown">
+							<li><a href="{% url 'leaders' %}">League Leaders</a></li>
+							<li><a href="{% url 'skaters' %}">Skater Stats</a></li>
+							<li><a href="{% url 'goalies' %}">Goalie Stats</a></li>
+						</ul>
+					</li>
+					<!-- <a href="{% url 'draft' %}">Draft</a> | -->
+					<li><a href="{% url 'awardsDef' %}">Awards</a></li>
+					<li><a href="{% url 'glossary' %}">Glossary</a></li>
+					<li><a href="{% url 'playerlist' %}">Playerlist</a></li>
+					<li><a href="https://roadmap.sh/r/ghl-website">Site Roadmap</a></li>
+				</ul>
+			</nav>
 			<div id="auth">
 				{% if user.is_authenticated %}
 					<form id="logout-form" method="post" action="{% url 'logout' %}">
 						{% csrf_token %}
-						User: {{ user.get_username }} | <a href="#" class="logout-link" onclick="document.getElementById('logout-form').submit();">Logout</a>
+						User: {{ user.get_username }} | <a href="#" class="logout-link" onclick="document.getElementById('logout-form').submit();"style="text-decoration: none;">Logout</a>
 					</form>
 				{% else %}
-					<a href="{% url 'login' %}?next={{ request.path }}">Login</a>
+					<a href="{% url 'login' %}?next={{ request.path }}" style="text-decoration: none;">Login</a>
 				{% endif %}
 			</div>
 		</div>
