@@ -24,6 +24,7 @@ urlpatterns = [
     path('admin/', custom_admin_site.urls),
     path('', include("GHLWebsiteApp.urls")),
     path('auth/', include('django.contrib.auth.urls')),
+    path("captcha/", include("captcha.urls")),
 ]
 
 if settings.DEBUG:

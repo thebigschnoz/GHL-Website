@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
-from .forms import UploadFileForm
+from .forms import UploadFileForm, CustomUserCreationForm
 from datetime import datetime
 from GHLWebsiteApp.models import *
 from django.db.models import Sum, Count, Case, When, Avg, F, Window, FloatField, Q
@@ -802,12 +802,12 @@ def export_player_data(request):
 
 def register(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, "Account created! You can now log in.")
             return redirect('login')  # redirect to login page
     else:
-        form = UserCreationForm()
+        form = CustomUserCreationForm()
     
     return render(request, 'registration/register.html', {'form': form})
