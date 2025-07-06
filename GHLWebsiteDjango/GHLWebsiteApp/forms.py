@@ -1,8 +1,9 @@
 from django import forms
-from .models import AwardTitle, Player
+from .models import AwardTitle, Player, User
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
 from captcha.fields import CaptchaField
+from dal import autocomplete
 
 class UploadFileForm(forms.Form):
     file = forms.FileField()
@@ -17,7 +18,15 @@ class CustomUserCreationForm(UserCreationForm):
     player_link = forms.ModelChoiceField(
         queryset=Player.objects.all(),
         required=False,
-        help_text="Optional: link this user to a player profile.",
+        widget=autocomplete.ModelSelect2(
+            url='player-autocomplete',
+            attrs={
+                'data-placeholder': 'Start typing a player username...',
+                'data-minimum-input-length': 1,
+            }
+        ),
+        help_text="Optional: link this user to an existing EA player profile.",
+        label="Player Link",
     )
 
     # Include captcha field for spam protection

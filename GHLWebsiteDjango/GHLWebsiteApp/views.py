@@ -1,7 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserCreationForm
 from .forms import UploadFileForm, CustomUserCreationForm
 from datetime import datetime
 from GHLWebsiteApp.models import *
@@ -17,6 +16,7 @@ import csv
 import pytz
 from django.utils.timezone import localtime
 from django.core.paginator import Paginator
+from dal import autocomplete
 # from points_table_simulator import PointsTableSimulator
 
 def get_seasonSetting():
@@ -811,3 +811,12 @@ def register(request):
         form = CustomUserCreationForm()
     
     return render(request, 'registration/register.html', {'form': form})
+
+class PlayerAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        qs = Player.objects.all()
+
+        if self.q:
+            qs = qs.filter(username__icontains=self.q)
+
+        return qs
