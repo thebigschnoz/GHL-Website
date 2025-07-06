@@ -87,9 +87,9 @@
                                 {% if announcement.has_previous %}
                                 <a href="?page={{ announcement_page.previous_page_number }}">Previous</a>
                                 {% endif %}
-                                Page {{ announcement_page.number }} of {{ announcement_page.paginator.num_pages }}
-                                {% if announcement_page.has_next %}
-                                    <a href="?page={{ announcement_page.next_page_number }}">Next</a>
+                                Page {{ announcement.number }} of {{ announcement.paginator.num_pages }}
+                                {% if announcement.has_next %}
+                                    <a href="?page={{ announcement.next_page_number }}">Next</a>
                                 {% endif %}
                             </div>
                         {% else %}
