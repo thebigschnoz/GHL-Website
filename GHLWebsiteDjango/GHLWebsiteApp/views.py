@@ -818,7 +818,7 @@ class PlayerAutocomplete(autocomplete.Select2QuerySetView):
             player_link__isnull=False
         ).values_list('player_link_id', flat=True)
 
-        qs = Player.objects.exclude(id__in=linked_ids)
+        qs = Player.objects.exclude(ea_player_num__in=linked_ids)
 
         if self.q:
             qs = qs.filter(username__icontains=self.q)
