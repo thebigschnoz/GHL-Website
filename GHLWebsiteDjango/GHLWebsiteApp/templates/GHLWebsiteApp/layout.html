@@ -105,11 +105,14 @@
 						<ul>
 							<li>Actions &dtrif;
 								<ul class="dropdown">
-									{% if user.is_superuser %}
+									{% if user.is_superuser or user|has_group:"Admins" %}
 									<li><a href="{% url 'admin:index' %}">Admin</a></li>
 									{% endif %}
 									{% if user|has_group:"Team Managers" %}
 									<li>Manage Team</li>
+									{% endif %}
+									{% if user|has_group:"Media" %}
+									<li>Media Page</li>
 									{% endif %}
 									<li>
 										<form id="logout-form" method="post" action="{% url 'logout' %}">
