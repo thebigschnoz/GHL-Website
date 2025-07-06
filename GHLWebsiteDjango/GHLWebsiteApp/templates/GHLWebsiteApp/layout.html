@@ -104,7 +104,7 @@
 				</ul>
 			</nav>
 			<div id="auth">
-				<span style="display: inline-block; margin-right: 5px;">User: {{ user.get_username }}</span><nav role="navigation" class="primary-navigation" style="display: inline-block; vertical-align: middle;">
+				<span style="display: inline-block; margin-right: 5px;">{% if user.is_authenticated %}User: {{ user.get_username }}{% endif %}</span><nav role="navigation" class="primary-navigation" style="display: inline-block; vertical-align: middle;">
 					{% if user.is_authenticated %}
 						<ul>
 							<li>Actions &dtrif;
@@ -118,7 +118,7 @@
 									{% if user|has_group:"Media" %}
 									<li>Media Page</li>
 									{% endif %}
-									<li><a href="{% url 'user_profile' %}">Profile</a></li>
+									<li><a href="#">Profile</a></li>
 									<li>
 										<form id="logout-form" method="post" action="{% url 'logout' %}">
 											{% csrf_token %}
