@@ -1419,3 +1419,35 @@ ul li ul li a {
 .select2-container--default .select2-selection--single .select2-selection__placeholder {
   color: #959697;
 }
+
+.error-page {
+  text-align: center;
+  margin: 60px auto;
+  max-width: 600px;
+  color: #e9eaec;
+}
+
+.error-page h1 {
+  color: #e4b61a;
+  font-size: 3em;
+  margin-bottom: 20px;
+}
+
+.error-page p {
+  font-size: 1.2em;
+  margin-bottom: 20px;
+}
+
+.error-page .btn-submit {
+  background-color: #e4b61a;
+  color: black;
+  font-weight: bold;
+  text-decoration: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.error-page .btn-submit:hover {
+  background-color: #fbe134;
+}

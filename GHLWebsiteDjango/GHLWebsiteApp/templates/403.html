@@ -1,0 +1,9 @@
+{% extends "GHLWebsiteApp/layout.html" %}
+
+{% block body %}
+  <div class="error-page">
+    <h1>Access Denied (403)</h1>
+    <p>Sorry, you don’t have permission to view this page.</p>
+    <p><a href="{% url 'index' %}" class="btn-submit">Return to Home</a></p>
+  </div>
+{% endblock %}
