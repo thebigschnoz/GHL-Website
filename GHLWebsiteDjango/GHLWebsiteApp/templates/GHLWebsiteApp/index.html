@@ -80,16 +80,16 @@
                             {% for announcement in announcement %}
                             <div class="announcement">
                                 <p>{{ announcement.content|tag_players|linebreaks }}</p>
-                                <p><small>- {{ announcement.author.username|default:"GHLBot" }}, {{ announcement.created_at|date:"M d, Y H:i" }}</small></p>
+                                <p style="font-size: 11px;"><i>- {{ announcement.author.username|default:"GHLBot" }}, {{ announcement.created_at|date:"D M j, Y @ g:i A" }}</i></p>
                             </div>
                             {% endfor %}
                             <div class="pagination">
                                 {% if announcement.has_previous %}
-                                <a href="?page={{ announcement_page.previous_page_number }}">Previous</a>
+                                    <a href="?page={{ announcement_page.previous_page_number }}"><div>&#171;</div></a>
                                 {% endif %}
-                                Page {{ announcement.number }} of {{ announcement.paginator.num_pages }}
+                                    <div>Page {{ announcement.number }} of {{ announcement.paginator.num_pages }}</div>
                                 {% if announcement.has_next %}
-                                    <a href="?page={{ announcement.next_page_number }}">Next</a>
+                                    <a href="?page={{ announcement.next_page_number }}"><div>&#187;</div></a>
                                 {% endif %}
                             </div>
                         {% else %}
@@ -97,7 +97,7 @@
                         {% endif %}
                     </div>
                 </div>
-                <div class="section">
+                <div class="section" style="padding-top: 0;">
                     <div class="header">Player Focus</div>
                     <div class="subsection-container">
                         <div id="playerfocustable">

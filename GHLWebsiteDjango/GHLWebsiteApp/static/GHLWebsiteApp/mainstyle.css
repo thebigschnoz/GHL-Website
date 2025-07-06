@@ -121,6 +121,27 @@ h1 {
 .bodytext {
   padding-left: 5%;
   padding-right: 5%;
+  margin-bottom: 10px;
+}
+
+.bodytext a {
+  text-decoration: none;
+}
+
+.bodytext a:hover {
+  color: #e4b61a;
+}
+
+.pagination {
+  justify-content: center;
+  display: flex;
+  width: auto;
+}
+
+.pagination div {
+  border: 1px groove #4f5661;
+  margin: 0 3px;
+  padding: 0 6px;
 }
 
 .sectiondiv {
