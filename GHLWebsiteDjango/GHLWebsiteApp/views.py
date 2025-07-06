@@ -814,7 +814,11 @@ def register(request):
 
 class PlayerAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
-        qs = Player.objects.all()
+        linked_ids = User.objects.filter(
+            player_link__isnull=False
+        ).values_list('player_link_id', flat=True)
+
+        qs = Player.objects.exclude(id__in=linked_ids)
 
         if self.q:
             qs = qs.filter(username__icontains=self.q)
