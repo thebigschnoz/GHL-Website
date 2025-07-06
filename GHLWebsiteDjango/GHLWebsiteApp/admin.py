@@ -20,6 +20,7 @@ class CustomAdminSite(AdminSite):
         urls = super().get_urls()
         custom_urls = [
             path('run-poll-api/', self.admin_view(self.run_poll_api), name='run_poll_api'),
+            path('run-leaders/', self.admin_view(self.run_leaders), name='run_leaders'),
         ]
         return custom_urls + urls
 
@@ -31,6 +32,15 @@ class CustomAdminSite(AdminSite):
         except Exception as e:
             messages.error(request, f"Error: {str(e)}")
         return HttpResponseRedirect(reverse('custom_admin:index'))
+    
+    def run_leaders(self, request):
+        try:
+            call_command('leaders')
+            messages.success(request, "Leaders command executed successfully!")
+        except Exception as e:
+            messages.error(request, f"Error running leaders command: {str(e)}")
+        return HttpResponseRedirect(reverse('custom_admin:index'))
+
 
 # Register the custom admin site
 custom_admin_site = CustomAdminSite(name='custom_admin')
