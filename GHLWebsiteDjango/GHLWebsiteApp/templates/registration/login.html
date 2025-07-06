@@ -19,11 +19,11 @@
     <form method="post" action="{% url 'login' %}">
         {% csrf_token %}
         <table>
-        <tr>
+        <tr class="no-bg">
             <td>{{ form.username.label_tag }}</td>
             <td>{{ form.username }}</td>
         </tr>
-        <tr>
+        <tr class="no-bg">
             <td>{{ form.password.label_tag }}</td>
             <td>{{ form.password }}</td>
         </tr>
