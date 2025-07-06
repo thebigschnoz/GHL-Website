@@ -1374,3 +1374,66 @@ ul li ul li a {
   font-size: 0.9em;
   margin-top: 5px;
 }
+
+.login-form {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  row-gap: 15px;
+  column-gap: 20px;
+  background-color: black;
+  border-top: 2px solid #e4b61a;
+  border-bottom: 2px solid #e4b61a;
+  padding: 30px;
+  max-width: 700px;
+  margin: 30px auto;
+  color: #e9eaec;
+}
+
+.login-form label {
+  align-self: center;
+  font-weight: bold;
+  color: #e4b61a;
+  display: inline-flex;
+  align-items: center;
+}
+
+.login-form input {
+  width: 100%;
+  padding: 8px;
+  background-color: #303030;
+  color: #e9eaec;
+  border: 1px solid #e4b61a;
+  border-radius: 4px;
+  font-size: 1em;
+}
+
+.login-form input:focus {
+  outline: none;
+  border-color: #fbe134;
+}
+
+.login-form .btn-submit {
+  background-color: #e4b61a;
+  color: black;
+  font-weight: bold;
+  border: none;
+  padding: 12px 20px;
+  cursor: pointer;
+  font-size: 1.1em;
+  margin-top: 20px;
+}
+
+.login-form .btn-submit:hover {
+  background-color: #fbe134;
+}
+
+.login-form .full-width {
+  grid-column: 1 / span 2;
+}
+
+.login-form .error {
+  grid-column: 1 / span 2;
+  color: #db0b17;
+  font-size: 0.9em;
+  margin-top: 5px;
+}

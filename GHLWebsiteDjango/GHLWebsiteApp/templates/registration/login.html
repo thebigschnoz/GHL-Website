@@ -16,23 +16,42 @@
         {% endif %}
     {% endif %}
 
-    <form method="post" action="{% url 'login' %}">
+    <form method="post" action="{% url 'login' %}" class="login-form">
         {% csrf_token %}
-        <table>
-        <tr class="no-bg">
-            <td>{{ form.username.label_tag }}</td>
-            <td>{{ form.username }}</td>
-        </tr>
-        <tr class="no-bg">
-            <td>{{ form.password.label_tag }}</td>
-            <td>{{ form.password }}</td>
-        </tr>
-        </table>
-        <input type="submit" value="login">
+    
+        {% if form.non_field_errors %}
+            <div class="error">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+    
+        <label for="{{ form.username.id_for_label }}">
+            {{ form.username.label }}
+        </label>
+        <div>
+            {{ form.username }}
+            {% for error in form.username.errors %}
+                <div class="error">{{ error }}</div>
+            {% endfor %}
+        </div>
+    
+        <label for="{{ form.password.id_for_label }}">
+            {{ form.password.label }}
+        </label>
+        <div>
+            {{ form.password }}
+            {% for error in form.password.errors %}
+                <div class="error">{{ error }}</div>
+            {% endfor %}
+        </div>
+    
+        <div class="full-width">
+            <button type="submit" class="btn-submit">Login</button>
+        </div>
+    
         <input type="hidden" name="next" value="{{ next }}">
     </form>
-
-    {# Assumes you set up the password_reset view in your URLConf #}
+    
     <p><a href="{% url 'password_reset' %}">Lost password?</a></p>
     <p><a href="{% url 'register' %}">Don't have an account? Register here.</a></p>
 </div>
