@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
 from .forms import UploadFileForm
 from datetime import datetime
 from GHLWebsiteApp.models import *
@@ -798,3 +799,15 @@ def export_player_data(request):
     response['Content-Disposition'] = 'attachment; filename="ghl_data.xlsx"'
 
     return response
+
+def register(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Account created! You can now log in.")
+            return redirect('login')  # redirect to login page
+    else:
+        form = UserCreationForm()
+    
+    return render(request, 'registration/register.html', {'form': form})
