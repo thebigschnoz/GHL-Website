@@ -1,5 +1,6 @@
 {% load static %}
 {% load tz %}
+{% load group_tags %}
 <!DOCTYPE html>
 <html dir="ltr" lang="en">
 
@@ -99,14 +100,30 @@
 				</ul>
 			</nav>
 			<div id="auth">
-				{% if user.is_authenticated %}
-					<form id="logout-form" method="post" action="{% url 'logout' %}">
-						{% csrf_token %}
-						User: {{ user.get_username }} | <a href="#" class="logout-link" onclick="document.getElementById('logout-form').submit();"style="text-decoration: none;">Logout</a>
-					</form>
-				{% else %}
-					<a href="{% url 'login' %}?next={{ request.path }}" style="text-decoration: none;">Login</a>
-				{% endif %}
+				<span style="display: inline-block; margin-right: 5px;">User: {{ user.get_username }}</span><nav role="navigation" class="primary-navigation" style="display: inline-block; vertical-align: middle;">
+					{% if user.is_authenticated %}
+						<ul>
+							<li>Actions &dtrif;
+								<ul class="dropdown">
+									{% if user.is_superuser %}
+									<li><a href="{% url 'admin:index' %}">Admin</a></li>
+									{% endif %}
+									{% if user|has_group:"Team Managers" %}
+									<li>Manage Team</li>
+									{% endif %}
+									<li>
+										<form id="logout-form" method="post" action="{% url 'logout' %}">
+											{% csrf_token %}
+											<a href="#" class="logout-link" onclick="document.getElementById('logout-form').submit();"style="text-decoration: none;">Logout</a>
+										</form>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					{% else %}
+						<a href="{% url 'login' %}?next={{ request.path }}" style="text-decoration: none;">Login</a>
+					{% endif %}
+				</nav>
 			</div>
 		</div>
 		<div id="divider"></div>
