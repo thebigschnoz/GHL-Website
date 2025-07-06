@@ -82,6 +82,7 @@ class Position(models.Model):
 
 class Player(models.Model):
     ea_player_num = models.IntegerField(primary_key=True)
+    jersey_num = models.PositiveSmallIntegerField(verbose_name="Jersey Number", default=99, blank=True, null=True)
     username = models.CharField(max_length=16)
     current_team = models.ForeignKey(Team, on_delete = models.CASCADE, blank=True, null=True)
     primarypos = models.ForeignKey(Position, on_delete = models.CASCADE, related_name="primary", blank=True, null=True)
@@ -388,7 +389,7 @@ class Announcement(models.Model):
     """Model to store announcements."""
     content = models.TextField(verbose_name="Announcement Content", help_text="Content of the announcement")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At", help_text="Date and time when the announcement was created")
-    author = models.ForeignKey(User, on_delete=models.SET_NULL, verbose_name="Author", help_text="User who created the announcement", default=timezone.now, null=True)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, verbose_name="Author", help_text="User who created the announcement", null=True, blank=True)
 
     def __str__(self):
         return f"Announcement by {self.author.username} on {self.created_at.strftime('%Y-%m-%d')}"

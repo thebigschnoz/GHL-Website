@@ -169,6 +169,12 @@ class CustomUserAdmin(UserAdmin):
 class AnnouncementAdmin(admin.ModelAdmin):
     list_display = ("created_at","author")
     list_filter = ("author",)
+    exclude = ("author",)
+
+    def save_model(self, request, obj, form, change):
+        if not change or not obj.author:
+            obj.author = request.user
+        obj.save()
 
 custom_admin_site.register(Season, SeasonsAdmin)
 custom_admin_site.register(Game, GameAdmin)
