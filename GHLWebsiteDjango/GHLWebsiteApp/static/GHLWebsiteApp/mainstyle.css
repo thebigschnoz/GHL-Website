@@ -1302,80 +1302,7 @@ ul li ul li a {
   transition: all 0.5s ease;
 }
 
-.registration-form {
-  display: grid;
-  grid-template-columns: 200px 1fr;
-  row-gap: 15px;
-  column-gap: 20px;
-  background-color: black;
-  border-top: 2px solid #e4b61a;
-  padding: 30px;
-  max-width: 700px;
-  margin: 30px auto;
-  color: #e9eaec;
-}
-
-.registration-form label {
-  align-self: center;
-  align-items: center;
-  text-align: left;
-  font-weight: bold;
-  color: #e4b61a;
-  display: inline-flex;
-  align-items: center;
-  flex-wrap: nowrap;
-}
-
-.registration-form input,
-.registration-form select {
-  width: 100%;
-  padding: 8px;
-  background-color: #303030;
-  color: #e9eaec;
-  border: 1px solid #e4b61a;
-  border-radius: 4px;
-  font-size: 1em;
-}
-
-.registration-form input:focus,
-.registration-form select:focus {
-  outline: none;
-  border-color: #fbe134;
-}
-
-.help-icon {
-  margin-left: 8px;
-  color: #e4b61a;
-  cursor: help;
-  font-size: 0.9em;
-}
-
-.registration-form .btn-submit {
-  background-color: #e4b61a;
-  color: black;
-  font-weight: bold;
-  border: none;
-  padding: 12px 20px;
-  cursor: pointer;
-  font-size: 1.1em;
-  margin-top: 20px;
-}
-
-.registration-form .btn-submit:hover {
-  background-color: #fbe134;
-}
-
-.registration-form .full-width {
-  grid-column: 1 / span 2;
-}
-
-.error {
-  color: #db0b17;
-  font-size: 0.9em;
-  margin-top: 5px;
-}
-
-.login-form {
+.auth-form {
   display: grid;
   grid-template-columns: 200px 1fr;
   row-gap: 15px;
@@ -1387,9 +1314,10 @@ ul li ul li a {
   max-width: 700px;
   margin: 30px auto;
   color: #e9eaec;
+
 }
 
-.login-form label {
+.auth-form label {
   align-self: center;
   font-weight: bold;
   color: #e4b61a;
@@ -1397,7 +1325,8 @@ ul li ul li a {
   align-items: center;
 }
 
-.login-form input {
+.auth-form input,
+.auth-form select {
   width: 100%;
   padding: 8px;
   background-color: #303030;
@@ -1407,12 +1336,20 @@ ul li ul li a {
   font-size: 1em;
 }
 
-.login-form input:focus {
+.auth-form input:focus,
+.auth-form select:focus {
   outline: none;
   border-color: #fbe134;
 }
 
-.login-form .btn-submit {
+.auth-form .help-icon {
+  margin-left: 8px;
+  color: #e4b61a;
+  cursor: help;
+  font-size: 0.9em;
+}
+
+.auth-form .btn-submit {
   background-color: #e4b61a;
   color: black;
   font-weight: bold;
@@ -1423,15 +1360,15 @@ ul li ul li a {
   margin-top: 20px;
 }
 
-.login-form .btn-submit:hover {
+.auth-form .btn-submit:hover {
   background-color: #fbe134;
 }
 
-.login-form .full-width {
+.auth-form .full-width {
   grid-column: 1 / span 2;
 }
 
-.login-form .error {
+.auth-form .error {
   grid-column: 1 / span 2;
   color: #db0b17;
   font-size: 0.9em;

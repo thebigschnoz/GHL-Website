@@ -16,7 +16,7 @@
         {% endif %}
     {% endif %}
 
-    <form method="post" action="{% url 'login' %}" class="login-form">
+    <form method="post" action="{% url 'login' %}" class="auth-form">
         {% csrf_token %}
     
         {% if form.non_field_errors %}
