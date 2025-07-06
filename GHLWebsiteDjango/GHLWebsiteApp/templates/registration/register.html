@@ -3,10 +3,79 @@
 {% block body %}
 <div class="section section_lg" style="text-align: -webkit-center; place-self: center;">
     <div class="header">Register</div>
-    <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Sign up</button>
+    <form method="post" class="registration-form">
+        {% csrf_token %}
+    
+        {{ form.non_field_errors }}
+    
+        <label for="{{ form.username.id_for_label }}">
+            {{ form.username.label }}
+            {% if form.username.help_text %}
+                <span class="help-icon" title="{{ form.username.help_text }}">&#9432;</span>
+            {% endif %}
+        </label>
+        <div>
+            {{ form.username }}
+            {% for error in form.username.errors %}
+                <div class="error">{{ error }}</div>
+            {% endfor %}
+        </div>
+    
+        <label for="{{ form.password1.id_for_label }}">
+            {{ form.password1.label }}
+            {% if form.password1.help_text %}
+                <span class="help-icon" title="{{ form.password1.help_text }}">&#9432;</span>
+            {% endif %}
+        </label>
+        <div>
+            {{ form.password1 }}
+            {% for error in form.password1.errors %}
+                <div class="error">{{ error }}</div>
+            {% endfor %}
+        </div>
+    
+        <label for="{{ form.password2.id_for_label }}">
+            <span class="label-text">
+                Confirm password
+                {% if form.password2.help_text %}
+                    <span class="help-icon" title="{{ form.password2.help_text }}">&#9432;</span>
+                {% endif %}
+            </span>
+        </label>
+        
+        <div>
+            {{ form.password2 }}
+            {% for error in form.password2.errors %}
+                <div class="error">{{ error }}</div>
+            {% endfor %}
+        </div>
+    
+        <label for="{{ form.player_link.id_for_label }}">
+            {{ form.player_link.label }}
+            {% if form.player_link.help_text %}
+                <span class="help-icon" title="{{ form.player_link.help_text }}">&#9432;</span>
+            {% endif %}
+        </label>
+        <div>
+            {{ form.player_link }}
+            {% for error in form.player_link.errors %}
+                <div class="error">{{ error }}</div>
+            {% endfor %}
+        </div>
+    
+        <label for="{{ form.captcha.id_for_label }}">
+            {{ form.captcha.label }}
+        </label>
+        <div>
+            {{ form.captcha }}
+            {% for error in form.captcha.errors %}
+                <div class="error">{{ error }}</div>
+            {% endfor %}
+        </div>
+    
+        <div class="full-width">
+            <button type="submit" class="btn-submit">Sign Up</button>
+        </div>
     </form>
 </div>
 {% endblock %}
