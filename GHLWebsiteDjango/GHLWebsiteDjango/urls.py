@@ -19,12 +19,14 @@ from django.urls import include, path
 from django.conf import settings
 from django.conf.urls.static import static
 from GHLWebsiteApp.admin import custom_admin_site
+from GHLWebsiteApp.views import PlayerAutocomplete
 
 urlpatterns = [
     path('admin/', custom_admin_site.urls),
     path('', include("GHLWebsiteApp.urls")),
     path('auth/', include('django.contrib.auth.urls')),
     path("captcha/", include("captcha.urls")),
+    path('player-autocomplete/', PlayerAutocomplete.as_view(), name='player-autocomplete'),
 ]
 
 if settings.DEBUG:

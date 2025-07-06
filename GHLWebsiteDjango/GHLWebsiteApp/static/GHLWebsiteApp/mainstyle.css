@@ -1374,3 +1374,48 @@ ul li ul li a {
   font-size: 0.9em;
   margin-top: 5px;
 }
+
+/* The outer box of the select field */
+.select2-container--default .select2-selection--single {
+  background-color: #303030;
+  border: 1px solid #e4b61a;
+  color: #e9eaec;
+  border-radius: 4px;
+  min-height: 38px;
+}
+
+/* Text inside the selected box */
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+  color: #e9eaec;
+  line-height: 38px;
+  padding-left: 10px;
+}
+
+/* The dropdown arrow */
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+  height: 38px;
+}
+
+/* The dropdown itself */
+.select2-container--default .select2-dropdown {
+  background-color: #303030;
+  border: 1px solid #e4b61a;
+  color: #e9eaec;
+}
+
+/* Each result item in the dropdown */
+.select2-container--default .select2-results__option {
+  color: #e9eaec;
+  background-color: #303030;
+}
+
+/* Hovered option */
+.select2-container--default .select2-results__option--highlighted {
+  background-color: #e4b61a;
+  color: black;
+}
+
+/* Placeholder text */
+.select2-container--default .select2-selection--single .select2-selection__placeholder {
+  color: #959697;
+}

@@ -1,6 +1,5 @@
 from django.urls import path
 from . import views
-from .views import PlayerAutocomplete
 
 urlpatterns = [
     path('', views.index, name="index"),
@@ -28,5 +27,4 @@ urlpatterns = [
     path('export/playerdata/', views.export_player_data, name="export_player_data"),
     path('profile/', views.user_profile, name="user_profile"),
     path('register/', views.register, name='register'),
-    path('player-autocomplete/', PlayerAutocomplete.as_view(), name='player-autocomplete'),
 ]
