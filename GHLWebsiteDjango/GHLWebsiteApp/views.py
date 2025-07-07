@@ -339,7 +339,7 @@ def skatersAdvanced(request, season=None):
         skatersbs=Avg("blocked_shots"),
         skatersfo = Case(
             When(
-                (F("total_fow") + F("total_fol")) > 0,
+                Q(total_fow__gt=0) | Q(total_fol__gt=0),
                 then=Cast(F("total_fow") * 100.0 / (F("total_fow") + F("total_fol")), FloatField())
             ),
             default=0,
