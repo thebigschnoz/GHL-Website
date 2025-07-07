@@ -1,3 +1,4 @@
+from django import forms
 from django.contrib import admin
 from django.urls import path
 from django.http import HttpResponseRedirect
@@ -176,10 +177,24 @@ class CustomUserAdmin(UserAdmin):
             return format_html('<a href="{}">{}</a>', url, obj.player_link.username)
         return "-"
 
+class AnnouncementAdminForm(forms.ModelForm):
+    class Meta:
+        model = Announcement
+        fields = "__all__"
+
 class AnnouncementAdmin(admin.ModelAdmin):
     list_display = ("created_at","author")
     list_filter = ("author",)
-    exclude = ("author",)
+    form = AnnouncementAdminForm
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+
+        # On the add page, hide the author field
+        if obj is None:
+            if "author" in form.base_fields:
+                form.base_fields["author"].widget = forms.HiddenInput()
+        return form
 
     def save_model(self, request, obj, form, change):
         if not change or not obj.author:
