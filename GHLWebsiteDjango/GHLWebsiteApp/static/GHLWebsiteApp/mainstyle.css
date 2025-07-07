@@ -1527,7 +1527,7 @@ ul li ul li a {
   margin-top: 4px;
 }
 
-@media (min-width: 768px) {
+@media (max-width: 400px) {
   .stat-label {
     display: none;
   }
