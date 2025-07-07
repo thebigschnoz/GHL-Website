@@ -1,5 +1,5 @@
 from django import forms
-from .models import AwardTitle, Player, User
+from .models import AwardTitle, Player, User, Position
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
 from captcha.fields import CaptchaField
@@ -36,3 +36,39 @@ class CustomUserCreationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = User
         fields = ("username", "password1", "password2", "player_link", "captcha")
+
+class UserProfileForm(forms.ModelForm):
+    player_link = forms.ModelChoiceField(
+        queryset=Player.objects.all(),
+        widget=autocomplete.ModelSelect2(url='player-autocomplete'),
+        required=False,
+        label="Linked Player",
+    )
+
+    jersey_num = forms.IntegerField(required=False, label="Jersey Number")
+    primarypos = forms.ModelChoiceField(
+        queryset=Position.objects.all().order_by('-ea_pos'),
+        required=False,
+        label="Primary Position"
+    )
+    secondarypos = forms.ModelMultipleChoiceField(
+        queryset=Position.objects.all().order_by('-ea_pos'),
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+        label="Secondary Positions"
+    )
+
+    class Meta:
+        model = User
+        fields = ['player_link', 'jersey_num', 'primarypos', 'secondarypos']
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
+        # Pre-fill player fields if user already linked
+        if user and user.player_link:
+            player = user.player_link
+            self.fields['jersey_num'].initial = player.jersey_num
+            self.fields['primarypos'].initial = player.primarypos
+            self.fields['secondarypos'].initial = player.secondarypos.all()

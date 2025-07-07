@@ -27,4 +27,5 @@ urlpatterns = [
     path('export/playerdata/', views.export_player_data, name="export_player_data"),
     path('profile/', views.user_profile, name="user_profile"),
     path('register/', views.register, name='register'),
+    path('api/player/<int:player_id>/', views.player_details, name='player-details'),
 ]

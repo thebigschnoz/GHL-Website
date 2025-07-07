@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .forms import UploadFileForm, CustomUserCreationForm
+from .forms import *
 from datetime import datetime
 from GHLWebsiteApp.models import *
 from django.db.models import Sum, Count, Case, When, Avg, F, Window, FloatField, Q
@@ -717,8 +717,32 @@ def playerlist(request):
 
 @login_required
 def user_profile(request):
-    # TODO: Add user profile functionality here
-    pass
+    user = request.user
+
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, user=user, instance=user)
+        if form.is_valid():
+            # Save User (updates player_link)
+            user = form.save()
+
+            # Save Player details if player_link exists
+            player = user.player_link
+            if player:
+                player.jersey_num = form.cleaned_data.get('jersey_num')
+                player.primarypos = form.cleaned_data.get('primarypos')
+                player.save()
+
+                # many-to-many must be set via set()
+                player.secondarypos.set(form.cleaned_data.get('secondarypos'))
+
+            messages.success(request, "Your profile has been updated.")
+            return redirect('user_profile')
+    else:
+        form = UserProfileForm(user=user, instance=user)
+
+    return render(request, 'GHLWebsiteApp/user_profile.html', {
+        'form': form
+    })
 
 def upload_file(request):
     season = get_seasonSetting()
@@ -816,6 +840,15 @@ def register(request):
         form = CustomUserCreationForm()
     
     return render(request, 'registration/register.html', {'form': form})
+
+def player_details(request, player_id):
+    player = get_object_or_404(Player, pk=player_id)
+    data = {
+        "jersey_num": player.jersey_num,
+        "primarypos": player.primarypos.pk if player.primarypos else None,
+        "secondarypos": [p.pk for p in player.secondarypos.all()],
+    }
+    return JsonResponse(data)
 
 class PlayerAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):

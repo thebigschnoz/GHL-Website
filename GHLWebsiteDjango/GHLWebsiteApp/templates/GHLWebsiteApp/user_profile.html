@@ -1,0 +1,74 @@
+{% extends "GHLWebsiteApp/layout.html" %}
+
+{% block body %}
+<div class="section section_lg" style="text-align: -webkit-center; place-self: center;">
+    <div class="header">User Profile</div>
+    {% if messages %}
+      {% for message in messages %}
+        <div class="auth-form error">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="post" class="auth-form">
+        {% csrf_token %}
+        
+        {{ form.non_field_errors }}
+        
+        {% for field in form.visible_fields %}
+        {% if field.id_for_label %}
+            <label for="{{ field.id_for_label }}">
+                {{ field.label }}
+            </label>
+        {% else %}
+            <label>
+                {{ field.label }}
+            </label>
+        {% endif %}
+        <div style="max-width: 400px;">
+            {{ field }}
+            {% for error in field.errors %}
+            <div class="error">{{ error }}</div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+        
+        <div class="full-width">
+            <button type="submit" class="btn-submit">Save Changes</button>
+        </div>
+    </form>
+    <script>
+        $(function() {
+            let playerField = $('#id_player_link');
+        
+            if (playerField.length === 0) {
+                console.error('playerField not found!');
+                return;
+            }
+        
+            playerField.on('select2:select', function(e) {
+                let playerId = e.params.data.id;
+        
+                $.ajax({
+                    url: `/api/player/${playerId}/`,
+                    type: 'GET',
+                    success: function(data) {
+                        $('#id_jersey_num').val(data.jersey_num);
+                        $('#id_primarypos').val(data.primarypos).change();
+        
+                        $('#id_secondarypos input[type=checkbox]').prop('checked', false);
+                        data.secondarypos.forEach(function(pk) {
+                            $('#id_secondarypos input[type=checkbox][value=' + pk + ']').prop('checked', true);
+                        });
+                    }
+                });
+            });
+            playerField.on('select2:clear', function(e) {
+                $('#id_jersey_num').val('');
+                $('#id_primarypos').val('').change();
+                $('#id_secondarypos input[type=checkbox]').prop('checked', false);
+            });
+        });
+        
+    </script>
+</div>
+{% endblock %}

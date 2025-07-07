@@ -80,6 +80,9 @@ class Position(models.Model):
     position = models.CharField(max_length=20)
     positionShort = models.CharField(max_length=2)
 
+    def __str__(self):
+        return self.position
+
 class Player(models.Model):
     ea_player_num = models.IntegerField(primary_key=True)
     jersey_num = models.PositiveSmallIntegerField(verbose_name="Jersey Number", default=99, blank=True, null=True)
@@ -98,6 +101,9 @@ class Player(models.Model):
 class User(AbstractUser):
     """Custom user model for GHL Website"""
     player_link = models.OneToOneField(Player, on_delete=models.SET_NULL, blank=True, null=True, verbose_name="Link to your player stats", help_text="Link to the player's profile in the GHL database")
+
+    class Meta:
+        ordering = [Lower('username')]
 
     def __str__(self):
         return self.username
