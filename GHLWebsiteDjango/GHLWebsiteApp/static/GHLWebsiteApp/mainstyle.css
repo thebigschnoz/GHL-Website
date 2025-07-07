@@ -1425,6 +1425,9 @@ ul li ul li a {
   margin: 60px auto;
   max-width: 600px;
   color: #e9eaec;
+  background-color: #303030;
+  border: 1px solid #e4b61a;
+  border-radius: 8px;
 }
 
 .error-page h1 {
