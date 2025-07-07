@@ -542,8 +542,8 @@ def player(request, player):
         sk_pims=Sum("pims"),
         sk_pk_clears=Sum("pk_clears"),
         sk_poss_time=Round(Avg("poss_time"),1),
-        sk_fow=Sum("fow"),
-        sk_fol=Sum("fol"),
+        sk_fow=Coalesce(Sum("fow"), 0),
+        sk_fol=Coalesce(Sum("fol"), 0),
     ).order_by("-game_num__season_num")
 
     # Calculated values for each season
@@ -560,10 +560,14 @@ def player(request, player):
             round((season["sk_pass_comp"] / season["sk_pass_att"]) * 100, 1)
             if season["sk_pass_att"] > 0 else "-"
         )
-        fow = season["sk_fow"] or 0
-        fol = season["sk_fol"] or 0
+        fow = season["sk_fow"]
+        fol = season["sk_fol"]
         total = fow + fol
-        season["sk_fo_perc"] = round((fow / total) * 100, 1) if total > 0 else "-"
+        if (total > 0):
+            season["sk_fo_perc"] = round((fow / total) * 100, 1)
+        else:
+            season["sk_fo_perc"] = "-"
+        print("FO%:", season["sk_fo_perc"])
 
     # Group and aggregate goalie records by season
     goalie_season_totals = playernum.goalierecord_set.exclude(

@@ -125,7 +125,7 @@
                 </div>
                 <div class="stat-card">
                     <div class="stat-abbr">FO%</div>
-                    <div class="stat-value">{{ season.sk_fo_perc|floatformat:1 }}</div>
+                    <div class="stat-value">{{ season.sk_fo_perc|floatformat:1|default:"-" }}</div>
                     <div class="stat-label">faceoff percentage</div>
                 </div>
                 {% endif %}
@@ -204,7 +204,7 @@
                         <td>{{ season.sk_int }}</td>
                         <td>{{ season.sk_gva }}</td>
                         <td>{{ season.sk_poss_time|floatformat:1 }}</td>
-                        <td>{{ season.sk_fo_perc|floatformat:1|default_if_none:"-" }}</td>
+                        <td>{{ season.sk_fo_perc|floatformat:1|default:"-" }}</td>
                         {% endif %}
                         {% endfor %}
                     </tr>
