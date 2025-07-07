@@ -155,3 +155,4 @@ DATETIME_FORMAT = "U"
 DATETIME_INPUT_FORMATS = ("%s",)
 LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/auth/login/'
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
