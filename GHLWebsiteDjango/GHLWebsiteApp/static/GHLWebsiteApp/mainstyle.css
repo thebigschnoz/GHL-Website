@@ -699,6 +699,7 @@ span.playerlist-details-bottom {
   position: relative;
   margin-right: 5px;
   overflow: hidden;
+  max-width: 125px;
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: 14px;
