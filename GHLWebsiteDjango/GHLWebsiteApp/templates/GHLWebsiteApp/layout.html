@@ -103,7 +103,7 @@
 				</ul>
 			</nav>
 			<div id="auth">
-				<span style="display: inline-block; margin-right: 5px;">{% if user.is_authenticated %}User: {{ user.get_username }}{% endif %}</span><nav role="navigation" class="primary-navigation" style="display: inline-block; vertical-align: middle;">
+				<span style="display: inline-block; margin-right: 5px; background-color: black;">{% if user.is_authenticated %}User: {{ user.get_username }}{% endif %}</span><nav role="navigation" class="primary-navigation" style="display: inline-block; vertical-align: middle;">
 					{% if user.is_authenticated %}
 						<ul>
 							<li>Actions &dtrif;

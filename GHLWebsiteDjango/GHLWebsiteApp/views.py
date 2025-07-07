@@ -712,6 +712,7 @@ def playerlist(request):
             "player": player,
             "total_seasons": len(combined_seasons),
             "total_games": total_games,
+            "number": player.jersey_num if player.jersey_num else "00",
         })
     return render(request, "GHLWebsiteApp/playerlist.html", {"all_players": player_data,})
 
