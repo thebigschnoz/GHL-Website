@@ -5,7 +5,7 @@ from .forms import UploadFileForm, CustomUserCreationForm
 from datetime import datetime
 from GHLWebsiteApp.models import *
 from django.db.models import Sum, Count, Case, When, Avg, F, Window, FloatField, Q
-from django.db.models.functions import Cast, Rank, Round, Lower
+from django.db.models.functions import Cast, Rank, Round, Lower, Coalesce
 from django.http import JsonResponse, HttpResponse
 from decimal import *
 from itertools import chain
@@ -310,8 +310,8 @@ def skatersAdvanced(request, season=None):
     if season is None:
         season = get_seasonSetting()
     all_skaters = SkaterRecord.objects.filter(game_num__season_num=season).exclude(position=0).values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(
-        total_fow=Sum("fow"),
-        total_fol=Sum("fol"),
+        total_fow=Coalesce(Sum("fow"), 0),
+        total_fol=Coalesce(Sum("fol"), 0),
     ).annotate(
         sumsog=Sum("sog"),
         sumshotatt=Sum("shot_attempts"),
@@ -337,12 +337,14 @@ def skatersAdvanced(request, season=None):
         skaterspims=Avg("pims"),
         skatersdrawn=Avg("pens_drawn"),
         skatersbs=Avg("blocked_shots"),
-        skatersfo=Case(
+        skatersfo = Case(
             When(
-                total_fow__isnull=False,
-                total_fol__isnull=False,
+                (F("total_fow") + F("total_fol")) > 0,
                 then=Cast(F("total_fow") * 100.0 / (F("total_fow") + F("total_fol")), FloatField())
-        ),default=0, output_field=FloatField()), # TODO: Find out why players without fow/fol are showing up with blanks
+            ),
+            default=0,
+            output_field=FloatField()
+        )
     ).order_by("ea_player_num__username")
     season = Season.objects.get(season_num=season)
     seasonlist = Season.objects.exclude(season_type="preseason").order_by("-start_date")
@@ -558,11 +560,10 @@ def player(request, player):
             round((season["sk_pass_comp"] / season["sk_pass_att"]) * 100, 1)
             if season["sk_pass_att"] > 0 else "-"
         )
-        season["sk_fo_perc"] = (
-            round((season["sk_fow"] / (season["sk_fow"] + season["sk_fol"])) * 100, 1)
-            if (season["sk_fow"] + season["sk_fol"]) > 0 else "-"
-        )
-
+        fow = season["sk_fow"] or 0
+        fol = season["sk_fol"] or 0
+        total = fow + fol
+        season["sk_fo_perc"] = round((fow / total) * 100, 1) if total > 0 else "-"
 
     # Group and aggregate goalie records by season
     goalie_season_totals = playernum.goalierecord_set.exclude(
