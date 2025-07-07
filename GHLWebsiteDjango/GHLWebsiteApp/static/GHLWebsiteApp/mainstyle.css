@@ -1451,3 +1451,228 @@ ul li ul li a {
 .error-page .btn-submit:hover {
   background-color: #fbe134;
 }
+
+.player-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  margin: 20px auto;
+  flex-wrap: wrap;
+  text-align: center;
+}
+
+.player-name {
+  font-weight: 700;
+  font-size: 68px;
+  color: #e9eaec;
+  word-break: break-word;
+}
+
+@media (max-width: 768px) {
+  .player-header {
+      flex-direction: column;
+      gap: 20px;
+  }
+
+  .player-name {
+      font-size: 42px;
+  }
+
+  .player-photo img,
+  .player-logo img {
+      width: 150px;
+      height: 150px;
+  }
+}
+
+.statsbar-cards {
+  display: none;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 0 auto;
+  max-width: 100%;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+.stat-card {
+  background-color: #303030;
+  border: 1px solid #e4b61a;
+  border-radius: 4px;
+  flex: 1 1 150px;
+  max-width: 300px;
+  padding: 10px;
+  text-align: center;
+  margin: 10px;
+}
+
+.stat-value {
+  font-size: 1.5em;
+  font-weight: bold;
+  color: #e9eaec;
+}
+
+.stat-label {
+  display: inline-block;
+  font-size: 0.8em;
+  color: #e4b61a;
+  margin-top: 4px;
+  word-break: break-word;
+}
+
+.stat-abbr {
+  font-size: 0.8em;
+  color: #e4b61a;
+  margin-top: 4px;
+}
+
+@media (min-width: 768px) {
+  .stat-label {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .stat-card {
+    width: 100%;
+    max-width: 300px;
+    flex: 1 1 45%;
+  }
+}
+
+@media (max-width: 480px) {
+  .stat-card {
+      width: 100%;
+  }
+}
+
+/* Mobile view */
+@media (max-width: 1100px) {
+  .statsbar-desktop {
+      display: none;
+  }
+
+  .statsbar-cards {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 20px;
+  }
+}
+
+.gamelog-table {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  border-collapse: collapse;
+}
+
+.gamelog-row {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: #1f1f1f;
+  border-bottom: 1px solid #444;
+  padding: 10px;
+  flex-wrap: wrap;
+}
+
+.gamelog-row > div {
+  flex: 1;
+  min-width: 100px;
+  text-align: center;
+  color: #e9eaec;
+  font-size: 0.95em;
+}
+
+.gamelog-row .team-name {
+  font-weight: bold;
+  color: #e4b61a;
+}
+
+.gamelog-row .team-score {
+  margin-left: 8px;
+  color: #e9eaec;
+}
+
+.gamelog-row .game-status {
+  min-width: 36px;
+  max-width: 60px;
+}
+
+.gamelog-row .game-status a {
+  color: #e4b61a;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  .gamelog-row {
+      flex-direction: column;
+      text-align: center;
+  }
+  .gamelog-row > div {
+      min-width: 100%;
+      margin-bottom: 5px;
+  }
+}
+.gamelog-row .game-away,
+.gamelog-row .game-home {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    color: #e9eaec;
+    font-weight: bold;
+    flex: 1;
+    min-width: 100px;
+}
+
+.gamelog-row .game-away {
+    justify-content: flex-end;
+}
+
+.gamelog-row .game-home {
+    justify-content: flex-start;
+}
+
+.gamelog-row .game-away .team-name,
+.gamelog-row .game-home .team-name {
+    color: #e4b61a;
+    text-decoration: none;
+}
+
+.gamelog-row .game-away .team-score,
+.gamelog-row .game-home .team-score {
+    color: #e9eaec;
+    font-weight: normal;
+}
+
+@media (max-width: 768px) {
+    .gamelog-row .game-away,
+    .gamelog-row .game-home {
+        justify-content: center;
+        text-align: center;
+        margin-bottom: 4px;
+    }
+}
+
+.gamelog-row .game-time {
+  text-align: center;
+  color: #e4b61a;
+  font-weight: bold;
+  margin-bottom: 8px;
+  font-size: 1em;
+}
+
+.gamelog-row .game-details {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: nowrap;
+}

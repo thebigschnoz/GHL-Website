@@ -4,50 +4,156 @@
 <center>
     <div class="section section_lg"><center>
         <div class="subsection-container">
-            <table>
-                <col style="width: 25%;">
-                <col style="width: 900px;">
-                <col style="width: 25%;">
-                <tr class="no-bg">
-                    <td>
-                        <img src="{% static 'GHLWebsiteApp/stock-user-photo.jpg' %}" width=220 height=220 />
-                    </td>
-                    <td>
-                        <center>
-                            <font style="font-weight: 700; font-size: 68px">{{ playernum.username }}</font>
-                        </center>
-                    </td>
-                    <td>
-                        <a href="{% url 'team' playernum.current_team.ea_club_num %}"><img src="{{ playernum.current_team.team_logo_link }}" width=220 height=220 /></a>
-                    </td>
-                </tr>
-            </table>
+            <div class="player-header">
+                <div class="player-photo">
+                    <img src="{% static 'GHLWebsiteApp/stock-user-photo.jpg' %}" width="220" height="220" />
+                </div>
+                <div class="player-name">
+                    {{ playernum.username }}
+                </div>
+                <div class="player-logo">
+                    <a href="{% url 'team' playernum.current_team.ea_club_num %}">
+                        <img src="{{ playernum.current_team.team_logo_link }}" width="220" height="220" />
+                    </a>
+                </div>
+            </div>
         </div>
         {% if skater_season_totals %}
         <div class="subsection-container" style="width: 100%;">
-            <table class="statsbar">
+            <div class="statsbar-cards">
+                {% for season in skater_season_totals %}
+                {% if forloop.first %}
+                <div class="stat-card">
+                    <div class="stat-abbr">GP</div>
+                    <div class="stat-value">{{ season.sk_gp }}</div>
+                    <div class="stat-label">games played</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-abbr">G</div>
+                    <div class="stat-value">{{ season.sk_g }}</div>
+                    <div class="stat-label">goals</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-abbr">A</div>
+                    <div class="stat-value">{{ season.sk_a }}</div>
+                    <div class="stat-label">assists</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-abbr">P</div>
+                    <div class="stat-value">{{ season.sk_p }}</div>
+                    <div class="stat-label">points</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-abbr">Hits</div>
+                    <div class="stat-value">{{ season.sk_hits }}</div>
+                    <div class="stat-label">hits</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-abbr">+/-</div>
+                    <div class="stat-value">{{ season.sk_plus_minus }}</div>
+                    <div class="stat-label">plus / minus</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-abbr">PIMs</div>
+                    <div class="stat-value">{{ season.sk_pims }}</div>
+                    <div class="stat-label">penalty minutes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-abbr">Drawn</div>
+                    <div class="stat-value">{{ season.sk_pens_drawn }}</div>
+                    <div class="stat-label">penalties drawn</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-abbr">PK Clear</div>
+                    <div class="stat-value">{{ season.sk_pk_clears }}</div>
+                    <div class="stat-label">pk clears</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-abbr">S</div>
+                    <div class="stat-value">{{ season.sk_sog }}</div>
+                    <div class="stat-label">shots</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-abbr">S %</div>
+                    <div class="stat-value">{{ season.sk_shot_perc|floatformat:1 }}</div>
+                    <div class="stat-label">shooting percentage</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-abbr">S Eff</div>
+                    <div class="stat-value">{{ season.sk_shot_eff|floatformat:1 }}</div>
+                    <div class="stat-label">shooting efficiency</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-abbr">PPG</div>
+                    <div class="stat-value">{{ season.sk_ppg }}</div>
+                    <div class="stat-label">powerplay goals</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-abbr">SHG</div>
+                    <div class="stat-value">{{ season.sk_shg }}</div>
+                    <div class="stat-label">shorthanded goals</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-abbr">Pass %</div>
+                    <div class="stat-value">{{ season.sk_pass_perc|floatformat:1 }}</div>
+                    <div class="stat-label">passing percentage</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-abbr">BS</div>
+                    <div class="stat-value">{{ season.sk_bs }}</div>
+                    <div class="stat-label">blocked shots</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-abbr">TK</div>
+                    <div class="stat-value">{{ season.sk_tk }}</div>
+                    <div class="stat-label">takeaways</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-abbr">INT</div>
+                    <div class="stat-value">{{ season.sk_int }}</div>
+                    <div class="stat-label">interceptions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-abbr">GVA</div>
+                    <div class="stat-value">{{ season.sk_gva }}</div>
+                    <div class="stat-label">giveaways</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-abbr">TOP</div>
+                    <div class="stat-value">{{ season.sk_poss_time|floatformat:1 }}</div>
+                    <div class="stat-label">avg sec of possession</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-abbr">FO%</div>
+                    <div class="stat-value">{{ season.sk_fo_perc|floatformat:1 }}</div>
+                    <div class="stat-label">faceoff percentage</div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+            <div class="statsbar-desktop"><table class="statsbar">
                 <colgroup>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
+                    <col style="width: 80px;">
+                    <col style="width: 80px;">
+                    <col style="width: 80px;">
+                    <col style="width: 80px;">
+                    <col style="width: 80px;">
+                    <col style="width: 80px;">
+                    <col style="width: 80px;">
+                    <col style="width: 80px;">
+                    <col style="width: 80px;">
+                    <col style="width: 80px;">
+                    <col style="width: 80px;">
+                    <col style="width: 80px;">
+                    <col style="width: 80px;">
+                    <col style="width: 80px;">
+                    <col style="width: 80px;">
+                    <col style="width: 80px;">
+                    <col style="width: 80px;">
+                    <col style="width: 80px;">
+                    <col style="width: 80px;">
+                    <col style="width: 80px;">
+                    <col style="width: 80px;">
                 </colgroup>
                 <thead>
                     <tr>
@@ -98,7 +204,7 @@
                         <td>{{ season.sk_int }}</td>
                         <td>{{ season.sk_gva }}</td>
                         <td>{{ season.sk_poss_time|floatformat:1 }}</td>
-                        <td>{{ season.sk_fo_perc|floatformat:1 }}</td>
+                        <td>{{ season.sk_fo_perc|floatformat:1|default_if_none:"-" }}</td>
                         {% endif %}
                         {% endfor %}
                     </tr>
@@ -126,27 +232,103 @@
                         <td>faceoff percentage</td>
                     </tr>
                 </tbody>
-            </table>
+            </div></table>
         </div>
         {% endif %}
         {% if goalie_season_totals %}
         <div class="subsection-container" style="width: 100%;">
-            <table class="statsbar">
+            <div class="statsbar-cards">
+                {% for season in goalie_season_totals %}
+                {% if forloop.first %}
+                <div class="stat-card">
+                    <div class="stat-abbr">GP</div>
+                    <div class="stat-value">{{ season.g_gp }}</div>
+                    <div class="stat-label">games played</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-abbr">W</div>
+                    <div class="stat-value">{{ season.g_wins }}</div>
+                    <div class="stat-label">wins</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-abbr">L</div>
+                    <div class="stat-value">{{ season.g_losses }}</div>
+                    <div class="stat-label">losses</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-abbr">OTL</div>
+                    <div class="stat-value">{{ season.g_otlosses }}</div>
+                    <div class="stat-label">overtime losses</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-abbr">GA</div>
+                    <div class="stat-value">{{ season.g_ga }}</div>
+                    <div class="stat-label">goals against</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-abbr">SH</div>
+                    <div class="stat-value">{{ season.g_sha }}</div>
+                    <div class="stat-label">shots against</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-abbr">SV%</div>
+                    <div class="stat-value">{{ season.g_svp|floatformat:1 }}</div>
+                    <div class="stat-label">save percentage</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-abbr">GAA</div>
+                    <div class="stat-value">{{ season.g_gaa|floatformat:2 }}</div>
+                    <div class="stat-label">goals against average</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-abbr">SO</div>
+                    <div class="stat-value">{{ season.g.so }}</div>
+                    <div class="stat-label">shutouts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-abbr">PS</div>
+                    <div class="stat-value">{{ season.g_ps_sh }}</div>
+                    <div class="stat-label">penalty shots</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-abbr">PS%</div>
+                    <div class="stat-value">{{ season.g_ps_perc }}</div>
+                    <div class="stat-label">penalty shot percentage</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-abbr">BRK</div>
+                    <div class="stat-value">{{ season.g_br_sh }}</div>
+                    <div class="stat-label">breakaways</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-abbr">BRK%</div>
+                    <div class="stat-value">{{ season.g_br_perc }}</div>
+                    <div class="stat-label">breakaway percentage</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-abbr">MIN</div>
+                    <div class="stat-value">{{ season.g_toi|floatformat:0 }}</div>
+                    <div class="stat-label">minutes played</div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+            <div class="statsbar-desktop"><table class="statsbar">
                 <colgroup>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
-                    <col>
+                    <col style="width: 80px;">
+                    <col style="width: 80px;">
+                    <col style="width: 80px;">
+                    <col style="width: 80px;">
+                    <col style="width: 80px;">
+                    <col style="width: 80px;">
+                    <col style="width: 80px;">
+                    <col style="width: 80px;">
+                    <col style="width: 80px;">
+                    <col style="width: 80px;">
+                    <col style="width: 80px;">
+                    <col style="width: 80px;">
+                    <col style="width: 80px;">
+                    <col style="width: 80px;">
                 </colgroup>
                 <thead>
                     <tr>
@@ -204,7 +386,7 @@
                         <td>minutes played</td>
                     </tr>
                 </tbody>
-            </table>
+            </table></div>
         </div>
         {% endif %}
     </center></div>
@@ -214,45 +396,35 @@
             <div class="header" style="width: 100%; text-align: center; margin-bottom: 1px;">
                 Game Log
             </div><br>
-            <div>
-                <table class="statsbar betweenrows" style="width: 800px;">
-                    <colgroup>
-                        <col style="width: 160px;"><!-- Game Time -->
-                        <col><!-- Away Team -->
-                        <col style="width: 80px;"><!-- Away Score -->
-                        <col style="width: 80px;"><!-- Final or OT -->
-                        <col style="width: 80px;"><!-- Home Score -->
-                        <col><!-- Home Team -->
-                    </colgroup>
-                    <thead>
-                        <tr>
-                            <th>Game Time</th>
-                            <th style="text-align: right; padding-right: 15px;">Away Team</th>
-                            <th>Away Score</th>
-                            <th>Final/OT</th>
-                            <th>Home Score</th>
-                            <th style="text-align: left; padding-left: 15px;">Home Team</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for game in games %}
-                        <tr class="no-bg">
-                            <td>{{ game.expected_time|date:"m/d/y  g:i" }}</td>
-                            <td style="text-align: right; padding-right: 10px;"><a href="{% url 'team' game.a_team_num.ea_club_num %}">{{ game.a_team_num.club_full_name }}</a></td>
-                            <td>{{ game.a_team_gf }}</td>
+            <div class="gamelog-table">
+                {% for game in games %}
+                <div class="gamelog-row">
+                    <div class="game-time">
+                        {{ game.expected_time|date:"n/j/y g:i" }}
+                    </div>
+                    <div class="game-details">
+                        <div class="game-away">
+                            <a href="{% url 'team' game.a_team_num.ea_club_num %}" class="team-name">
+                            {{ game.a_team_num.club_abbr }}
+                            </a>
+                            <span class="team-score">{{ game.a_team_gf }}</span>
+                        </div>
+                        <div class="game-status">
                             {% if game.gamelength > 3600 %}
-                            <td><a href="{% url 'game' game.game_num %}">Final/OT</a></td>
-                            {% elif game.played_time is None %}
-                            <td><a href="{% url 'game' game.game_num %}">@</a></td>
+                            <a href="{% url 'game' game.game_num %}">F/OT</a>
                             {% else %}
-                            <td><a href="{% url 'game' game.game_num %}">Final</a></td>
+                            <a href="{% url 'game' game.game_num %}">F</a>
                             {% endif %}
-                            <td>{{ game.h_team_gf }}</td>
-                            <td style="text-align: left; padding-left: 10px;"><a href="{% url 'team' game.h_team_num.ea_club_num %}">{{ game.h_team_num.club_full_name }}</a></td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                        </div>
+                        <div class="game-home">
+                            <span class="team-score">{{ game.h_team_gf }}</span>
+                            <a href="{% url 'team' game.h_team_num.ea_club_num %}" class="team-name">
+                            {{ game.h_team_num.club_abbr }}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
             </div>
         </div>
     </center></div>
