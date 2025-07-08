@@ -917,7 +917,7 @@ def weekly_stats_view(request):
         skater_qs
         .annotate(
             shifted_date=ExpressionWrapper(
-                F('game_num__played_time') - datetime.timedelta(days=1),
+                F('game_num__played_time') + datetime.timedelta(days=1),
                 output_field=DateTimeField()
             ),
             week=TruncWeek('shifted_date')
@@ -940,7 +940,7 @@ def weekly_stats_view(request):
             plus_minus=Sum('plus_minus'),
             hits=Sum('hits'),
         )
-        .order_by('-total_points')
+        .order_by('-total_points', '-total_goals', '-plus_minus')
     )
 
     # Map Player info
@@ -967,7 +967,7 @@ def weekly_stats_view(request):
         goalie_qs
         .annotate(
             shifted_date=ExpressionWrapper(
-                F('game_num__played_time') - datetime.timedelta(days=1),
+                F('game_num__played_time') + datetime.timedelta(days=1),
                 output_field=DateTimeField()
             ),
             week=TruncWeek('shifted_date')
