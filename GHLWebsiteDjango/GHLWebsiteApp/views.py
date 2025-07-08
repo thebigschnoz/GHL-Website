@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from .forms import *
 import datetime
 from GHLWebsiteApp.models import *
-from django.db.models import Sum, Count, Case, When, Avg, F, Window, FloatField, Q, Value, ExpressionWrapper, DateTimeField
+from django.db.models import Sum, Count, Case, When, Avg, F, Window, FloatField, Q, Value
 from django.db.models.functions import Cast, Rank, Round, Lower, Coalesce, TruncWeek
 from django.http import JsonResponse, HttpResponse
 from decimal import *
@@ -17,6 +17,7 @@ import pytz
 from django.utils.timezone import localtime
 from django.core.paginator import Paginator
 from dal import autocomplete
+from collections import defaultdict
 # from points_table_simulator import PointsTableSimulator
 
 def media_required(view_func):
@@ -859,48 +860,53 @@ def player_details(request, player_id):
 
 @media_required
 def weekly_stats_view(request):
-    # Get list of available weeks from SkaterRecord
-    weeks_qs = (
-        SkaterRecord.objects
-        .filter(game_num__season_num=get_seasonSetting())
-        .annotate(
-            shifted_date=ExpressionWrapper(
-                F('game_num__played_time') + datetime.timedelta(days=1),
-                output_field=DateTimeField()
-            )
+    # Build list of weeks (Sundays) for dropdown
+    weeks_set = set()
+    season_num = get_seasonSetting()
+
+    if season_num is not None:
+        # Fetch all played_times in this season
+        dates_qs = (
+            SkaterRecord.objects
+            .filter(game_num__season_num=season_num)
+            .values_list('game_num__played_time', flat=True)
         )
-        .annotate(
-            week=TruncWeek('shifted_date')
-        )
-        .values_list('week', flat=True)
-        .distinct()
-        .order_by('-week')
-    )
+        for dt in dates_qs:
+            if dt:
+                played_date = dt.date()
+                # Find previous Sunday
+                days_since_sunday = (played_date.weekday() + 1) % 7
+                sunday_date = played_date - datetime.timedelta(days=days_since_sunday)
+                weeks_set.add(sunday_date)
 
+    weeks = sorted(weeks_set, reverse=True)
 
-    weeks = list(weeks_qs)
-
+    # Handle user's selected week
     selected_week_str = request.GET.get("week")
-
-    # Determine selected week
     if selected_week_str:
         try:
-            # parse as datetime
-            selected_week = datetime.datetime.strptime(selected_week_str, "%Y-%m-%d")
-            selected_week = timezone.make_aware(selected_week)
+            selected_week = datetime.datetime.strptime(selected_week_str, "%Y-%m-%d").date()
         except (ValueError, TypeError):
             selected_week = weeks[0] if weeks else None
     else:
         selected_week = weeks[0] if weeks else None
 
     if selected_week:
-        start_date = selected_week
+        # Boundaries of selected week (Sunday → Saturday)
+        start_date = datetime.datetime.combine(
+            selected_week,
+            datetime.time.min,
+            tzinfo=timezone.get_current_timezone()
+        )
         end_date = start_date + datetime.timedelta(days=7)
 
-        skater_qs = SkaterRecord.objects.exclude(position=0).filter(
+        # Filter Skater Records
+        skater_qs = SkaterRecord.objects.filter(
             game_num__played_time__gte=start_date,
             game_num__played_time__lt=end_date
         )
+
+        # Filter Goalie Records
         goalie_qs = GoalieRecord.objects.filter(
             game_num__played_time__gte=start_date,
             game_num__played_time__lt=end_date
@@ -909,100 +915,105 @@ def weekly_stats_view(request):
         skater_qs = SkaterRecord.objects.none()
         goalie_qs = GoalieRecord.objects.none()
 
-    # Aggregate Skater Stats
-    weekly_skaters = (
-        skater_qs
-        .annotate(
-            shifted_date=ExpressionWrapper(
-                F('game_num__played_time') + datetime.timedelta(days=1),
-                output_field=DateTimeField()
-            ),
-            week=TruncWeek('shifted_date')
-        )
-        .values('week', 'ea_player_num')
-        .annotate(
-            total_goals=Sum('goals'),
-            total_sog=Sum('sog'),
-        )
-        .annotate(
-            total_goals=Sum('goals'),
-            total_assists=Sum('assists'),
-            total_points=Sum('points'),
-            games_played=Count('game_num'),
-            shot_perc=Case(
-                When(total_sog=0, then=Value(0.0)),
-                default=F('total_goals') * 100.0 / F('total_sog'),
-                output_field=FloatField(),
-            ),
-            plus_minus=Sum('plus_minus'),
-            hits=Sum('hits'),
-        )
-        .order_by('-total_points', '-total_goals', '-plus_minus')
-    )
+    # =========================
+    # SKATER AGGREGATION
+    # =========================
+    skater_map = defaultdict(lambda: {
+        'total_goals': 0,
+        'total_assists': 0,
+        'total_points': 0,
+        'total_sog': 0,
+        'games_played': 0,
+        'plus_minus': 0,
+        'hits': 0,
+    })
 
-    # Map Player info
+    for record in skater_qs:
+        ea_player_num = record.ea_player_num.ea_player_num
+        skater_map[ea_player_num]['total_goals'] += record.goals
+        skater_map[ea_player_num]['total_assists'] += record.assists
+        skater_map[ea_player_num]['total_points'] += record.points
+        skater_map[ea_player_num]['total_sog'] += record.sog or 0
+        skater_map[ea_player_num]['plus_minus'] += record.plus_minus or 0
+        skater_map[ea_player_num]['games_played'] += 1
+        skater_map[ea_player_num]['hits'] += record.hits or 0
+
     player_map = Player.objects.in_bulk(field_name='ea_player_num')
 
     skater_stats = []
-    for s in weekly_skaters:
-        player = player_map.get(s['ea_player_num'])
+    for ea_player_num, stats in skater_map.items():
+        player = player_map.get(ea_player_num)
+        shot_perc = (
+            (stats['total_goals'] * 100.0 / stats['total_sog'])
+            if stats['total_sog'] > 0 else 0.0
+        )
+
         skater_stats.append({
-            'week': s['week'],
+            'week': selected_week,
             'player_name': player.username if player else 'Unknown',
-            'ea_player_num': s['ea_player_num'] if player else None,
-            'total_goals': s['total_goals'],
-            'total_assists': s['total_assists'],
-            'total_points': s['total_points'],
-            'games_played': s['games_played'],
-            'shot_perc': round(s['shot_perc'], 2) if s['shot_perc'] is not None else 0,
-            'plus_minus': s['plus_minus'],
-            'hits': s['hits'],
+            'ea_player_num': player.ea_player_num,
+            'total_goals': stats['total_goals'],
+            'total_assists': stats['total_assists'],
+            'total_points': stats['total_points'],
+            'games_played': stats['games_played'],
+            'shot_perc': round(shot_perc, 2),
+            'plus_minus': stats['plus_minus'],
+            'hits': stats['hits'],
         })
 
-    # Aggregate Goalie Stats
-    weekly_goalies = (
-        goalie_qs
-        .annotate(
-            shifted_date=ExpressionWrapper(
-                F('game_num__played_time') + datetime.timedelta(days=1),
-                output_field=DateTimeField()
-            ),
-            week=TruncWeek('shifted_date')
-        )
-        .values('week', 'ea_player_num')
-        .annotate(
-            tshots_against=Sum('shots_against'),
-            tsaves=Sum('saves'),
-            shutouts=Sum(Case(
-                When(shutout=True, then=1),
-                default=0,
-                output_field=models.IntegerField()
-            )),
-            games_played=Count('game_num'),
-            svp = (Cast(Sum("saves"), models.FloatField())/Cast(Sum("shots_against"), models.FloatField()))*100,
-            gaa = ((Cast(Sum("shots_against"), models.FloatField())-Cast(Sum("saves"), models.FloatField()))/Cast(Sum("game_num__gamelength"), models.FloatField()))*3600,
-        )
-        .order_by('-svp')
-    )
+    skater_stats.sort(key=lambda x: (
+        -x['total_points'],
+        -x['total_goals'],
+        -x['plus_minus']
+    ))
+
+    # =========================
+    # GOALIE AGGREGATION
+    # =========================
+    goalie_map = defaultdict(lambda: {
+        'shots_against': 0,
+        'saves': 0,
+        'shutouts': 0,
+        'games_played': 0,
+        'seconds_played': 0,
+    })
+
+    for record in goalie_qs:
+        ea_player_num = record.ea_player_num.ea_player_num
+        seconds_played = record.game_num.gamelength or 3600
+        goalie_map[ea_player_num]['shots_against'] += record.shots_against or 0
+        goalie_map[ea_player_num]['saves'] += record.saves or 0
+        goalie_map[ea_player_num]['shutouts'] += record.shutout or 0
+        goalie_map[ea_player_num]['games_played'] += 1
+        goalie_map[ea_player_num]['seconds_played'] += seconds_played
 
     goalie_stats = []
-    for g in weekly_goalies:
-        player = player_map.get(g['ea_player_num'])
+    for ea_player_num, stats in goalie_map.items():
+        player = player_map.get(ea_player_num)
+        svp = (
+            (stats['saves'] * 100.0 / stats['shots_against'])
+            if stats['shots_against'] > 0 else 0.0
+        )
+        gaa = (
+            (stats['shots_against'] - stats['saves']) / (stats['seconds_played']) * 3600
+        )
         goalie_stats.append({
-            'week': g['week'],
+            'week': selected_week,
             'player_name': player.username if player else 'Unknown',
-            'ea_player_num': s['ea_player_num'] if player else None,
-            'shots_against': g['tshots_against'],
-            'saves': g['tsaves'],
-            'shutouts': g['shutouts'],
-            'games_played': g['games_played'],
-            'svp': round(g['svp'], 1) if g['svp'] is not None else 0,
-            'gaa': round(g['gaa'], 2) if g['gaa'] is not None else 0,
+            'ea_player_num': ea_player_num,
+            'shots_against': stats['shots_against'],
+            'saves': stats['saves'],
+            'shutouts': stats['shutouts'],
+            'games_played': stats['games_played'],
+            'svp': round(svp, 1) if stats['shots_against'] > 0 else 0.0,
+            'gaa': round(gaa, 2) if stats['seconds_played'] > 0 else 0.0,
         })
+
+    goalie_stats.sort(key=lambda x: (-x['svp'], x['games_played']))
 
     context = {
         'weeks': weeks,
-        'selected_week': selected_week_str,
+        'selected_week': selected_week,
         'skater_stats': skater_stats,
         'goalie_stats': goalie_stats,
     }
