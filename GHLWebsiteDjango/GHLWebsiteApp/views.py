@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from .forms import *
 import datetime
 from GHLWebsiteApp.models import *
-from django.db.models import Sum, Count, Case, When, Avg, F, Window, FloatField, Q, Value
+from django.db.models import Sum, Count, Case, When, Avg, F, Window, FloatField, Q, Value, ExpressionWrapper, DateTimeField
 from django.db.models.functions import Cast, Rank, Round, Lower, Coalesce, TruncWeek
 from django.http import JsonResponse, HttpResponse
 from decimal import *
@@ -29,7 +29,7 @@ def get_seasonSetting():
     seasonSetting = Season.objects.filter(isActive=True).first().season_num
     if not seasonSetting:
         seasonSetting = 1
-    return seasonSetting
+    return seasonSetting # Returns an integer
 
 def calculate_leaders():
     season = get_seasonSetting()
@@ -862,7 +862,16 @@ def weekly_stats_view(request):
     # Get list of available weeks from SkaterRecord
     weeks_qs = (
         SkaterRecord.objects
-        .annotate(week=TruncWeek('game_num__played_time'))
+        .filter(game_num__season_num=get_seasonSetting())
+        .annotate(
+            shifted_date=ExpressionWrapper(
+                F('game_num__played_time') - datetime.timedelta(days=1),
+                output_field=DateTimeField()
+            )
+        )
+        .annotate(
+            week=TruncWeek('shifted_date')
+        )
         .values_list('week', flat=True)
         .distinct()
         .order_by('-week')
@@ -902,7 +911,13 @@ def weekly_stats_view(request):
     # Aggregate Skater Stats
     weekly_skaters = (
         skater_qs
-        .annotate(week=TruncWeek('game_num__played_time'))
+        .annotate(
+            shifted_date=ExpressionWrapper(
+                F('game_num__played_time') - datetime.timedelta(days=1),
+                output_field=DateTimeField()
+            ),
+            week=TruncWeek('shifted_date')
+        )
         .values('week', 'ea_player_num')
         .annotate(
             total_goals=Sum('goals'),
@@ -946,7 +961,13 @@ def weekly_stats_view(request):
     # Aggregate Goalie Stats
     weekly_goalies = (
         goalie_qs
-        .annotate(week=TruncWeek('game_num__played_time'))
+        .annotate(
+            shifted_date=ExpressionWrapper(
+                F('game_num__played_time') - datetime.timedelta(days=1),
+                output_field=DateTimeField()
+            ),
+            week=TruncWeek('shifted_date')
+        )
         .values('week', 'ea_player_num')
         .annotate(
             tshots_against=Sum('shots_against'),
