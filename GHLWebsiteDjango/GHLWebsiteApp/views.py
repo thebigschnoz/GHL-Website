@@ -4,8 +4,8 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from .forms import *
 import datetime
 from GHLWebsiteApp.models import *
-from django.db.models import Sum, Count, Case, When, Avg, F, Window, FloatField, Q, Value
-from django.db.models.functions import Cast, Rank, Round, Lower, Coalesce, TruncWeek
+from django.db.models import Sum, Count, Case, When, Avg, F, Window, FloatField, Q
+from django.db.models.functions import Cast, Rank, Round, Lower, Coalesce
 from django.http import JsonResponse, HttpResponse
 from decimal import *
 from itertools import chain
@@ -14,6 +14,7 @@ import pandas as pd
 from io import BytesIO
 import csv
 import pytz
+from django.utils import timezone as django_timezone
 from django.utils.timezone import localtime
 from django.core.paginator import Paginator
 from dal import autocomplete
@@ -893,10 +894,12 @@ def weekly_stats_view(request):
 
     if selected_week:
         # Boundaries of selected week (Sunday → Saturday)
-        start_date = datetime.datetime.combine(
-            selected_week,
-            datetime.time.min,
-            tzinfo=timezone.get_current_timezone()
+        start_date = django_timezone.make_aware(
+            datetime.datetime.combine(
+                selected_week,
+                datetime.time.min
+            ),
+            datetime.timezone.utc
         )
         end_date = start_date + datetime.timedelta(days=7)
 
@@ -905,6 +908,11 @@ def weekly_stats_view(request):
             game_num__played_time__gte=start_date,
             game_num__played_time__lt=end_date
         )
+
+        print("start_date =", start_date)
+        print("end_date =", end_date)
+        for record in skater_qs:
+            print(record.game_num.played_time)
 
         # Filter Goalie Records
         goalie_qs = GoalieRecord.objects.filter(
