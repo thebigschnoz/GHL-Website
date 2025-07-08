@@ -865,7 +865,7 @@ def weekly_stats_view(request):
         .filter(game_num__season_num=get_seasonSetting())
         .annotate(
             shifted_date=ExpressionWrapper(
-                F('game_num__played_time') - datetime.timedelta(days=1),
+                F('game_num__played_time') + datetime.timedelta(days=1),
                 output_field=DateTimeField()
             )
         )
@@ -877,7 +877,11 @@ def weekly_stats_view(request):
         .order_by('-week')
     )
 
-    weeks = list(weeks_qs)
+
+    weeks = [
+        w.date() - datetime.timedelta(days=1)
+        for w in weeks_qs
+    ]
 
     selected_week_str = request.GET.get("week")
 
