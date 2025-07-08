@@ -1,11 +1,11 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from .forms import *
-from datetime import datetime
+import datetime
 from GHLWebsiteApp.models import *
-from django.db.models import Sum, Count, Case, When, Avg, F, Window, FloatField, Q
-from django.db.models.functions import Cast, Rank, Round, Lower, Coalesce
+from django.db.models import Sum, Count, Case, When, Avg, F, Window, FloatField, Q, Value
+from django.db.models.functions import Cast, Rank, Round, Lower, Coalesce, TruncWeek
 from django.http import JsonResponse, HttpResponse
 from decimal import *
 from itertools import chain
@@ -18,6 +18,12 @@ from django.utils.timezone import localtime
 from django.core.paginator import Paginator
 from dal import autocomplete
 # from points_table_simulator import PointsTableSimulator
+
+def media_required(view_func):
+    decorated_view_func = user_passes_test(
+        lambda u: u.is_authenticated and u.groups.filter(name="Media").exists()
+    )(view_func)
+    return decorated_view_func
 
 def get_seasonSetting():
     seasonSetting = Season.objects.filter(isActive=True).first().season_num
@@ -757,7 +763,7 @@ def upload_file(request):
                     expected_time = row['Expected Game Time']
                     if isinstance(expected_time, str):
                         # Parse the string into a datetime object
-                        expected_time = datetime.strptime(expected_time, '%Y-%m-%d %H:%M:%S')
+                        expected_time = datetime.datetime.strptime(expected_time, '%Y-%m-%d %H:%M:%S')
                     game, created = Game.objects.get_or_create(
                         game_num=row['Game Num'],
                         season_num=Season.objects.get(season_num=season),
@@ -850,6 +856,136 @@ def player_details(request, player_id):
         "secondarypos": [p.pk for p in player.secondarypos.all()],
     }
     return JsonResponse(data)
+
+@media_required
+def weekly_stats_view(request):
+    # Get list of available weeks from SkaterRecord
+    weeks_qs = (
+        SkaterRecord.objects
+        .annotate(week=TruncWeek('game_num__played_time'))
+        .values_list('week', flat=True)
+        .distinct()
+        .order_by('-week')
+    )
+
+    weeks = list(weeks_qs)
+
+    selected_week_str = request.GET.get("week")
+
+    # Determine selected week
+    if selected_week_str:
+        try:
+            # parse as datetime
+            selected_week = datetime.datetime.strptime(selected_week_str, "%Y-%m-%d")
+            selected_week = timezone.make_aware(selected_week)
+        except (ValueError, TypeError):
+            selected_week = weeks[0] if weeks else None
+    else:
+        selected_week = weeks[0] if weeks else None
+
+    if selected_week:
+        start_date = selected_week
+        end_date = start_date + datetime.timedelta(days=7)
+
+        skater_qs = SkaterRecord.objects.exclude(position=0).filter(
+            game_num__played_time__gte=start_date,
+            game_num__played_time__lt=end_date
+        )
+        goalie_qs = GoalieRecord.objects.filter(
+            game_num__played_time__gte=start_date,
+            game_num__played_time__lt=end_date
+        )
+    else:
+        skater_qs = SkaterRecord.objects.none()
+        goalie_qs = GoalieRecord.objects.none()
+
+    # Aggregate Skater Stats
+    weekly_skaters = (
+        skater_qs
+        .annotate(week=TruncWeek('game_num__played_time'))
+        .values('week', 'ea_player_num')
+        .annotate(
+            total_goals=Sum('goals'),
+            total_sog=Sum('sog'),
+        )
+        .annotate(
+            total_goals=Sum('goals'),
+            total_assists=Sum('assists'),
+            total_points=Sum('points'),
+            games_played=Count('game_num'),
+            shot_perc=Case(
+                When(total_sog=0, then=Value(0.0)),
+                default=F('total_goals') * 100.0 / F('total_sog'),
+                output_field=FloatField(),
+            ),
+            plus_minus=Sum('plus_minus'),
+            hits=Sum('hits'),
+        )
+        .order_by('-total_points')
+    )
+
+    # Map Player info
+    player_map = Player.objects.in_bulk(field_name='ea_player_num')
+
+    skater_stats = []
+    for s in weekly_skaters:
+        player = player_map.get(s['ea_player_num'])
+        skater_stats.append({
+            'week': s['week'],
+            'player_name': player.username if player else 'Unknown',
+            'ea_player_num': s['ea_player_num'] if player else None,
+            'total_goals': s['total_goals'],
+            'total_assists': s['total_assists'],
+            'total_points': s['total_points'],
+            'games_played': s['games_played'],
+            'shot_perc': round(s['shot_perc'], 2) if s['shot_perc'] is not None else 0,
+            'plus_minus': s['plus_minus'],
+            'hits': s['hits'],
+        })
+
+    # Aggregate Goalie Stats
+    weekly_goalies = (
+        goalie_qs
+        .annotate(week=TruncWeek('game_num__played_time'))
+        .values('week', 'ea_player_num')
+        .annotate(
+            tshots_against=Sum('shots_against'),
+            tsaves=Sum('saves'),
+            shutouts=Sum(Case(
+                When(shutout=True, then=1),
+                default=0,
+                output_field=models.IntegerField()
+            )),
+            games_played=Count('game_num'),
+            svp = (Cast(Sum("saves"), models.FloatField())/Cast(Sum("shots_against"), models.FloatField()))*100,
+            gaa = ((Cast(Sum("shots_against"), models.FloatField())-Cast(Sum("saves"), models.FloatField()))/Cast(Sum("game_num__gamelength"), models.FloatField()))*3600,
+        )
+        .order_by('-svp')
+    )
+
+    goalie_stats = []
+    for g in weekly_goalies:
+        player = player_map.get(g['ea_player_num'])
+        goalie_stats.append({
+            'week': g['week'],
+            'player_name': player.username if player else 'Unknown',
+            'ea_player_num': s['ea_player_num'] if player else None,
+            'shots_against': g['tshots_against'],
+            'saves': g['tsaves'],
+            'shutouts': g['shutouts'],
+            'games_played': g['games_played'],
+            'svp': round(g['svp'], 1) if g['svp'] is not None else 0,
+            'gaa': round(g['gaa'], 2) if g['gaa'] is not None else 0,
+        })
+
+    context = {
+        'weeks': weeks,
+        'selected_week': selected_week_str,
+        'skater_stats': skater_stats,
+        'goalie_stats': goalie_stats,
+    }
+
+    return render(request, 'GHLWebsiteApp/weekly_stats.html', context)
 
 class PlayerAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):

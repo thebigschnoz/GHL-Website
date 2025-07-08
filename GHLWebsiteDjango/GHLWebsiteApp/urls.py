@@ -28,4 +28,5 @@ urlpatterns = [
     path('profile/', views.user_profile, name="user_profile"),
     path('register/', views.register, name='register'),
     path('api/player/<int:player_id>/', views.player_details, name='player-details'),
+    path('media/weekly-stats/', views.weekly_stats_view, name='weekly_stats'),
 ]

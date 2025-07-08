@@ -115,7 +115,7 @@
 									<li>Manage Team</li>
 									{% endif %}
 									{% if user|has_group:"Media" %}
-									<li>Media Page</li>
+									<li><a href="{% url 'weekly_stats' %}">Media Page</a></li>
 									{% endif %}
 									<li><a href="{% url 'user_profile' %}">Profile</a></li>
 									<li>

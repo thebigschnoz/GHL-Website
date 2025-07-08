@@ -1,0 +1,72 @@
+{% extends "GHLWebsiteApp/layout.html" %}
+
+{% block body %}
+<div class="section section_lg" style="justify-items: center;">
+    <div class="header">Weekly Stats</div>
+
+    <form method="get">
+        <label for="week-select">Select Week:</label>
+        <select name="week" id="week-select" onchange="this.form.submit()">
+            {% for w in weeks %}
+                <option value="{{ w|date:'Y-m-d' }}" {% if selected_week == w|date:'Y-m-d' %}selected{% endif %}>
+                    {{ w|date:"Y-m-d" }}
+                </option>
+            {% endfor %}
+        </select>
+    </form>
+    
+    {% if skater_stats %}
+      <h3>Skater Stats</h3>
+      <table class="fullstandings sortable">
+        <tr>
+            <th>Player</th>
+            <th>GP</th>
+            <th>G</th>
+            <th>A</th>
+            <th>Pts</th>
+            <th>S%</th>
+            <th>+/-</th>
+            <th>Hits</th>
+        </tr>
+        {% for s in skater_stats %}
+        <tr>
+            <td class="hoverlink"><a href="{% url 'player' s.ea_player_num %}">{{ s.player_name }}</a></td>
+            <td style="width: 40px;">{{ s.games_played }}</td>
+            <td style="width: 40px;">{{ s.total_goals }}</td>
+            <td style="width: 40px;">{{ s.total_assists }}</td>
+            <td style="width: 40px;">{{ s.total_points }}</td>
+            <td style="width: 40px;">{{ s.shot_perc|floatformat:1 }}%</td>
+            <td style="width: 40px;">{{ s.plus_minus }}</td>
+            <td style="width: 40px;">{{ s.hits }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    
+    <h3>Goalie Stats</h3>
+    <table class="fullstandings sortable">
+        <tr>
+            <th>Player</th>
+            <th>GP</th>
+            <th>SA</th>
+            <th>SV</th>
+            <th>SV%</th>
+            <th>GAA</th>
+            <th>SO</th>
+        </tr>
+        {% for g in goalie_stats %}
+        <tr>
+            <td class="hoverlink"><a href="{% url 'player' g.ea_player_num %}">{{ g.player_name }}</a></td>
+            <td style="width: 40px;">{{ g.games_played }}</td>
+            <td style="width: 40px;">{{ g.shots_against }}</td>
+            <td style="width: 40px;">{{ g.saves }}</td>
+            <td style="width: 40px;">{{ g.svp|floatformat:1 }}%</td>
+            <td style="width: 40px;">{{ g.gaa|floatformat:2 }}</td>
+            <td style="width: 40px;">{{ g.shutouts }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+        <p>No stats for this week.</p>
+    {% endif %}    
+</div>
+{% endblock %}

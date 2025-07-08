@@ -290,6 +290,18 @@ th {
   margin-bottom: 15px;
 }
 
+.fullstandings {
+  table-layout: fixed;
+  align-self: center;
+  justify-self: center;
+  border: 1px solid #e9eaec;
+  padding: 3px;
+  background-color: #303030;
+  border-spacing: 5px;
+  margin: 5px;
+  margin-bottom: 15px;
+}
+
 #playoffInfo {
   font-weight: 150;
   color: #959697;
@@ -1723,4 +1735,12 @@ ul li ul li a {
   #id_secondarypos {
       grid-template-columns: 1fr;
   }
+}
+
+td.hoverlink a {
+  text-decoration: none;
+}
+
+td.hoverlink:hover a {
+  color: #e4b61a;
 }
