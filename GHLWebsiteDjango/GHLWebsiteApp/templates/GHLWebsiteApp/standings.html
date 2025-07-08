@@ -52,7 +52,7 @@
             {% else %}
             <td>&nbsp;</td>
             {% endif %}
-            <td><a href="{% url 'team' standing.team.ea_club_num %}">{{ standing.team.club_full_name }}</a></td>
+            <td class="hoverlink"><a href="{% url 'team' standing.team.ea_club_num %}">{{ standing.team.club_full_name }}</a></td>
             <td>{{ standing.gp }}</td>
             <td>{{ standing.wins }}</td>
             <td>{{ standing.losses }}</td>
