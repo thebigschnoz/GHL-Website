@@ -878,10 +878,7 @@ def weekly_stats_view(request):
     )
 
 
-    weeks = [
-        w.date() - datetime.timedelta(days=1)
-        for w in weeks_qs
-    ]
+    weeks = list(weeks_qs)
 
     selected_week_str = request.GET.get("week")
 
