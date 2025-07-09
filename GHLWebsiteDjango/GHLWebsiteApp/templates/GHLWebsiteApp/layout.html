@@ -112,7 +112,7 @@
 									<li><a href="{% url 'admin:index' %}">Admin</a></li>
 									{% endif %}
 									{% if user|has_group:"Team Managers" %}
-									<li>Manage Team</li>
+									<li><a href="{% url 'manager_view' %}">Manage Team</a></li>
 									{% endif %}
 									{% if user|has_group:"Media" %}
 									<li><a href="{% url 'weekly_stats' %}">Media Page</a></li>

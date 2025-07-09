@@ -1,0 +1,50 @@
+{% extends "GHLWebsiteApp/layout.html" %}
+
+{% block body %}
+<div class="section section_lg" style="place-self: center; width: 95vw;">
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <img src="{{ team.team_logo_link }}" alt="Team Logo" class="team-logo">
+            <h1 class="team-name">{{ team.club_full_name }} (0-0-0)</h1>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- LEFT COLUMN -->
+            <div class="dashboard-column">
+                <div class="dashboard-panel">
+                    <h2>Team Availability</h2>
+                    <p>Weekly availability report with a list for all the players on the team.</p>
+                </div>
+
+                <div class="dashboard-panel">
+                    <h2>Team Needs</h2>
+                    <p>Set up your team's needs for being interested in a trade.</p>
+                </div>
+
+                <div class="dashboard-panel">
+                    <h2>Trade Block</h2>
+                    <p>Players listed on the trade block go here - including both your team and other teams.</p>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div class="dashboard-column">
+                <div class="dashboard-panel">
+                    <h2>Team Leaders</h2>
+                    <p>Goals, assists, points leaders, etc.</p>
+                </div>
+
+                <div class="dashboard-panel">
+                    <h2>Schedule</h2>
+                    <p>Upcoming games listed here.</p>
+                </div>
+
+                <div class="dashboard-panel">
+                    <h2>League Standings</h2>
+                    <p>Standings table goes here.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

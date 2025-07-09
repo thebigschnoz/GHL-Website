@@ -1041,8 +1041,16 @@ def weekly_stats_view(request):
 @manager_required
 def manager_view(request):
     # This view is for managers to access the manager dashboard
-    # You can add any specific logic or data retrieval here
-    return render(request, 'GHLWebsiteApp/manager_dashboard.html')
+    team = None
+    if hasattr(request.user, 'player_link') and request.user.player_link:
+        player = request.user.player_link
+        if player.current_team:
+            team = player.current_team
+
+    context = {
+        'team': team,
+    }
+    return render(request, 'GHLWebsiteApp/manager_dashboard.html', context)
 
 class PlayerAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):

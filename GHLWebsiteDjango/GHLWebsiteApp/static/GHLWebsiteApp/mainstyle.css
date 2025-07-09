@@ -1744,3 +1744,62 @@ td.hoverlink a {
 td.hoverlink:hover a {
   color: #e4b61a;
 }
+
+.dashboard-container {
+  padding: 20px;
+  color: #fff;
+  font-family: sans-serif;
+}
+
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  border-bottom: 2px solid #e4b61a;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+}
+
+.dashboard-header img {
+  object-fit: contain;
+}
+
+.team-logo {
+  max-width: 80px;
+  height: auto;
+  margin-right: 20px;
+}
+
+.team-name {
+  color: #e4b61a;
+  font-size: 32px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.dashboard-grid {
+  display: flex;
+  gap: 20px;
+}
+
+.dashboard-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.dashboard-panel {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid #e4b61a;
+  border-radius: 5px;
+  padding: 15px;
+  min-height: 150px;
+}
+
+.dashboard-panel h2 {
+  margin-top: 0;
+  color: #e4b61a;
+  border-bottom: 1px solid #e4b61a;
+  padding-bottom: 5px;
+  font-size: 20px;
+}
