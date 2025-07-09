@@ -48,7 +48,6 @@ INSTALLED_APPS = [
 ]
 
 CRONJOBS = [
-    ('CRON_TZ=America/New_York')
     ('*/10 21-23 * * 0-4', 'GHLWebsiteApp.run_poll_api'),
 ]
 
