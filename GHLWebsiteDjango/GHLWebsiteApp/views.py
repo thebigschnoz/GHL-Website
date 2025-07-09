@@ -27,6 +27,12 @@ def media_required(view_func):
     )(view_func)
     return decorated_view_func
 
+def manager_required(view_func):
+    decorated_view_func = user_passes_test(
+        lambda u: u.is_authenticated and u.groups.filter(name="Team Managers").exists()
+    )(view_func)
+    return decorated_view_func
+
 def get_seasonSetting():
     seasonSetting = Season.objects.filter(isActive=True).first().season_num
     if not seasonSetting:
@@ -277,6 +283,8 @@ def leaders(request):
         output_field=models.IntegerField()
     ))).filter(wincount__gte=1).order_by("-wincount")[:10]
     leaders_gaa = GoalieRecord.objects.filter(game_num__season_num=season).exclude(game_num__played_time=None).values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(gaatotal=((Cast(Sum("shots_against"), models.FloatField())-Cast(Sum("saves"), models.FloatField()))/Cast(Sum("game_num__gamelength"), models.FloatField()))*3600).order_by("gaatotal")[:10]
+    missing_shutouts = max(10 - len(leaders_shutouts), 0)
+    missing_wins = max(10 - len(leaders_wins), 0)
     context = {
         "leaders_goals": leaders_goals,
         "leaders_assists": leaders_assists,
@@ -286,6 +294,8 @@ def leaders(request):
         "leaders_shutouts": leaders_shutouts,
         "leaders_wins": leaders_wins,
         "leaders_gaa": leaders_gaa,
+        "missing_shutouts": missing_shutouts,
+        "missing_wins": missing_wins,
     }
     return render(request, "GHLWebsiteApp/leaders.html", context)
 
@@ -1027,6 +1037,12 @@ def weekly_stats_view(request):
     }
 
     return render(request, 'GHLWebsiteApp/weekly_stats.html', context)
+
+@manager_required
+def manager_view(request):
+    # This view is for managers to access the manager dashboard
+    # You can add any specific logic or data retrieval here
+    return render(request, 'GHLWebsiteApp/manager_dashboard.html')
 
 class PlayerAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
