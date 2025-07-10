@@ -14,7 +14,7 @@
                 <div class="dashboard-panel">
                     <h2>Team Availability</h2>
                     {% if availability %}
-                        <h3>Team Availability for Week Starting {{ availability.first.week_start }}</h3>
+                        <h3>For Week Starting {{ availability.first.week_start|date:"D, M j" }}</h3>
                         <table class="standingstable">
                             <thead>
                                 <tr>
