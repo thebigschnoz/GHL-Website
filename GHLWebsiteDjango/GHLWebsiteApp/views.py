@@ -1129,7 +1129,6 @@ def manager_view(request):
         "team_leaders": team_leaders,
         "upcoming_games": upcoming_games,
     }
-    print(context)
     return render(request, 'GHLWebsiteApp/manager_dashboard.html', context)
 
 class PlayerAutocomplete(autocomplete.Select2QuerySetView):
