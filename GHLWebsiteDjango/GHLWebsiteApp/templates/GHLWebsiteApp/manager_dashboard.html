@@ -29,6 +29,41 @@
 
             <!-- RIGHT COLUMN -->
             <div class="dashboard-column">
+
+                <div class="dashboard-panel">
+                    <h2>Next Ten Games</h2>
+                    <table class="standingstable">
+                        <thead>
+                            <th>Date</th>
+                            <th>Opponent</th>
+                            <th>Home/Away</th>
+                            <th>Search Code</th>
+                        </th>
+                        <tbody>
+                            {% for game in upcoming_games %}
+                            <tr>
+                                <td>{{ game.expected_time|date:"D n/j" }}</td>
+                                <td class="hoverlink">
+                                    {% if game.h_team_num == team %}
+                                        vs <img src="{{ game.a_team_num.team_logo_link }}" height=16 width=16 /> <a href="{% url 'team' game.a_team_num.ea_club_num %}">{{ game.a_team_num.club_full_name }}</a>
+                                    {% else %}
+                                        @ <img src="{{ game.h_team_num.team_logo_link }}" height=16 width=16 /> <a href="{% url 'team' game.h_team_num.ea_club_num %}">{{ game.h_team_num.club_full_name }}</a>
+                                    {% endif %}
+                                </td>
+                                {% if game.h_team_num == team %}
+                                    <td style="color:rgb(128, 128, 128); font-style: italic;">Home</td>
+                                {% else %}
+                                    <td>Away</td>
+                                {% endif %}
+                                <td{% if game.h_team_num == team %} style="color:rgb(128, 128, 128); font-style: italic;"{% endif %}>
+                                    {{ game.h_team_num.team_code|default:"-" }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
                 <div class="dashboard-panel">
                     <h2>Team Leaders</h2>
                     <table class="standingstable">
@@ -79,11 +114,6 @@
                 </div>
 
                 <div class="dashboard-panel">
-                    <h2>Schedule</h2>
-                    <p>Upcoming games listed here.</p>
-                </div>
-
-                <div class="dashboard-panel">
                     <h2>League Standings</h2>
                     {% if not season.season_type == "playoffs" %}
                     <table class="standingstable">
@@ -115,14 +145,14 @@
                         </thead>
                         <tbody>
                             {% for standing in standings %}
-                            <tr>
+                            <tr{% if standing.team == team %} style="background-color: #78620a;"{% endif %}>
                                 <td class="hoverlink"><a href="{% url 'team' standing.team.ea_club_num %}">{{ standing.team.club_abbr }}</a></td>
                                 <td>{{ standing.gp }}</td>
                                 <td>{{ standing.wins }}</td>
                                 <td>{{ standing.losses }}</td>
                                 <td>{{ standing.otlosses }}</td>
-                                <td>{{ standing.ppperc|floatformat:1 }}%</td>
-                                <td>{{ standing.pkperc|floatformat:1 }}%</td>
+                                <td>{{ standing.ppperc|floatformat:2 }}%</td>
+                                <td>{{ standing.pkperc|floatformat:2 }}%</td>
                                 <td>{{ standing.lastten }}</td>
                                 <td>{{ standing.streak }}</td>
                                 <td class="points">{{ standing.points }}</td>

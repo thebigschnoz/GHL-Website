@@ -1109,11 +1109,25 @@ def manager_view(request):
                 "SV%": leader_svp[0] if leader_svp else None,
                 "GAA": leader_gaa[0] if leader_gaa else None,
             }
+        now = timezone.now()
+        upcoming_games = (
+            Game.objects
+            .filter(
+                season_num=season,
+                expected_time__gt=now,
+                played_time__isnull=True  # Ensure the game hasn't been played yet
+            )
+            .filter(
+                Q(a_team_num=team) | Q(h_team_num=team)
+            )
+            .order_by('expected_time')[:10]
+        )
 
     context = {
         'team': team,
         "standings": standings,
         "team_leaders": team_leaders,
+        "upcoming_games": upcoming_games,
     }
     print(context)
     return render(request, 'GHLWebsiteApp/manager_dashboard.html', context)
