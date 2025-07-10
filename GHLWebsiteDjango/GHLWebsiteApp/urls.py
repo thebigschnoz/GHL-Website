@@ -26,6 +26,7 @@ urlpatterns = [
     path('export/team/<int:team_id>/', views.export_team, name="export_team"),
     path('export/playerdata/', views.export_player_data, name="export_player_data"),
     path('profile/', views.user_profile, name="user_profile"),
+    path('profile/availability/', views.player_availability_view, name="player_availability"),
     path('register/', views.register, name='register'),
     path('api/player/<int:player_id>/', views.player_details, name='player-details'),
     path('media/weekly-stats/', views.weekly_stats_view, name='weekly_stats'),

@@ -211,6 +211,21 @@ def get_scoreboard():
     data = Game.objects.filter(season_num=season).order_by("-played_time")[:20]
     return data
 
+def get_default_week_start():
+    eastern = pytz.timezone("America/New_York")
+    now_est = timezone.now().astimezone(eastern)
+
+    today = now_est.date()
+    days_since_sunday = (today.weekday() + 1) % 7
+    this_sunday = today - datetime.timedelta(days=days_since_sunday)
+
+    if now_est.hour < 20:
+        week_start = this_sunday
+    else:
+        week_start = this_sunday + datetime.timedelta(days=7)
+
+    return week_start
+
 def GamesRequest(request):
     season = get_seasonSetting()
     data = Game.objects.filter(season_num=season).values("game_num", "gamelength", "played_time", "a_team_num__club_abbr", "h_team_num__club_abbr", "a_team_num__team_logo_link", "h_team_num__team_logo_link" "a_team_gf", "h_team_gf").order_by("-played_time")[:15]
@@ -1122,14 +1137,62 @@ def manager_view(request):
             )
             .order_by('expected_time')[:10]
         )
+        # Find current week Sunday
+        today = timezone.now().date()
+        days_since_sunday = (today.weekday() + 1) % 7
+        sunday = today - datetime.timedelta(days=days_since_sunday)
+
+        availability_qs = PlayerAvailability.objects.filter(
+            player__current_team=team,
+            week_start=sunday,
+        )
 
     context = {
         'team': team,
         "standings": standings,
         "team_leaders": team_leaders,
         "upcoming_games": upcoming_games,
+        "availability": availability_qs,
     }
     return render(request, 'GHLWebsiteApp/manager_dashboard.html', context)
+
+@login_required
+def player_availability_view(request):
+    player = request.user.player_link
+    default_week_start = get_default_week_start()
+
+    existing = PlayerAvailability.objects.filter(
+        player=player,
+        week_start=default_week_start
+    ).first()
+    if request.method == 'POST':
+        form = PlayerAvailabilityForm(request.POST, instance=existing)
+        if form.is_valid():
+            avail = form.save(commit=False)
+            avail.player = player
+            avail.week_start = default_week_start
+            avail.save()
+            return redirect('team', team=player.current_team.ea_club_num)
+    else:
+        if existing:
+            form = PlayerAvailabilityForm(instance=existing)
+        else:
+            form = PlayerAvailabilityForm(initial={'week_start': default_week_start})
+    
+    day_fields = [
+        'sunday',
+        'monday',
+        'tuesday',
+        'wednesday',
+        'thursday',
+    ]
+    day_form_fields = [(day.capitalize(), form[day]) for day in day_fields]
+
+    return render(request, 'GHLWebsiteApp/player_availability.html', {
+        'form': form,
+        'day_form_fields': day_form_fields,
+    })
+
 
 class PlayerAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):

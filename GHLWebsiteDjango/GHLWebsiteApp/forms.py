@@ -1,5 +1,5 @@
 from django import forms
-from .models import AwardTitle, Player, User, Position
+from .models import AwardTitle, Player, User, Position, PlayerAvailability
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
 from captcha.fields import CaptchaField
@@ -72,3 +72,19 @@ class UserProfileForm(forms.ModelForm):
             self.fields['jersey_num'].initial = player.jersey_num
             self.fields['primarypos'].initial = player.primarypos
             self.fields['secondarypos'].initial = player.secondarypos.all()
+
+class PlayerAvailabilityForm(forms.ModelForm):
+    class Meta:
+        model = PlayerAvailability
+        fields = [
+            'week_start',
+            'sunday',
+            'monday',
+            'tuesday',
+            'wednesday',
+            'thursday',
+            'comment',
+        ]
+        widgets = {
+            'week_start': forms.SelectDateWidget,
+        }

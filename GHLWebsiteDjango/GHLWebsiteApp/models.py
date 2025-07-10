@@ -399,3 +399,19 @@ class Announcement(models.Model):
 
     def __str__(self):
         return f"Announcement by {self.author.username} on {self.created_at.strftime('%Y-%m-%d')}"
+    
+class PlayerAvailability(models.Model):
+    player = models.ForeignKey(Player, on_delete=models.CASCADE)
+    week_start = models.DateField(help_text="Sunday date for the start of the week")
+    sunday = models.BooleanField(default=False)
+    monday = models.BooleanField(default=False)
+    tuesday = models.BooleanField(default=False)
+    wednesday = models.BooleanField(default=False)
+    thursday = models.BooleanField(default=False)
+    comment = models.TextField(blank=True, null=True, help_text="Any extra info from the player")
+
+    class Meta:
+        unique_together = ('player', 'week_start')
+
+    def __str__(self):
+        return f"{self.player.username} availability for week of {self.week_start}"

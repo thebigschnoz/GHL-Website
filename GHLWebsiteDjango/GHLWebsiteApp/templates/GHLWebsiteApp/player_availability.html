@@ -1,0 +1,35 @@
+{% extends "GHLWebsiteApp/layout.html" %}
+
+{% block body %}
+<div class="section section_lg container availability-container">
+    <h2 style="color: #e4b61a">Submit Your Weekly Availability</h2>
+
+    <form method="post" class="availability-form">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="{{ form.week_start.id_for_label }}">Week Starting (Sunday):</label>
+            {{ form.week_start }}
+        </div>
+
+        <div class="availability-flex">
+            <div class="availability-days">
+                <span class="dayheader">Days of the Week:</span>
+                {% for day_label, field in day_form_fields %}
+                    <div class="checkbox-box">
+                        <label class="form-check-label">
+                            {{ field }} {{ day_label }}
+                        </label>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="availability-comment">
+                <label for="{{ form.comment.id_for_label }}">Additional Notes:</label>
+                {{ form.comment }}
+            </div>
+        </div>
+        <button type="submit" class="btn-submit">Save Availability</button>
+    </form>
+</div>
+{% endblock %}

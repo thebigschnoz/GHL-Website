@@ -118,6 +118,7 @@
 									<li><a href="{% url 'weekly_stats' %}">Media Page</a></li>
 									{% endif %}
 									<li><a href="{% url 'user_profile' %}">Profile</a></li>
+									<li><a href="{% url 'player_availability' %}">Availability</a></li>
 									<li>
 										<form id="logout-form" method="post" action="{% url 'logout' %}">
 											{% csrf_token %}

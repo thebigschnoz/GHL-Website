@@ -13,7 +13,37 @@
             <div class="dashboard-column">
                 <div class="dashboard-panel">
                     <h2>Team Availability</h2>
-                    <p>Weekly availability report with a list for all the players on the team.</p>
+                    {% if availability %}
+                        <h3>Team Availability for Week Starting {{ availability.first.week_start }}</h3>
+                        <table class="standingstable">
+                            <thead>
+                                <tr>
+                                    <th>Player</th>
+                                    <th>Sun</th>
+                                    <th>Mon</th>
+                                    <th>Tue</th>
+                                    <th>Wed</th>
+                                    <th>Thu</th>
+                                    <th>Comment</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for avail in availability %}
+                                <tr>
+                                    <td>{{ avail.player.username }}</td>
+                                    <td>{% if avail.sunday %}✔️{% else %}-{% endif %}</td>
+                                    <td>{% if avail.monday %}✔️{% else %}-{% endif %}</td>
+                                    <td>{% if avail.tuesday %}✔️{% else %}-{% endif %}</td>
+                                    <td>{% if avail.wednesday %}✔️{% else %}-{% endif %}</td>
+                                    <td>{% if avail.thursday %}✔️{% else %}-{% endif %}</td>
+                                    <td>{{ avail.comment }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p>No availability submitted yet for this week.</p>
+                    {% endif %}
                 </div>
 
                 <div class="dashboard-panel">
