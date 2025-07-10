@@ -113,26 +113,26 @@
                             {% for label, leader in team_leaders.items %}
                             <tr>
                                 <td>{{ label }}</td>
-                                <td class="hoverlink"><a href="{% url 'player' leader.ea_player_num %}">{{ leader.ea_player_num__username }}</a></td>
+                                <td class="hoverlink"><a href="{% url 'player' leader.ea_player_num %}">{{ leader.ea_player_num__username|default:"-" }}</a></td>
                                 <td>
                                     {% if label == "G" %}
-                                        {{ leader.numgoals }}
+                                        {{ leader.numgoals|default:"-" }}
                                     {% elif label == "A" %}
-                                        {{ leader.numassists }}
+                                        {{ leader.numassists|default:"-" }}
                                     {% elif label == "P" %}
-                                        {{ leader.numpoints }}
+                                        {{ leader.numpoints|default:"-" }}
                                     {% elif label == "S%" %}
-                                        {{ leader.shootperc|floatformat:2 }}%
+                                        {{ leader.shootperc|floatformat:2|default:"-" }}%
                                     {% elif label == "PIM" %}
-                                        {{ leader.pim }}
+                                        {{ leader.pim|default:"-" }}
                                     {% elif label == "HIT" %}
-                                        {{ leader.hits_per_game }} / game
+                                        {{ leader.hits_per_game|floatformat:2|default:"-" }} / game
                                     {% elif label == "BLK" %}
-                                        {{ leader.blocks_per_game }} / game
+                                        {{ leader.blocks_per_game|floatformat:2|default:"-" }} / game
                                     {% elif label == "SV%" %}
-                                        {{ leader.savepercsum|floatformat:2 }}%
+                                        {{ leader.savepercsum|floatformat:2|default:"-" }}%
                                     {% elif label == "GAA" %}
-                                        {{ leader.gaa|floatformat:2 }}
+                                        {{ leader.gaa|floatformat:2|default:"-" }}
                                     {% else %}
                                         -
                                     {% endif %}
