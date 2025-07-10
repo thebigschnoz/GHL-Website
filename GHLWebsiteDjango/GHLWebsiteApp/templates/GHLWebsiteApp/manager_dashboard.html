@@ -5,7 +5,7 @@
     <div class="dashboard-container">
         <div class="dashboard-header">
             <img src="{{ team.team_logo_link }}" alt="Team Logo" class="team-logo">
-            <h1 class="team-name">{{ team.club_full_name }} (0-0-0)</h1>
+            <h1 class="team-name">{{ team.club_full_name }} ({{ my_standing.wins }}-{{ my_standing.losses}}-{{my_standing.otlosses}})</h1>
         </div>
 
         <div class="dashboard-grid">

@@ -1059,6 +1059,7 @@ def weekly_stats_view(request):
 def manager_view(request):
     # This view is for managers to access the manager dashboard
     standings = Standing.objects.filter(season=get_seasonSetting()).order_by('-points', '-wins', '-goalsfor', 'goalsagainst', 'team__club_full_name')
+    my_standing = Standing.objects.filter(season=get_seasonSetting(), team=request.user.player_link.current_team.ea_club_num).first() if hasattr(request.user, 'player_link') else None
     season = get_seasonSetting()
     team = None
     if hasattr(request.user, 'player_link') and request.user.player_link:
@@ -1146,6 +1147,8 @@ def manager_view(request):
             player__current_team=team,
             week_start=sunday,
         )
+    else:
+        redirect('user_profile') # TODO: Add alert that you are not linked to a team
 
     context = {
         'team': team,
@@ -1153,6 +1156,7 @@ def manager_view(request):
         "team_leaders": team_leaders,
         "upcoming_games": upcoming_games,
         "availability": availability_qs,
+        "my_standing": my_standing,
     }
     return render(request, 'GHLWebsiteApp/manager_dashboard.html', context)
 
