@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from .forms import *
 import datetime
 from GHLWebsiteApp.models import *
-from django.db.models import Sum, Count, Case, When, Avg, F, Window, FloatField, Q
+from django.db.models import Sum, Count, Case, When, Avg, F, Window, FloatField, Q, ExpressionWrapper, Value
 from django.db.models.functions import Cast, Rank, Round, Lower, Coalesce
 from django.http import JsonResponse, HttpResponse
 from decimal import *
@@ -654,6 +654,8 @@ def player(request, player):
         all_games = skater_games.union(goalie_games).order_by("-expected_time")
     else:
         all_games = []
+
+    # TODO: Make the season pass through context and use it for the top stats line (Vallee shows this season's G stats but last season's P stats)
     context = {
         "playernum": playernum, 
         "skater_season_totals": skater_season_totals,
@@ -1041,15 +1043,79 @@ def weekly_stats_view(request):
 @manager_required
 def manager_view(request):
     # This view is for managers to access the manager dashboard
+    standings = Standing.objects.filter(season=get_seasonSetting()).order_by('-points', '-wins', '-goalsfor', 'goalsagainst', 'team__club_full_name')
+    season = get_seasonSetting()
     team = None
     if hasattr(request.user, 'player_link') and request.user.player_link:
         player = request.user.player_link
         if player.current_team:
             team = player.current_team
+            leader_goals = SkaterRecord.objects.filter(game_num__season_num=season, ea_club_num=team).exclude(game_num__played_time=None).values("ea_player_num", "ea_player_num__username").annotate(numgoals=Sum("goals")).filter(numgoals__gt=0).order_by("-numgoals")[:1]
+            leader_assists = SkaterRecord.objects.filter(game_num__season_num=season, ea_club_num=team).exclude(game_num__played_time=None).values("ea_player_num", "ea_player_num__username").annotate(numassists=Sum("assists")).filter(numassists__gt=0).order_by("-numassists")[:1]
+            leader_points = SkaterRecord.objects.filter(game_num__season_num=season, ea_club_num=team).exclude(game_num__played_time=None).values("ea_player_num", "ea_player_num__username").annotate(numpoints=Sum("points")).filter(numpoints__gt=0).order_by("-numpoints")[:1]
+            leader_shooting = SkaterRecord.objects.filter(game_num__season_num=season, ea_club_num=team).exclude(game_num__played_time=None).values("ea_player_num", "ea_player_num__username").annotate(shootperc=(Cast(Sum("goals"), models.FloatField())/Cast(Sum("sog"), models.FloatField()))*100).filter(shootperc__gt=0).order_by("-shootperc")[:1]
+            leader_svp = GoalieRecord.objects.filter(game_num__season_num=season, ea_club_num=team).exclude(game_num__played_time=None).values("ea_player_num", "ea_player_num__username").annotate(savepercsum=(Cast(Sum("saves"), models.FloatField())/Cast(Sum("shots_against"), models.FloatField()))*100).order_by("-savepercsum")[:1]
+            leader_hits = (
+                SkaterRecord.objects
+                .filter(game_num__season_num=season, ea_club_num=team)
+                .values("ea_player_num", "ea_player_num__username")
+                .annotate(
+                    total_hits=Sum('hits'),
+                    games=Count('id'),
+                    hits_per_game=ExpressionWrapper(
+                        F('total_hits') / F('games'),
+                        output_field=FloatField()
+                    )
+                )
+                .order_by('-hits_per_game')
+            )[:1]
+            leader_blocks = (
+                SkaterRecord.objects
+                .filter(game_num__season_num=season, ea_club_num=team)
+                .values("ea_player_num", "ea_player_num__username")
+                .annotate(
+                    total_blocks=Sum('blocked_shots'),
+                    games=Count('id'),
+                    blocks_per_game=ExpressionWrapper(
+                        F('total_blocks') / F('games'),
+                        output_field=FloatField()
+                    )
+                )
+                .order_by('-blocks_per_game')
+            )[:1]
+            leader_gaa = (
+                GoalieRecord.objects
+                .filter(game_num__season_num=season, ea_club_num=team)
+                .values("ea_player_num", "ea_player_num__username")
+                .annotate(
+                    goals_against=Sum(F('shots_against') - F('saves')),
+                    seconds_played=Sum(F('game_num__gamelength')),
+                    gaa=Case(
+                        When(seconds_played=0, then=Value(0.0)),
+                        default=F('goals_against') * 3600.0 / F('seconds_played'),
+                        output_field=FloatField(),
+                    )
+                )
+                .order_by('gaa')
+            )[:1]
+            # TODO: Make sure players are still on the team and not traded
+            team_leaders = {
+                "G": leader_goals[0] if leader_goals else None,
+                "A": leader_assists[0] if leader_assists else None,
+                "P": leader_points[0] if leader_points else None,
+                "S%": leader_shooting[0] if leader_shooting else None,
+                "HIT": leader_hits[0] if leader_hits else None,
+                "BLK": leader_blocks[0] if leader_blocks else None,
+                "SV%": leader_svp[0] if leader_svp else None,
+                "GAA": leader_gaa[0] if leader_gaa else None,
+            }
 
     context = {
         'team': team,
+        "standings": standings,
+        "team_leaders": team_leaders,
     }
+    print(context)
     return render(request, 'GHLWebsiteApp/manager_dashboard.html', context)
 
 class PlayerAutocomplete(autocomplete.Select2QuerySetView):

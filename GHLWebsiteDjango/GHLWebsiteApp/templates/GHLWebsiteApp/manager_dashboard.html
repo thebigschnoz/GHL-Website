@@ -31,7 +31,51 @@
             <div class="dashboard-column">
                 <div class="dashboard-panel">
                     <h2>Team Leaders</h2>
-                    <p>Goals, assists, points leaders, etc.</p>
+                    <table class="standingstable">
+                        <colgroup>
+                            <col>
+                            <col>
+                            <col>
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th>Label</th>
+                                <th>Player</th>
+                                <th>Stat</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for label, leader in team_leaders.items %}
+                            <tr>
+                                <td>{{ label }}</td>
+                                <td class="hoverlink"><a href="{% url 'player' leader.ea_player_num %}">{{ leader.ea_player_num__username }}</a></td>
+                                <td>
+                                    {% if label == "G" %}
+                                        {{ leader.numgoals }}
+                                    {% elif label == "A" %}
+                                        {{ leader.numassists }}
+                                    {% elif label == "P" %}
+                                        {{ leader.numpoints }}
+                                    {% elif label == "S%" %}
+                                        {{ leader.shootperc|floatformat:2 }}%
+                                    {% elif label == "PIM" %}
+                                        {{ leader.pim }}
+                                    {% elif label == "HIT" %}
+                                        {{ leader.hits_per_game }} / game
+                                    {% elif label == "BLK" %}
+                                        {{ leader.blocks_per_game }} / game
+                                    {% elif label == "SV%" %}
+                                        {{ leader.savepercsum|floatformat:2 }}%
+                                    {% elif label == "GAA" %}
+                                        {{ leader.gaa|floatformat:2 }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
 
                 <div class="dashboard-panel">
@@ -41,7 +85,54 @@
 
                 <div class="dashboard-panel">
                     <h2>League Standings</h2>
-                    <p>Standings table goes here.</p>
+                    {% if not season.season_type == "playoffs" %}
+                    <table class="standingstable">
+                        <colgroup>
+                            <col style="width: 60px">
+                            <col style="width: 35px">
+                            <col style="width: 35px">
+                            <col style="width: 35px">
+                            <col style="width: 35px">
+                            <col style="width: 35px">
+                            <col style="width: 35px">
+                            <col style="width: 35px">
+                            <col style="width: 35px">
+                            <col style="width: 35px">
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th>Team</th>
+                                <th>GP</th>
+                                <th>W</th>
+                                <th>L</th>
+                                <th>OTL</th>
+                                <th>PP%</th>
+                                <th>PK%</th>
+                                <th>L10</th>
+                                <th>Str</th>
+                                <th>PTS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for standing in standings %}
+                            <tr>
+                                <td class="hoverlink"><a href="{% url 'team' standing.team.ea_club_num %}">{{ standing.team.club_abbr }}</a></td>
+                                <td>{{ standing.gp }}</td>
+                                <td>{{ standing.wins }}</td>
+                                <td>{{ standing.losses }}</td>
+                                <td>{{ standing.otlosses }}</td>
+                                <td>{{ standing.ppperc|floatformat:1 }}%</td>
+                                <td>{{ standing.pkperc|floatformat:1 }}%</td>
+                                <td>{{ standing.lastten }}</td>
+                                <td>{{ standing.streak }}</td>
+                                <td class="points">{{ standing.points }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <a href="{% url 'standings' %}" style="text-decoration: none;">Click here for playoff tree</a>
+                    {% endif %}
                 </div>
             </div>
         </div>
