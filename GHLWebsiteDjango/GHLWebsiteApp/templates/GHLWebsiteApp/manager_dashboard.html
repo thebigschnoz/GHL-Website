@@ -15,7 +15,7 @@
                     <h2>Team Availability</h2>
                     {% if availability %}
                         <h3>For Week Starting {{ availability.first.week_start|date:"D, M j" }}</h3>
-                        <table class="standingstable">
+                        <table class="standingstable" style="width: 95%;">
                             <thead>
                                 <tr>
                                     <th>Player</th>
@@ -36,7 +36,7 @@
                                     <td>{% if avail.tuesday %}✔️{% else %}-{% endif %}</td>
                                     <td>{% if avail.wednesday %}✔️{% else %}-{% endif %}</td>
                                     <td>{% if avail.thursday %}✔️{% else %}-{% endif %}</td>
-                                    <td>{{ avail.comment }}</td>
+                                    <td style="text-wrap: wrap;">{{ avail.comment }}</td>
                                 </tr>
                             {% endfor %}
                             </tbody>
