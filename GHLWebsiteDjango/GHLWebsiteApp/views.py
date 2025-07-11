@@ -213,16 +213,19 @@ def get_scoreboard():
 
 def get_default_week_start():
     eastern = pytz.timezone("America/New_York")
-    now_est = timezone.now().astimezone(eastern)
-
+    now_est = django_timezone.now().astimezone(eastern)
     today = now_est.date()
-    days_since_sunday = (today.weekday() + 1) % 7
-    this_sunday = today - datetime.timedelta(days=days_since_sunday)
 
-    if now_est.hour < 20:
-        week_start = this_sunday
+    if today.weekday() == 6:
+        # It's Sunday
+        if now_est.hour < 20:
+            week_start = today
+        else:
+            week_start = today + datetime.timedelta(days=7)
     else:
-        week_start = this_sunday + datetime.timedelta(days=7)
+        # Not Sunday
+        days_until_sunday = 6 - today.weekday()
+        week_start = today + datetime.timedelta(days=days_until_sunday)
 
     return week_start
 
@@ -1138,17 +1141,26 @@ def manager_view(request):
             )
             .order_by('expected_time')[:10]
         )
-        # Find current week Sunday
         today = timezone.now().date()
+        
+        # find this week's Sunday
         days_since_sunday = (today.weekday() + 1) % 7
-        sunday = today - datetime.timedelta(days=days_since_sunday)
+        this_sunday = today - datetime.timedelta(days=days_since_sunday)
 
+        # if it's Friday or later, jump to next Sunday
+        if today.weekday() >= 4:
+            sunday = this_sunday + datetime.timedelta(days=7)
+        else:
+            sunday = this_sunday
+
+        # Query availability for the correct week
         availability_qs = PlayerAvailability.objects.filter(
             player__current_team=team,
             week_start=sunday,
         )
     else:
-        redirect('user_profile') # TODO: Add alert that you are not linked to a team
+        messages.error(request, "You are currently not linked to a team. Either adjust your linked player, or contact the league manager.")
+        redirect('user_profile')
 
     context = {
         'team': team,
