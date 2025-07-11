@@ -1176,6 +1176,7 @@ def player_availability_view(request):
             avail.player = player
             avail.week_start = default_week_start
             avail.save()
+            messages.success(request, "Your availability has been saved successfully!")
             return redirect('team', team=player.current_team.ea_club_num)
     else:
         if existing:

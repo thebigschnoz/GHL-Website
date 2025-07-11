@@ -1924,3 +1924,43 @@ td.hoverlink:hover a {
 .auth-form div input {
   text-align: center;
 }
+
+.messages {
+  margin: 20px auto;
+  max-width: 800px;
+}
+
+.alert {
+  border-radius: 4px;
+  padding: 10px 15px;
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: #e9eaec; /* light gray text */
+  background-color: #303030; /* dark background */
+  border: 1px solid #e4b61a; /* default gold border */
+}
+
+.alert-success {
+  border-color: #4CAF50;
+  background-color: #204020;
+  color: #d4f7d4;
+}
+
+.alert-info {
+  border-color: #2196F3;
+  background-color: #0d2e6d;
+  color: #c7dbf5;
+}
+
+.alert-warning {
+  border-color: #ff9800;
+  background-color: #543f1b;
+  color: #ffe0b3;
+}
+
+.alert-error,
+.alert-danger {
+  border-color: #f44336;
+  background-color: #4a1f1f;
+  color: #f9c3c3;
+}
