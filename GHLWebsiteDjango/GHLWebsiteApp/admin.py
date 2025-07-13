@@ -201,6 +201,9 @@ class AnnouncementAdmin(admin.ModelAdmin):
             obj.author = request.user
         obj.save()
 
+class AvailabilityAdmin(admin.ModelAdmin):
+    list_display = ("player", "week_start")
+
 custom_admin_site.register(Season, SeasonsAdmin)
 custom_admin_site.register(Game, GameAdmin)
 custom_admin_site.register(AwardTitle)
@@ -222,3 +225,4 @@ custom_admin_site.register(PlayoffSeries, PlayoffSeriesAdmin)
 custom_admin_site.register(Schedule, ScheduleAdmin)
 custom_admin_site.register(BannedUser)
 custom_admin_site.register(Announcement, AnnouncementAdmin)
+custom_admin_site.register(PlayerAvailability, AvailabilityAdmin)
