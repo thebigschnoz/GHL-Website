@@ -1141,14 +1141,15 @@ def manager_view(request):
             )
             .order_by('expected_time')[:10]
         )
-        today = timezone.now().date()
+        eastern = pytz.timezone("America/New_York")
+        now_est = django_timezone.now().astimezone(eastern)
+        today = now_est.date() # Returns today's date in EST
         
         # find this week's Sunday
-        days_since_sunday = (today.weekday() + 1) % 7
-        this_sunday = today - datetime.timedelta(days=days_since_sunday)
+        days_since_sunday = (today.weekday() + 1) % 7 # Calculates days since previous Sunday
+        this_sunday = today - datetime.timedelta(days=days_since_sunday) # "This Sunday" is the previous Sunday
 
-        # if it's Friday or later, jump to next Sunday
-        if today.weekday() >= 4:
+        if days_since_sunday >= 5: # If Friday or Saturday
             sunday = this_sunday + datetime.timedelta(days=7)
         else:
             sunday = this_sunday
