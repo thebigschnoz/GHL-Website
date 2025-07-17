@@ -127,8 +127,8 @@ class Command(BaseCommand):
 
         qs = (SkaterRecord.objects
             .filter(game_num__season_num=season)
-            .values('ea_player_num', 'position', 'game_num__gamelength')
-            .exclude(position=0)   # group by player and position
+            .values('ea_player_num', 'position')
+            .exclude(position=0)  # exclude goalies
             .annotate(
                 gp          = Count('game_num', distinct=True),
                 goals       = Coalesce(Sum('goals'), 0),
@@ -189,6 +189,7 @@ class Command(BaseCommand):
         rep_pool = subquery.filter(rank__lte=replacement_cut)
 
         for row in qs:
+            print(f"Player: {row['ea_player_num']}, Position: {row['position']},Games Played: {row['gp']}")
             gar = (
                 (row['goals']   * LINEAR_WEIGHTS['goal'])   +
                 (row['assists'] * LINEAR_WEIGHTS['assist']) +
