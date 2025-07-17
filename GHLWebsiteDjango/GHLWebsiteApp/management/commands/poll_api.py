@@ -4,6 +4,7 @@ import httpx
 from GHLWebsiteApp.models import *
 from datetime import datetime, time, date
 import pytz
+from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
 
 BASE_API_URL = "https://proclubs.ea.com/api/nhl/clubs/matches?matchType=club_private&platform=common-gen5&clubIds="
@@ -332,6 +333,7 @@ class Command(BaseCommand):
             self.stdout.write("Recalculated standings")
             calculate_leaders()
             self.stdout.write("Recalculated leaders")
+            call_command("updatewar")            
         
 
     def handle(self, *args, **options):
