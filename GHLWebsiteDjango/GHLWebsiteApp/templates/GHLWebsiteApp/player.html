@@ -18,6 +18,51 @@
                 </div>
             </div>
         </div>
+        {% if skaterwar %}
+        <div class="subsection-container" style="width: 100%;">
+            <div class="report-card">
+                <div class="report-card-row rowheader">
+                    Skater Report Card
+                </div>
+                {% for pos in skaterwar %}
+                <div class="report-card-row">
+                  <div class="pos-cell">{{ pos.position.positionShort }}</div>
+                  <div class="percentile-card">
+                    <div class="percentile-number">{{ pos.war_percentile|floatformat:0 }}%</div>
+                    <div class="percentile-label">WAR</div>
+                  </div>
+                  <div class="percentile-card">
+                    <div class="percentile-number">{{ pos.gar_offence_pct|floatformat:0 }}%</div>
+                    <div class="percentile-label">Offense</div>
+                  </div>
+                  <div class="percentile-card">
+                    <div class="percentile-number">{{ pos.gar_defence_pct|floatformat:0 }}%</div>
+                    <div class="percentile-label">Defense</div>
+                  </div>
+                  <div class="percentile-card">
+                    <div class="percentile-number">{{ pos.gar_turnover_pct|floatformat:0 }}%</div>
+                    <div class="percentile-label">Turnovers</div>
+                  </div>
+                  <div class="percentile-card">
+                    <div class="percentile-number">{{ pos.gar_penalties_pct|floatformat:0 }}%</div>
+                    <div class="percentile-label">Penalties</div>
+                  </div>
+                  <div class="percentile-card">
+                    <div class="percentile-number">
+                      {% if pos.gar_faceoffs_pct %}
+                          {{ pos.gar_faceoffs_pct|floatformat:0 }}%
+                      {% else %}
+                          -
+                      {% endif %}
+                    </div>
+                    <div class="percentile-label">Faceoffs</div>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>              
+        </div>
+        {% endif %}
+
         {% if skater_season_totals %}
         <div class="subsection-container" style="width: 100%;">
             <div class="statsbar-cards">

@@ -415,3 +415,33 @@ class PlayerAvailability(models.Model):
 
     def __str__(self):
         return f"{self.player.username} availability for week of {self.week_start}"
+
+class SkaterWAR(models.Model):
+    player   = models.ForeignKey(Player,  on_delete=models.CASCADE)
+    season   = models.ForeignKey(Season,  on_delete=models.CASCADE)
+    position = models.ForeignKey(Position, on_delete=models.SET_NULL, null=True)
+
+    # building blocks
+    gar_offence   = models.DecimalField(max_digits=6, decimal_places=2)   # xG + primary assists
+    gar_defence   = models.DecimalField(max_digits=6, decimal_places=2)   # prevented xG
+    gar_turnover  = models.DecimalField(max_digits=6, decimal_places=2)   # take / give / intercept
+    gar_penalties = models.DecimalField(max_digits=6, decimal_places=2)   # drawn – taken
+    gar_faceoffs  = models.DecimalField(max_digits=6, decimal_places=2)   # centres only
+    gar_total     = models.DecimalField(max_digits=7, decimal_places=2)
+    war           = models.DecimalField(max_digits=6, decimal_places=2)
+    gar_offence_pct   = models.DecimalField(max_digits=5, decimal_places=2, null=True)
+    gar_defence_pct   = models.DecimalField(max_digits=5, decimal_places=2, null=True)
+    gar_turnover_pct  = models.DecimalField(max_digits=5, decimal_places=2, null=True)
+    gar_penalties_pct = models.DecimalField(max_digits=5, decimal_places=2, null=True)
+    gar_faceoffs_pct  = models.DecimalField(max_digits=5, decimal_places=2, null=True)
+    war_percentile = models.DecimalField(max_digits=5, decimal_places=2, null=True)
+
+    weights_version = models.CharField(max_length=10, default="v1")       # easy A/B tests
+    updated_at      = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ("player", "season", "position", "weights_version")
+        ordering        = ["-war"]
+
+    def __str__(self):
+        return f"{self.player.username} - {self.position.positionShort} ({self.season.season_text}) - WAR: {self.war:.2f}"

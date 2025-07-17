@@ -1964,3 +1964,81 @@ td.hoverlink:hover a {
   background-color: #4a1f1f;
   color: #f9c3c3;
 }
+
+.report-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100%;
+  margin: 20px auto;
+}
+
+.report-card-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.report-card-row.rowheader {
+  font-size: 28px;
+  font-weight: 800;
+  color: #fbe134;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  text-align: center;
+  padding-bottom: 8px;
+  margin-bottom: 20px;
+  width: 100%;
+  justify-content: center;
+}
+
+.pos-cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 28px;
+  font-weight: bold;
+  color: #e4b61a;
+  background-color: #2a2e34;
+  text-align: center;
+  vertical-align: middle;
+  border: 1px solid #e4b61a;
+  border-radius: 4px;
+  padding: 8px;
+  min-width: 65px;
+}
+
+.report-card-row.rowheader .pos-cell {
+  padding: 15px;
+}
+
+.percentile-card {
+  background: linear-gradient(145deg, #2a2e34 30%, #303030 70%);
+  border: 2px solid #e4b61a;
+  border-radius: 6px;
+  padding: 12px 8px;
+  width: 100px;
+  height: 80px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.percentile-number {
+  font-size: 24px;
+  font-weight: 700;
+  color: #fbe134;
+  line-height: 1.2;
+}
+
+.percentile-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #e9eaec;
+  text-transform: uppercase;
+  margin-top: 4px;
+  line-height: 1.2;
+}

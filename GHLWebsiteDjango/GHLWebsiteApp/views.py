@@ -603,7 +603,6 @@ def player(request, player):
             season["sk_fo_perc"] = round((fow / total) * 100, 1)
         else:
             season["sk_fo_perc"] = "-"
-        print("FO%:", season["sk_fo_perc"])
 
     # Group and aggregate goalie records by season
     goalie_season_totals = playernum.goalierecord_set.exclude(
@@ -672,6 +671,9 @@ def player(request, player):
         all_games = skater_games.union(goalie_games).order_by("-expected_time")
     else:
         all_games = []
+    skater_war = SkaterWAR.objects.filter(
+        player=playernum,
+        season=seasonSetting)
 
     # TODO: Make the season pass through context and use it for the top stats line (Vallee shows this season's G stats but last season's P stats)
     context = {
@@ -679,6 +681,7 @@ def player(request, player):
         "skater_season_totals": skater_season_totals,
         "goalie_season_totals": goalie_season_totals,
         "sk_team_num": sk_team_num,
+        "skaterwar": skater_war,
         "games": all_games,
         }
     return render(request, "GHLWebsiteApp/player.html", context)
@@ -866,6 +869,20 @@ def export_player_data(request):
     response = HttpResponse(output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = 'attachment; filename="ghl_data.xlsx"'
 
+    return response
+
+def export_war(request):
+    war_data = SkaterWAR.objects.all().values(
+        "player__username",  # Replace player with username
+        "position__positionShort", "season__season_text", "gar_offence", "gar_defence", "gar_turnover", "gar_penalties", "gar_faceoffs", "gar_total", "war", "gar_offence_pct", "gar_defence_pct", "gar_turnover_pct", "gar_penalties_pct", "gar_faceoffs_pct", "war_percentile"
+    )
+    war_df = pd.DataFrame(list(war_data))
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+        war_df.to_excel(writer, sheet_name='WAR Data', index=False)
+    output.seek(0)
+    response = HttpResponse(output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="ghl_war.xlsx"'
     return response
 
 def register(request):
