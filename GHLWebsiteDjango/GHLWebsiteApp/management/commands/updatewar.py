@@ -2,7 +2,7 @@ from decimal import Decimal
 from collections import defaultdict
 from django.db import transaction
 from django.core.management.base import BaseCommand
-from django.db.models import Sum, Count, F, Window, DecimalField
+from django.db.models import Sum, Count, F, Window, DecimalField, Q
 from django.db.models.functions import Rank, Coalesce, Cast
 from GHLWebsiteApp.models import SkaterWAR, SkaterRecord, Season, Position
 
@@ -17,6 +17,7 @@ LINEAR_WEIGHTS = {
     "pen_drawn"     : Decimal("0.18"),
     "pen_taken"     : Decimal("-0.18"),
     "faceoff_win"   : Decimal("0.02"),
+    "corsi_diff"    : Decimal("0.04"),
     "hit"           : Decimal("0.02"),   # or 0 if you want no reward
 }
 
@@ -142,6 +143,16 @@ class Command(BaseCommand):
                 fow         = Coalesce(Sum('fow'), 0),
                 fol         = Coalesce(Sum('fol'), 0),
                 hits        = Coalesce(Sum('hits'), 0),
+                corsi_for  = Coalesce(
+                    Sum('game_num__teamrecord__shot_att_team',
+                        filter=Q(game_num__teamrecord__ea_club_num=F('ea_club_num'))),
+                    0
+                ),
+                corsi_against = Coalesce(
+                    Sum('game_num__teamrecord__shot_att_team',
+                        filter=~Q(game_num__teamrecord__ea_club_num=F('ea_club_num'))),
+                    0
+                ),
             )
         )
         self.stdout.write(self.style.SUCCESS(f"Found {qs.count()} skater records for season {season.season_text}."))
@@ -149,7 +160,7 @@ class Command(BaseCommand):
         for pos_id in qs.values_list('position', flat=True).distinct():
             rep_pool = (qs.filter(position=pos_id)
                         .order_by('gp')[: max(1, qs.filter(position=pos_id)
-                                                    .count() // 5)])  # bottom-20 %
+                                                    .count() // 10)])  # bottom-10 %
             rep_events = sum(
                 ((r['goals']   * LINEAR_WEIGHTS['goal'])          +
                 (r['assists'] * LINEAR_WEIGHTS['assist'])        +
@@ -158,12 +169,13 @@ class Command(BaseCommand):
                 (r['interceptions']* LINEAR_WEIGHTS['interception']) +
                 (r['giveaways']    * LINEAR_WEIGHTS['giveaway'])     +
                 (r['blocks']       * LINEAR_WEIGHTS['blocked_shot']) +
+                ((r['corsi_for'] - r['corsi_against']) * LINEAR_WEIGHTS['corsi_diff']) +
                 (r['hits']         * LINEAR_WEIGHTS['hit']))
                 for r in rep_pool
             )
             rep_games  = sum(row['gp'] for row in rep_pool) or 1
             rep_baseline[pos_id] = Decimal(rep_events) / Decimal(rep_games)   # **per game**
-        # replacement level = bottom 20 % of TOI at position
+        # replacement level = bottom 10 % of TOI at position
         subquery = qs.annotate(
                         rank=Window(
                             expression=Rank(),
@@ -172,7 +184,7 @@ class Command(BaseCommand):
                     )
 
         total_players = subquery.count()
-        replacement_cut = int(total_players * 0.2)
+        replacement_cut = int(total_players * 0.1)
 
         rep_pool = subquery.filter(rank__lte=replacement_cut)
 
@@ -183,6 +195,7 @@ class Command(BaseCommand):
                 (row['shots']   * LINEAR_WEIGHTS['shot_attempt'])   +
                 (row['takeaways'] * LINEAR_WEIGHTS['takeaway'])     +
                 (row['blocks']    * LINEAR_WEIGHTS['blocked_shot']) +
+                ((row['corsi_for'] + row['corsi_against']) * LINEAR_WEIGHTS['corsi_diff']) +
                 (row['pens_drawn'] * LINEAR_WEIGHTS['pen_drawn'])    +
                 (row['pens_taken'] * LINEAR_WEIGHTS['pen_taken'])    +
                 (row['interceptions']* LINEAR_WEIGHTS['interception']) +
@@ -193,7 +206,7 @@ class Command(BaseCommand):
             
 
             gar_off = (row['goals'] * LINEAR_WEIGHTS['goal']) + (row['assists'] * LINEAR_WEIGHTS['assist'])
-            gar_def = (row['blocks'] * LINEAR_WEIGHTS['blocked_shot'])
+            gar_def = (row['blocks'] * LINEAR_WEIGHTS['blocked_shot']) + (((row['corsi_for']) + row['corsi_against']) * LINEAR_WEIGHTS['corsi_diff'])
             gar_turn= (row['takeaways'] * LINEAR_WEIGHTS['takeaway']) + (row['interceptions'] * LINEAR_WEIGHTS['interception']) + (row['giveaways'] * LINEAR_WEIGHTS['giveaway'])
             gar_pen = (row['pens_drawn'] * LINEAR_WEIGHTS['pen_drawn']) + (row['pens_taken'] * LINEAR_WEIGHTS['pen_taken'])
             rep_per_game = rep_baseline[row['position']]
