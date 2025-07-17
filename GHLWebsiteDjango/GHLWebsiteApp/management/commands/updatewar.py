@@ -7,14 +7,17 @@ from django.db.models.functions import Rank, Coalesce, Cast
 from GHLWebsiteApp.models import SkaterWAR, SkaterRecord, Season, Position
 
 LINEAR_WEIGHTS = {
-    "goal"             : Decimal("1.00"),
-    "assist"           : Decimal("0.70"),
-    "shot_attempt"     : Decimal("0.03"),
-    "takeaway"         : Decimal("0.05"),
-    "blocked_shot"     : Decimal("0.03"),
-    "pen_drawn"        : Decimal("0.19"),
-    "pen_taken"        : Decimal("-0.19"),
-    "faceoff_win"      : Decimal("0.015")  # per win ≈ 3-sec OZ possession
+    "goal"          : Decimal("1.00"),
+    "assist"        : Decimal("0.70"),
+    "shot_attempt"  : Decimal("0.04"),
+    "blocked_shot"  : Decimal("0.10"),
+    "takeaway"      : Decimal("0.06"),
+    "interception"  : Decimal("0.05"),
+    "giveaway"      : Decimal("-0.08"),
+    "pen_drawn"     : Decimal("0.18"),
+    "pen_taken"     : Decimal("-0.18"),
+    "faceoff_win"   : Decimal("0.02"),
+    "hit"           : Decimal("0.02"),   # or 0 if you want no reward
 }
 
 COMPONENTS = [
