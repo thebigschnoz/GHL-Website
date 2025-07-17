@@ -19,7 +19,7 @@
             </div>
         </div>
         {% if skaterwar %}
-        <div class="subsection-container" style="width: 100%;">
+        <div class="subsection-container" style="width: 100%; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
             <div class="report-card">
                 <div class="report-card-row rowheader">
                     Skater Report Card
@@ -59,7 +59,10 @@
                   </div>
                 </div>
                 {% endfor %}
-              </div>              
+            </div> 
+            <div class="position-pie-container">
+                <div id="positionPieChart" style="max-width: 300px;"></div>
+            </div>
         </div>
         {% endif %}
 
@@ -626,4 +629,49 @@
     </center></div>
     {% endif %}
 </center>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const rawData = {{ position_games|safe }};
+        const positionColors = {
+            "C": "#c71c0a",
+            "LW": "#10c70a",
+            "RW": "#0519ad",
+            "LD": "#05abad",
+            "RD": "#f0e40a",
+            "G": "#970af0",
+          };
+        const labels = Object.keys(rawData);
+        const data = Object.values(rawData);
+        const colors = labels.map(label => positionColors[label] || "#7f8c8d"); // fallback grey
+      
+  
+        const options = {
+            chart: {
+            type: 'pie',
+            background: '#1e1e1e',
+            foreColor: '#fbe134',
+            },
+            labels: labels,
+            series: data,
+            colors: colors,
+            title: {
+                text: "Games by Position",
+                style: {
+                    color: '#fbe134',
+                    fontSize: '18px',
+                }
+            },
+            legend: {
+                position: 'bottom',
+                labels: {
+                    colors: '#fbe134'
+                }
+            }
+        };
+  
+      const chart = new ApexCharts(document.querySelector("#positionPieChart"), options);
+      chart.render();
+    });
+  </script>
+  
 {% endblock %}

@@ -1968,7 +1968,6 @@ td.hoverlink:hover a {
 .report-card {
   display: flex;
   flex-direction: column;
-  width: 100%;
   max-width: 100%;
   margin: 20px auto;
 }
@@ -2041,4 +2040,13 @@ td.hoverlink:hover a {
   text-transform: uppercase;
   margin-top: 4px;
   line-height: 1.2;
+}
+
+.position-pie-container {
+  background-color: #2a2e34;
+  border: 2px solid #fbe134;
+  border-radius: 8px;
+  padding: 16px;
+  color: #fbe134;
+  margin: 5px auto;
 }

@@ -674,6 +674,25 @@ def player(request, player):
     skater_war = SkaterWAR.objects.filter(
         player=playernum,
         season=seasonSetting)
+    
+    position_mapping = {
+        0: 'G',   # Goalie
+        5: 'C',   # Center
+        4: 'LW',  # Left Wing
+        3: 'RW',  # Right Wing
+        2: 'LD',  # Left Defense
+        1: 'RD',  # Right Defense
+    }
+    position_counts = SkaterRecord.objects.filter(
+        ea_player_num=playernum,
+        game_num__season_num=seasonSetting,
+        game_num__played_time__isnull=False,
+    ).values("position").annotate(gp=Count("game_num")).order_by("position")
+    position_games = {
+        position_mapping.get(entry["position"], "Unknown"): entry["gp"]
+        for entry in position_counts
+    }
+
 
     # TODO: Make the season pass through context and use it for the top stats line (Vallee shows this season's G stats but last season's P stats)
     context = {
@@ -683,6 +702,7 @@ def player(request, player):
         "sk_team_num": sk_team_num,
         "skaterwar": skater_war,
         "games": all_games,
+        "position_games": position_games,
         }
     return render(request, "GHLWebsiteApp/player.html", context)
 
