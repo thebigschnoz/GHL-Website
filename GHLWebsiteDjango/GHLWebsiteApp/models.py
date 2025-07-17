@@ -422,6 +422,7 @@ class SkaterWAR(models.Model):
     position = models.ForeignKey(Position, on_delete=models.SET_NULL, null=True)
 
     # building blocks
+    games_played   = models.PositiveSmallIntegerField(default=0)
     gar_offence   = models.DecimalField(max_digits=6, decimal_places=2)   # xG + primary assists
     gar_defence   = models.DecimalField(max_digits=6, decimal_places=2)   # prevented xG
     gar_turnover  = models.DecimalField(max_digits=6, decimal_places=2)   # take / give / intercept

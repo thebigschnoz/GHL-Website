@@ -1,4 +1,6 @@
 from decimal import Decimal
+from collections import defaultdict
+from django.db import transaction
 from django.core.management.base import BaseCommand
 from django.db.models import Sum, Count, F, Window
 from django.db.models.functions import Rank, Coalesce
@@ -39,32 +41,64 @@ class Command(BaseCommand):
         )
 
     def assign_percentiles(self, season):
+        buckets = defaultdict(list)           # {pos_id: [row, …]}
+
+        qs = (SkaterWAR.objects
+            .filter(season=season)
+            .select_related("position")     # avoids extra queries
+            .only("id", "position", "games_played",
+                    *(c for c, _ in COMPONENTS)))  # load just the needed fields
+
+        for row in qs:
+            buckets[row.position_id].append(row)
+
+        # ②  loop over every component
         for comp, pct_field in COMPONENTS:
-            # Filter by position (only centers for faceoff)
+
+            # Which positions to include?
+            positions = [CENTER_POS] if comp == "gar_faceoffs" else buckets.keys()
+
+            for pos in positions:
+                cohort = buckets.get(pos, [])
+                if not cohort:
+                    continue
+
+                # --- build a list of (rate, row) ---
+                with_rates = [
+                    (row.__dict__[comp] / row.games_played if row.games_played else Decimal("0"), row)
+                    for row in cohort
+                ]
+
+                # sort ascending: lowest value => 0th percentile
+                with_rates.sort(key=lambda tup: tup[0])
+
+                # inclusive percentile
+                n = len(with_rates)
+                i = 0
+                while i < n:
+                    j = i
+                    # group ties so they share a percentile
+                    while j < n and with_rates[j][0] == with_rates[i][0]:
+                        j += 1
+                    pct = (Decimal(j) / Decimal(n) * 100).quantize(Decimal("0.01"))
+                    for _, row in with_rates[i:j]:
+                        setattr(row, pct_field, pct)
+                    i = j
+
+            # --- blank face-off pct for non-centres ---
             if comp == "gar_faceoffs":
-                positions_to_rank = [CENTER_POS]
-            else:
-                positions_to_rank = SkaterWAR.objects.filter(season=season).values_list('position', flat=True).distinct()
+                for pos, cohort in buckets.items():
+                    if pos == CENTER_POS:
+                        continue
+                    for row in cohort:
+                        row.gar_faceoffs_pct = None
 
-            for pos in positions_to_rank:
-                cohort = (SkaterWAR.objects
-                        .filter(season=season, position=pos)
-                        .order_by(comp))  # ascending
-
-                total = cohort.count()
-                updates = []
-                for i, sk in enumerate(cohort, start=1):
-                    percentile = (Decimal(i) / Decimal(total)) * 100
-                    setattr(sk, pct_field, percentile.quantize(Decimal("0.01")))
-                    updates.append(sk)
-
-                SkaterWAR.objects.bulk_update(updates, [pct_field])
-
-            # Nullify faceoff percentiles for non-centres
-            if comp == "gar_faceoffs":
-                SkaterWAR.objects.filter(
-                    season=season
-                ).exclude(position=CENTER_POS).update(gar_faceoffs_pct=None)
+        # ③  one bulk update per field – fastest on SQLite
+        #    (could also bulk_update once per COMPONENTS batch)
+        fields_to_update = [pct for _, pct in COMPONENTS]
+        with transaction.atomic():
+            for pos_rows in buckets.values():
+                SkaterWAR.objects.bulk_update(pos_rows, fields_to_update)
 
 
     def handle(self, *args, **options):
@@ -104,17 +138,18 @@ class Command(BaseCommand):
                 fol         = Coalesce(Sum('fol'), 0),
             )
         )
+        self.stdout.write(self.style.SUCCESS(f"Found {qs.count()} skater records for season {season.season_text}."))
         rep_baseline = {}          # {pos_id: GAR_per_game_for_replacement}
         for pos_id in qs.values_list('position', flat=True).distinct():
             rep_pool = (qs.filter(position=pos_id)
                         .order_by('gp')[: max(1, qs.filter(position=pos_id)
                                                     .count() // 5)])  # bottom-20 %
             rep_events = sum(
-                (row['goals']   * LINEAR_WEIGHTS['goal']   +
-                row['assists'] * LINEAR_WEIGHTS['assist'] +
-                row['shots']   * LINEAR_WEIGHTS['shot_attempt'] +
-                row['takeaways']*LINEAR_WEIGHTS['takeaway'] +
-                row['blocks']  * LINEAR_WEIGHTS['blocked_shot'])
+                ((row['goals']   * LINEAR_WEIGHTS['goal'])   +
+                (row['assists'] * LINEAR_WEIGHTS['assist']) +
+                (row['shots']   * LINEAR_WEIGHTS['shot_attempt']) +
+                (row['takeaways']*LINEAR_WEIGHTS['takeaway']) +
+                (row['blocks']  * LINEAR_WEIGHTS['blocked_shot']))
                 for row in rep_pool
             )
             rep_games  = sum(row['gp'] for row in rep_pool) or 1
@@ -132,15 +167,6 @@ class Command(BaseCommand):
 
         rep_pool = subquery.filter(rank__lte=replacement_cut)
 
-        # average GAR/60 for replacement skaters
-        rep_gar60 = (rep_pool.aggregate(rep=Sum(
-                        (F('goals')   * LINEAR_WEIGHTS['goal'])   +
-                        (F('assists') * LINEAR_WEIGHTS['assist']) +
-                        (F('shots')   * LINEAR_WEIGHTS['shot_attempt'])   +
-                        (F('takeaways') * LINEAR_WEIGHTS['takeaway'])     +
-                        (F('blocks')    * LINEAR_WEIGHTS['blocked_shot'])
-                    ))['rep'] or 0) / (rep_pool.aggregate(gp=Sum('gp'))['gp'] or 1)
-
         for row in qs:
             gar = (
                 (row['goals']   * LINEAR_WEIGHTS['goal'])   +
@@ -152,7 +178,7 @@ class Command(BaseCommand):
                 (row['pen_taken'] * LINEAR_WEIGHTS['pen_taken'])    +
                 ((row['fow'] - row['fol']) * LINEAR_WEIGHTS['faceoff_win'])
             )
-            print(f"Computed GAR for player {row['ea_player_num']} as {row['position']}: {gar:.2f}")
+            
 
             gar_off = (row['goals'] * LINEAR_WEIGHTS['goal']) + (row['assists'] * LINEAR_WEIGHTS['assist'])
             gar_def = (row['blocks'] * LINEAR_WEIGHTS['blocked_shot'])
@@ -168,13 +194,13 @@ class Command(BaseCommand):
             if gar_above_rep.is_nan():
                 gar_above_rep = Decimal("0.0")
             war = gar_above_rep / G_PER_WIN
-            print(f"Computed WAR for player {row['ea_player_num']} as {row['position']}: {war:.2f}")
 
             SkaterWAR.objects.update_or_create(
                 player_id   = row['ea_player_num'],
                 position_id = row['position'],
                 season      = season,
                 defaults    = dict(
+                    games_played   = row['gp'],
                     position_id   = row['position'],
                     gar_offence   = gar_off,
                     gar_defence   = gar_def,
@@ -186,17 +212,19 @@ class Command(BaseCommand):
                     weights_version="v1"
                 )
             )
+        self.stdout.write(f"GAR and WAR totals successfully computed for {qs.count()} skater records.")
         positions = Position.objects.values_list('ea_pos', flat=True)  # get all position IDs
         for pos in positions:                                  # loop once per position
             cohort = (SkaterWAR.objects
                     .filter(season=season, position=pos)
-                    .order_by('war'))                        # ascending
+                    .order_by('-war'))                        # descending
 
             n = cohort.count()
             for i, skater in enumerate(cohort, start=1):
                 pct = (Decimal(i) / Decimal(n)) * 100          # Inclusive style
                 skater.war_percentile = pct.quantize(Decimal('0.01'))
             SkaterWAR.objects.bulk_update(cohort, ['war_percentile'])
+        self.stdout.write(f"WAR percentiles updated for {qs.count()} skater records.")
 
         self.assign_percentiles(season)
         self.stdout.write(self.style.SUCCESS("WAR update completed!"))
