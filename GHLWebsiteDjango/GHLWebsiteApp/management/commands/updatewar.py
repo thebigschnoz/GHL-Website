@@ -2,8 +2,8 @@ from decimal import Decimal
 from collections import defaultdict
 from django.db import transaction
 from django.core.management.base import BaseCommand
-from django.db.models import Sum, Count, F, Window
-from django.db.models.functions import Rank, Coalesce
+from django.db.models import Sum, Count, F, Window, DecimalField
+from django.db.models.functions import Rank, Coalesce, Cast
 from GHLWebsiteApp.models import SkaterWAR, SkaterRecord, Season, Position
 
 LINEAR_WEIGHTS = {
@@ -214,15 +214,18 @@ class Command(BaseCommand):
             )
         self.stdout.write(f"GAR and WAR totals successfully computed for {qs.count()} skater records.")
         positions = Position.objects.values_list('ea_pos', flat=True)  # get all position IDs
-        for pos in positions:                                  # loop once per position
+        for pos in positions:
             cohort = (SkaterWAR.objects
                     .filter(season=season, position=pos)
-                    .order_by('-war'))                        # descending
+                    .annotate(
+                        war_rate = F('war') / Cast('games_played', DecimalField())
+                    )
+                    .order_by('war_rate'))              # ascending = worst → best
 
             n = cohort.count()
-            for i, skater in enumerate(cohort, start=1):
-                pct = (Decimal(i) / Decimal(n)) * 100          # Inclusive style
-                skater.war_percentile = pct.quantize(Decimal('0.01'))
+            for i, sk in enumerate(cohort, start=1):
+                pct = (Decimal(i) / Decimal(n)) * 100
+                sk.war_percentile = pct.quantize(Decimal('0.01'))
             SkaterWAR.objects.bulk_update(cohort, ['war_percentile'])
         self.stdout.write(f"WAR percentiles updated for {qs.count()} skater records.")
 
