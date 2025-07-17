@@ -134,11 +134,14 @@ class Command(BaseCommand):
                 assists     = Coalesce(Sum('assists'), 0),
                 shots       = Coalesce(Sum('shot_attempts'), 0),
                 takeaways   = Coalesce(Sum('takeaways'), 0),
+                interceptions = Coalesce(Sum('interceptions'), 0),
+                giveaways     = Coalesce(Sum('giveaways'), 0),
                 blocks      = Coalesce(Sum('blocked_shots'), 0),
-                pen_drawn   = Coalesce(Sum('pens_drawn'), 0),
-                pen_taken   = Coalesce(Sum('pims'), 0),
+                pens_drawn  = Coalesce(Sum('pens_drawn'), 0),
+                pens_taken  = Coalesce(Sum('pims'), 0),
                 fow         = Coalesce(Sum('fow'), 0),
                 fol         = Coalesce(Sum('fol'), 0),
+                hits        = Coalesce(Sum('hits'), 0),
             )
         )
         self.stdout.write(self.style.SUCCESS(f"Found {qs.count()} skater records for season {season.season_text}."))
@@ -148,12 +151,15 @@ class Command(BaseCommand):
                         .order_by('gp')[: max(1, qs.filter(position=pos_id)
                                                     .count() // 5)])  # bottom-20 %
             rep_events = sum(
-                ((row['goals']   * LINEAR_WEIGHTS['goal'])   +
-                (row['assists'] * LINEAR_WEIGHTS['assist']) +
-                (row['shots']   * LINEAR_WEIGHTS['shot_attempt']) +
-                (row['takeaways']*LINEAR_WEIGHTS['takeaway']) +
-                (row['blocks']  * LINEAR_WEIGHTS['blocked_shot']))
-                for row in rep_pool
+                ((r['goals']   * LINEAR_WEIGHTS['goal'])          +
+                (r['assists'] * LINEAR_WEIGHTS['assist'])        +
+                (r['shots']   * LINEAR_WEIGHTS['shot_attempt'])  +
+                (r['takeaways']    * LINEAR_WEIGHTS['takeaway']) +
+                (r['interceptions']* LINEAR_WEIGHTS['interception']) +
+                (r['giveaways']    * LINEAR_WEIGHTS['giveaway'])     +
+                (r['blocks']       * LINEAR_WEIGHTS['blocked_shot']) +
+                (r['hits']         * LINEAR_WEIGHTS['hit']))
+                for r in rep_pool
             )
             rep_games  = sum(row['gp'] for row in rep_pool) or 1
             rep_baseline[pos_id] = Decimal(rep_events) / Decimal(rep_games)   # **per game**
@@ -179,13 +185,16 @@ class Command(BaseCommand):
                 (row['blocks']    * LINEAR_WEIGHTS['blocked_shot']) +
                 (row['pen_drawn'] * LINEAR_WEIGHTS['pen_drawn'])    +
                 (row['pen_taken'] * LINEAR_WEIGHTS['pen_taken'])    +
+                (row['interceptions']* LINEAR_WEIGHTS['interception']) +
+                (row['giveaways']    * LINEAR_WEIGHTS['giveaway'])     +
+                (row['hits']         * LINEAR_WEIGHTS['hit']) +
                 ((row['fow'] - row['fol']) * LINEAR_WEIGHTS['faceoff_win'])
             )
             
 
             gar_off = (row['goals'] * LINEAR_WEIGHTS['goal']) + (row['assists'] * LINEAR_WEIGHTS['assist'])
             gar_def = (row['blocks'] * LINEAR_WEIGHTS['blocked_shot'])
-            gar_turn= (row['takeaways'] * LINEAR_WEIGHTS['takeaway']) + (row['shots'] * LINEAR_WEIGHTS['shot_attempt'])
+            gar_turn= (row['takeaways'] * LINEAR_WEIGHTS['takeaway']) + (row['interceptions'] * LINEAR_WEIGHTS['interception']) + (row['giveaways'] * LINEAR_WEIGHTS['giveaway'])
             gar_pen = (row['pen_drawn'] * LINEAR_WEIGHTS['pen_drawn']) + (row['pen_taken'] * LINEAR_WEIGHTS['pen_taken'])
             rep_per_game = rep_baseline[row['position']]
             if row['position'] == CENTER_POS:
