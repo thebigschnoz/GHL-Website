@@ -183,8 +183,8 @@ class Command(BaseCommand):
                 (row['shots']   * LINEAR_WEIGHTS['shot_attempt'])   +
                 (row['takeaways'] * LINEAR_WEIGHTS['takeaway'])     +
                 (row['blocks']    * LINEAR_WEIGHTS['blocked_shot']) +
-                (row['pen_drawn'] * LINEAR_WEIGHTS['pen_drawn'])    +
-                (row['pen_taken'] * LINEAR_WEIGHTS['pen_taken'])    +
+                (row['pens_drawn'] * LINEAR_WEIGHTS['pen_drawn'])    +
+                (row['pens_taken'] * LINEAR_WEIGHTS['pen_taken'])    +
                 (row['interceptions']* LINEAR_WEIGHTS['interception']) +
                 (row['giveaways']    * LINEAR_WEIGHTS['giveaway'])     +
                 (row['hits']         * LINEAR_WEIGHTS['hit']) +
@@ -195,7 +195,7 @@ class Command(BaseCommand):
             gar_off = (row['goals'] * LINEAR_WEIGHTS['goal']) + (row['assists'] * LINEAR_WEIGHTS['assist'])
             gar_def = (row['blocks'] * LINEAR_WEIGHTS['blocked_shot'])
             gar_turn= (row['takeaways'] * LINEAR_WEIGHTS['takeaway']) + (row['interceptions'] * LINEAR_WEIGHTS['interception']) + (row['giveaways'] * LINEAR_WEIGHTS['giveaway'])
-            gar_pen = (row['pen_drawn'] * LINEAR_WEIGHTS['pen_drawn']) + (row['pen_taken'] * LINEAR_WEIGHTS['pen_taken'])
+            gar_pen = (row['pens_drawn'] * LINEAR_WEIGHTS['pen_drawn']) + (row['pens_taken'] * LINEAR_WEIGHTS['pen_taken'])
             rep_per_game = rep_baseline[row['position']]
             if row['position'] == CENTER_POS:
                 gar_fo = (row['fow'] - row['fol']) * LINEAR_WEIGHTS['faceoff_win']
