@@ -27,6 +27,11 @@
             <th>S%</th>
             <th>+/-</th>
             <th>Hits</th>
+            <th>Poss Avg</th>
+            <th>Pass %</th>
+            <th>TK/GP</th>
+            <th>INT/GP</th>
+            <th>BLK/GP</th>
         </tr>
         {% for s in skater_stats %}
         <tr>
@@ -38,6 +43,11 @@
             <td style="width: 40px;">{{ s.shot_perc|floatformat:1 }}%</td>
             <td style="width: 40px;">{{ s.plus_minus }}</td>
             <td style="width: 40px;">{{ s.hits }}</td>
+            <td style="width: 40px;">{{ s.postime|floatformat:0 }}</td>
+            <td style="width: 40px;">{{ s.pass_perc|floatformat:1 }}%</td>
+            <td style="width: 40px;">{{ s.tkpergame|floatformat:2 }}</td>
+            <td style="width: 40px;">{{ s.intpergame|floatformat:2 }}</td>
+            <td style="width: 40px;">{{ s.bspergame|floatformat:2 }}</td>
         </tr>
         {% endfor %}
     </table>

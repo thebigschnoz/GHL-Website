@@ -937,6 +937,7 @@ def weekly_stats_view(request):
         dates_qs = (
             SkaterRecord.objects
             .filter(game_num__season_num=season_num)
+            .exclude(position=0)
             .values_list('game_num__played_time', flat=True)
         )
         for dt in dates_qs:
@@ -974,7 +975,7 @@ def weekly_stats_view(request):
         skater_qs = SkaterRecord.objects.filter(
             game_num__played_time__gte=start_date,
             game_num__played_time__lt=end_date
-        )
+        ).exclude(position=0)
 
         print("start_date =", start_date)
         print("end_date =", end_date)
@@ -1001,6 +1002,12 @@ def weekly_stats_view(request):
         'games_played': 0,
         'plus_minus': 0,
         'hits': 0,
+        'postime': 0,
+        'pass_att': 0,
+        'pass_comp': 0,
+        'taekaways': 0,
+        'interceptions': 0,
+        'blocked_shots': 0,
     })
 
     for record in skater_qs:
@@ -1012,6 +1019,12 @@ def weekly_stats_view(request):
         skater_map[ea_player_num]['plus_minus'] += record.plus_minus or 0
         skater_map[ea_player_num]['games_played'] += 1
         skater_map[ea_player_num]['hits'] += record.hits or 0
+        skater_map[ea_player_num]['postime'] += record.poss_time or 0
+        skater_map[ea_player_num]['pass_att'] += record.pass_att or 0
+        skater_map[ea_player_num]['pass_comp'] += record.pass_comp or 0
+        skater_map[ea_player_num]['taekaways'] += record.takeaways or 0
+        skater_map[ea_player_num]['interceptions'] += record.interceptions or 0
+        skater_map[ea_player_num]['blocked_shots'] += record.blocked_shots or 0
 
     player_map = Player.objects.in_bulk(field_name='ea_player_num')
 
@@ -1021,6 +1034,22 @@ def weekly_stats_view(request):
         shot_perc = (
             (stats['total_goals'] * 100.0 / stats['total_sog'])
             if stats['total_sog'] > 0 else 0.0
+        )
+        pass_perc = (
+            (stats['pass_comp'] * 100.0 / stats['pass_att'])
+            if stats['pass_att'] > 0 else 0.0
+        )
+        posspergame = (
+            (stats['postime'] / stats['games_played'])
+        )
+        tkpergame = (
+            (stats['taekaways'] / stats['games_played'])
+        )
+        intpergame = (
+            (stats['interceptions'] / stats['games_played'])
+        )
+        bspergame = (
+            (stats['blocked_shots'] / stats['games_played'])
         )
 
         skater_stats.append({
@@ -1034,6 +1063,11 @@ def weekly_stats_view(request):
             'shot_perc': round(shot_perc, 2),
             'plus_minus': stats['plus_minus'],
             'hits': stats['hits'],
+            'pass_perc': round(pass_perc, 2),
+            'postime': round(posspergame, 1),
+            'tkpergame': round(tkpergame, 1),
+            'intpergame': round(intpergame, 1),
+            'bspergame': round(bspergame, 1),
         })
 
     skater_stats.sort(key=lambda x: (
