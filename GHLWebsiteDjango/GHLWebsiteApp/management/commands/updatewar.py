@@ -189,7 +189,7 @@ class Command(BaseCommand):
         rep_pool = subquery.filter(rank__lte=replacement_cut)
 
         for row in qs:
-            print(f"Player: {row['ea_player_num']}, Position: {row['position']},Games Played: {row['gp']}")
+            print(f"Player: {row['ea_player_num']}, Position: {row['position']}, Games Played: {row['gp']}")
             gar = (
                 (row['goals']   * LINEAR_WEIGHTS['goal'])   +
                 (row['assists'] * LINEAR_WEIGHTS['assist']) +
