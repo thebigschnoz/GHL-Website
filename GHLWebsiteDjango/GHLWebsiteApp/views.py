@@ -575,6 +575,9 @@ def game(request, game):
         h_team_min = h_team_record.toa_team // 60
         h_team_sec = h_team_record.toa_team % 60
         h_team_toa_formatted = f"{h_team_min}:{h_team_sec:02d}"
+    gamelength_min = gamenum.gamelength // 60
+    gamelength_sec = gamenum.gamelength % 60
+    gamelength_formatted = f"{gamelength_min}:{gamelength_sec:02d}"
     context = {"game": gamenum,
                "a_skater_records": a_skater_records,
                "h_skater_records": h_skater_records,
@@ -587,6 +590,7 @@ def game(request, game):
                "a_team_toa": a_team_toa_formatted,
                "h_team_toa": h_team_toa_formatted,
                "comparison_stats": comparison_stats,
+               "gamelength": gamelength_formatted,
     }
     return render(request, "GHLWebsiteApp/game.html", context)
 

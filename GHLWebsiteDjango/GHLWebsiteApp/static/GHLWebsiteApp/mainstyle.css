@@ -2118,9 +2118,9 @@ td.hoverlink:hover a {
 .stats-table {
   border: 2px solid #fbe134;
   border-radius: 10px;
-  border-collapse: collapse;
-  overflow: hidden;
+  border-spacing: 0;
   background-color: #111;
+  margin-bottom: 10px;
 }
 
 .stats-table th,
@@ -2191,4 +2191,11 @@ td.hoverlink:hover a {
 .stats-bar {
   height: 100%;
   transition: width 0.3s ease;
+}
+
+.game-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }

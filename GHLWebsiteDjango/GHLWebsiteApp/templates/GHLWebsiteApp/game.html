@@ -20,9 +20,21 @@
                     </a>
                 </div>
                 <div class="score-box">
-                    <span class="score">{{ game.a_team_gf }}</span>
-                    <span class="vs">-</span>
-                    <span class="score">{{ game.h_team_gf }}</span>
+                    <div class="game-info">
+                        <span>
+                            <span class="score">{{ game.a_team_gf }}</span>
+                            <span class="vs">-</span>
+                            <span class="score">{{ game.h_team_gf }}</span>
+                        </span>
+                        {% if game.gamelength > 3600 %}
+                        <span style="font-weight: 400; font-size: 24px">Final/OT</span>
+                        {% elif game.played_time is None %}
+                        <span style="font-weight: 400; font-size: 24px">Scheduled</span>
+                        {% else %}
+                        <span style="font-weight: 400; font-size: 24px">Final</span>
+                        {% endif %}
+                        <span style="font-weight: 200; font-size: 16px;">{{ gamelength }}</span>
+                    </div>
                 </div>
                 <div class="stats-team" style="background-image: linear-gradient(115deg, black 20%, {{ game.h_team_num.team_color }});">
                     <a href="{% url 'team' game.h_team_num.ea_club_num %}" class="stats-team-link noline">
@@ -163,7 +175,6 @@
                 </tr>
             </tbody>
         </table>
-    </div>
         <div id="divider"></div>
         <div class="header">{{ game.a_team_num.club_full_name }}</div>
         <div class="section_lg" style="align-items: auto; width: 90%; overflow: scroll; margin-bottom: 10px;"><center>
