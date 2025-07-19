@@ -2050,3 +2050,145 @@ td.hoverlink:hover a {
   color: #fbe134;
   margin: 5px auto;
 }
+
+.game-summary {
+  max-width: 800px;
+  margin: 40px auto;
+  font-family: 'Segoe UI', sans-serif;
+  color: #fbe134;
+}
+
+.stats-team-box {
+  display: flex;
+  position: relative;
+  justify-content: center;
+  align-items: center;
+  background-color: #111;
+  border: 3px solid #fbe134;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.stats-team {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 15px 20px;
+  width: 100%;
+  position: relative;
+}
+
+.stats-team-logo {
+  width: 100px;
+  height: 100px;
+  -webkit-text-stroke: 3px white;
+  paint-order: stroke fill;
+  /* border-radius: 50%;
+  margin-bottom: 10px;
+  background-color: #222;
+  border: 2px solid #fbe134;
+  z-index: 3;
+  position: relative; */
+}
+
+.stats-info {
+  border: 2px solid #fbe134;
+  border-radius: 5px;
+  background-color: #111;
+  padding: 7px;
+  margin-bottom: 10px;
+}
+
+.stats-team-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #fbe134;
+  text-transform: uppercase;
+}
+
+.stats-team-location {
+  font-size: 12px;
+  font-weight: 200;
+  color: #fbe134;
+  text-transform: capitalize;
+}
+
+.stats-table {
+  border: 2px solid #fbe134;
+  border-radius: 10px;
+  border-collapse: collapse;
+  overflow: hidden;
+  background-color: #111;
+}
+
+.stats-table th,
+.stats-table td {
+  padding: 6px;
+  text-align: center;
+  font-size: 16px;
+}
+
+.stats-table th {
+  background-color: #1a1a1a;
+  color: #fbe134;
+  font-weight: bold;
+}
+
+.stats-table td {
+  color: #ffffff;
+}
+
+.stats-table tr:last-child td {
+  border-bottom: none;
+}
+
+.stats-table td.stats-label {
+  text-transform: uppercase;
+  text-wrap: nowrap;
+  font-weight: bold;
+  color: #fbe134;
+  width: 140px;
+}
+
+.stats-standing {
+  font-size: 12px;
+  line-height: auto;
+}
+
+.score-box {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 60px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  z-index: 5;
+  padding: 4px 10px;
+  border-radius: 8px;
+  -webkit-text-stroke: 4px #222;
+  paint-order: stroke fill;
+}
+
+.score {
+  min-width: 90px;
+}
+
+.stats-bar-row {
+  border-bottom: 1px solid #444;
+}
+
+.stats-bar-container {
+  display: flex;
+  height: 8px;
+  background-color: #1b1b1b;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.stats-bar {
+  height: 100%;
+  transition: width 0.3s ease;
+}

@@ -37,6 +37,8 @@ class Team(models.Model):
     isActive = models.BooleanField(default=True, verbose_name="Is Active Team", help_text="Indicates if the team is currently active in the league")
     team_color = models.CharField(max_length=7, default="#000000", verbose_name="Team Color", help_text="Hex color code for the team's primary color")
     team_code = models.CharField(max_length=6, verbose_name="Game Matchup Code", help_text="GHL specific matchup code to be used in EA NHL games", blank=True, null=True)
+    team_location = models.CharField(max_length=50, verbose_name="Team Location", help_text="Location of the team, e.g., 'New York', 'Toronto'", default="Location")
+    team_name = models.CharField(max_length=50, verbose_name="Team Name", help_text="Name of the team, e.g., 'Rangers', 'Maple Leafs'", default="Name")
 
     def __str__(self):
         return self.club_full_name

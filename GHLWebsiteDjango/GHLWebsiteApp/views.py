@@ -516,20 +516,65 @@ def game(request, game):
     h_skater_records = SkaterRecord.objects.filter(game_num=gamenum.game_num, ea_club_num=gamenum.h_team_num.ea_club_num).exclude(position="0")
     a_goalie_records = GoalieRecord.objects.filter(game_num=gamenum.game_num, ea_club_num=gamenum.a_team_num.ea_club_num)
     h_goalie_records = GoalieRecord.objects.filter(game_num=gamenum.game_num, ea_club_num=gamenum.h_team_num.ea_club_num)
-    a_team_standing = Standing.objects.filter(team=gamenum.a_team_num.ea_club_num, season=season)
-    h_team_standing = Standing.objects.filter(team=gamenum.h_team_num.ea_club_num, season=season)
-    a_team_record = TeamRecord.objects.filter(game_num=gamenum.game_num, ea_club_num=gamenum.a_team_num.ea_club_num)
-    h_team_record = TeamRecord.objects.filter(game_num=gamenum.game_num, ea_club_num=gamenum.h_team_num.ea_club_num)
+    a_team_standing = Standing.objects.filter(team=gamenum.a_team_num.ea_club_num, season=season).first()
+    h_team_standing = Standing.objects.filter(team=gamenum.h_team_num.ea_club_num, season=season).first()
+    a_team_record = TeamRecord.objects.filter(game_num=gamenum.game_num, ea_club_num=gamenum.a_team_num.ea_club_num).first()
+    h_team_record = TeamRecord.objects.filter(game_num=gamenum.game_num, ea_club_num=gamenum.h_team_num.ea_club_num).first()
+    comparison_stats = {}
+    if a_team_record and h_team_record:
+        def calculate_percentage(home_value, away_value):
+            total = home_value + away_value
+            if total == 0:
+                return 50, 50
+            home_percentage = round((home_value / total) * 100, 1)
+            away_percentage = round((away_value / total) * 100, 1)
+            return home_percentage, away_percentage
+
+        # Calculate percentages for each stat
+        comparison_stats['home_sogperc'], comparison_stats['away_sogperc'] = calculate_percentage(
+            h_team_record.sog_team, a_team_record.sog_team
+        )
+        comparison_stats['home_hitsperc'], comparison_stats['away_hitsperc'] = calculate_percentage(
+            h_team_record.hits_team, a_team_record.hits_team
+        )
+        comparison_stats['home_toaperc'], comparison_stats['away_toaperc'] = calculate_percentage(
+            h_team_record.toa_team, a_team_record.toa_team
+        )
+        comparison_stats['home_fowperc'], comparison_stats['away_fowperc'] = calculate_percentage(
+            h_team_record.fow_team, a_team_record.fow_team
+        )
+        comparison_stats['home_pimsperc'], comparison_stats['away_pimsperc'] = calculate_percentage(
+            h_team_record.pims_team, a_team_record.pims_team
+        )
+
+        # Calculate passing percentage
+        h_pass_comp = h_team_record.pass_comp_team or 0
+        h_pass_att = h_team_record.pass_att_team or 1  # Avoid division by zero
+        a_pass_comp = a_team_record.pass_comp_team or 0
+        a_pass_att = a_team_record.pass_att_team or 1  # Avoid division by zero
+        comparison_stats['home_passperc'], comparison_stats['away_passperc'] = calculate_percentage(
+            h_pass_comp / h_pass_att, a_pass_comp / a_pass_att
+        )
+
+        # Calculate powerplay percentage
+        h_ppg = h_team_record.ppg_team or 0
+        h_ppo = h_team_record.ppo_team or 1  # Avoid division by zero
+        a_ppg = a_team_record.ppg_team or 0
+        a_ppo = a_team_record.ppo_team or 1  # Avoid division by zero
+        comparison_stats['home_ppperc'], comparison_stats['away_ppperc'] = calculate_percentage(
+            h_ppg / h_ppo, a_ppg / a_ppo
+        )
+
+    # Format TOA
     a_team_toa_formatted = h_team_toa_formatted = "0:00"
     if a_team_record:
-        a_team_min = a_team_record[0].toa_team // 60
-        a_team_sec = a_team_record[0].toa_team % 60
+        a_team_min = a_team_record.toa_team // 60
+        a_team_sec = a_team_record.toa_team % 60
         a_team_toa_formatted = f"{a_team_min}:{a_team_sec:02d}"
     if h_team_record:
-        h_team_min = h_team_record[0].toa_team // 60
-        h_team_sec = h_team_record[0].toa_team % 60
+        h_team_min = h_team_record.toa_team // 60
+        h_team_sec = h_team_record.toa_team % 60
         h_team_toa_formatted = f"{h_team_min}:{h_team_sec:02d}"
-    print(a_team_record)
     context = {"game": gamenum,
                "a_skater_records": a_skater_records,
                "h_skater_records": h_skater_records,
@@ -541,6 +586,7 @@ def game(request, game):
                "h_team_record": h_team_record,
                "a_team_toa": a_team_toa_formatted,
                "h_team_toa": h_team_toa_formatted,
+               "comparison_stats": comparison_stats,
     }
     return render(request, "GHLWebsiteApp/game.html", context)
 
