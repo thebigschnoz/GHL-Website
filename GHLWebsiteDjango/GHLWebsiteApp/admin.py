@@ -144,6 +144,7 @@ class CustomUserAdmin(UserAdmin):
 
     list_display = (
         "username",
+        "date_joined",
         "is_superuser",
         "is_admin_group",
         "is_media_group",
