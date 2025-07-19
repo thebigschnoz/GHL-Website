@@ -140,12 +140,21 @@ class Command(BaseCommand):
                 merge_goalie.game_num = survivor_game
                 merge_goalie.save()
                 self.stdout.write(self.style.WARNING(f"GoalieRecord {merge_goalie.ea_player_num} from game {merge_game_num} was not found in game {game_num}. Reassigned to game {game_num}."))
-            # TODO: Save goalies again after merging to calculate W/L/OTL/SO
             
 
         survivor_game.save() # Save the survivor game
         merge_game.season_num = Season.objects.get(season_text__icontains="Test") # Move merged game to test season (so it doesn't show up in the standings and doesn't download again)
         merge_game.save()
+
+        # Resave goalies to recalculate W/L/OTL/SO
+        resave_goalies = GoalieRecord.objects.filter(game_num=survivor_game.game_num) 
+        for goalie in resave_goalies:
+            try:
+                goalie.save()
+            except Exception as e:
+                self.stdout.write(self.style.ERROR(f"Error re-saving GoalieRecord {goalie.ea_player_num.username} for game {survivor_game.game_num}: {str(e)}"))
+                continue
+            self.stdout.write(self.style.SUCCESS(f"Successfully recalculated GoalieRecord {goalie.ea_player_num.username} for game {survivor_game.game_num}."))
 
         self.stdout.write(self.style.SUCCESS(f"Successfully merged game {merge_game_num} into game {game_num}."))
         calculate_leaders()
