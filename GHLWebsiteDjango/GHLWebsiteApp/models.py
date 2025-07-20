@@ -448,3 +448,32 @@ class SkaterWAR(models.Model):
 
     def __str__(self):
         return f"{self.player.username} - {self.position.positionShort} ({self.season.season_text}) - WAR: {self.war:.2f}"
+    
+class TradeBlockPlayer(models.Model):
+    player = models.ForeignKey(Player, on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    listed_at = models.DateTimeField(auto_now_add=True)
+    notes = models.TextField(blank=True, help_text="Optional notes about the trade value or desired return")
+
+    def __str__(self):
+        return f"{self.player.username} on block for {self.team.club_abbr}"
+
+class TeamNeed(models.Model):
+    TEAM_NEED_CHOICES = [
+        ('any', 'Any'),
+        ('key', 'Key'),
+        ('core', 'Core'),
+        ('depth', 'Depth'),
+        ('prospect', 'Prospect'),
+        ('avail', 'Schedule Availability'),
+        ('cap', 'Cap Space'),
+    ]
+    
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    position = models.ManyToManyField(Position, null=True, blank=True, verbose_name="Position Needed")
+    skill = models.CharField(max_length=10, choices=TEAM_NEED_CHOICES, default='any', verbose_name="Need Type")
+    note = models.CharField(max_length=100, blank=True, help_text="E.g. 'Top-4 LD', 'Faceoff specialist', etc.")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.team.club_abbr} needs - {self.created_at}"
