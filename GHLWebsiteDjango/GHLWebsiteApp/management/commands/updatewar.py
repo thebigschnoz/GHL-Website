@@ -4,7 +4,7 @@ from django.db import transaction
 from django.core.management.base import BaseCommand
 from django.db.models import Sum, Count, F, Window, DecimalField, Q
 from django.db.models.functions import Rank, Coalesce, Cast
-from GHLWebsiteApp.models import SkaterWAR, SkaterRecord, Season, Position
+from GHLWebsiteApp.models import SkaterWAR, SkaterRecord, Season, Position, Game
 
 LINEAR_WEIGHTS = {
     "goal"          : Decimal("1.00"),
@@ -21,6 +21,8 @@ LINEAR_WEIGHTS = {
     "hit"           : Decimal("0.02"),   # or 0 if you want no reward
 }
 
+CONTEXT_WEIGHT = Decimal("0.10")   # 0.10 goals per WAR/GP gap
+
 COMPONENTS = [
     ("gar_offence",   "gar_offence_pct"),
     ("gar_defence",   "gar_defence_pct"),
@@ -33,6 +35,8 @@ COMPONENTS = [
 G_PER_WIN = Decimal("5.2976")                 # compute once per league via logistic model
 
 CENTER_POS = 5   # EA enum for centres
+
+DEFAULT_TALENT = Decimal("0") 
 
 class Command(BaseCommand):
     help = "Re/compute WAR for every player-season"
@@ -124,6 +128,41 @@ class Command(BaseCommand):
         if season.season_type != 'regular':
             self.stdout.write(self.style.ERROR("WAR can only be computed for regular seasons."))
             return
+        prev_war_rate = {
+            sw.player_id: (sw.war / Decimal(sw.games_played))
+            for sw in SkaterWAR.objects.filter(season=season.season_num)  # yesterday's rows
+        }
+        
+        # ctx_tot[player_id] = [sum_ctx_diff, games_count]
+        ctx_tot = defaultdict(lambda: [Decimal("0"), 0])
+
+        for g in Game.objects.filter(season_num=season):
+            recs = SkaterRecord.objects.filter(game_num=g) \
+                .values('ea_player_num', 'ea_club_num')
+
+            # split into two rosters
+            clubs = {}
+            for r in recs:
+                clubs.setdefault(r['ea_club_num'], []).append(r['ea_player_num'])
+
+            if len(clubs) != 2:        # should never happen, but be safe
+                continue
+
+            (home_ids, away_ids) = clubs.values()           # order is irrelevant
+            # average WAR/GP talent of the six skaters on each side
+            home_talent = sum(prev_war_rate.get(pid, DEFAULT_TALENT)
+                            for pid in home_ids) / 6
+            away_talent = sum(prev_war_rate.get(pid, DEFAULT_TALENT)
+                            for pid in away_ids) / 6
+
+            # everyone on home team faced 'away' competition, and vice-versa
+            for pid in home_ids:
+                diff, n             = ctx_tot[pid]
+                ctx_tot[pid]        = [diff + (away_talent - home_talent), n + 1]
+
+            for pid in away_ids:
+                diff, n             = ctx_tot[pid]
+                ctx_tot[pid]        = [diff + (home_talent - away_talent), n + 1]
 
         qs = (SkaterRecord.objects
             .filter(game_num__season_num=season)
@@ -196,7 +235,7 @@ class Command(BaseCommand):
                 (row['shots']   * LINEAR_WEIGHTS['shot_attempt'])   +
                 (row['takeaways'] * LINEAR_WEIGHTS['takeaway'])     +
                 (row['blocks']    * LINEAR_WEIGHTS['blocked_shot']) +
-                ((row['corsi_for'] + row['corsi_against']) * LINEAR_WEIGHTS['corsi_diff']) +
+                ((row['corsi_for'] - row['corsi_against']) * LINEAR_WEIGHTS['corsi_diff']) +
                 (row['pens_drawn'] * LINEAR_WEIGHTS['pen_drawn'])    +
                 (row['pens_taken'] * LINEAR_WEIGHTS['pen_taken'])    +
                 (row['interceptions']* LINEAR_WEIGHTS['interception']) +
@@ -204,10 +243,12 @@ class Command(BaseCommand):
                 (row['hits']         * LINEAR_WEIGHTS['hit']) +
                 ((row['fow'] - row['fol']) * LINEAR_WEIGHTS['faceoff_win'])
             )
-            
+            diff_sum, diff_n = ctx_tot.get(row['ea_player_num'], (Decimal("0"), 0))
+            ctx_adj = (diff_sum / diff_n) if diff_n else Decimal("0")   # average per game
+            ctx_gar = ctx_adj * CONTEXT_WEIGHT                          # goals per game
 
             gar_off = (row['goals'] * LINEAR_WEIGHTS['goal']) + (row['assists'] * LINEAR_WEIGHTS['assist'])
-            gar_def = (row['blocks'] * LINEAR_WEIGHTS['blocked_shot']) + (((row['corsi_for']) + row['corsi_against']) * LINEAR_WEIGHTS['corsi_diff'])
+            gar_def = (row['blocks'] * LINEAR_WEIGHTS['blocked_shot']) + (((row['corsi_for']) + row['corsi_against']) * LINEAR_WEIGHTS['corsi_diff']) + (ctx_gar * row['gp'])
             gar_turn= (row['takeaways'] * LINEAR_WEIGHTS['takeaway']) + (row['interceptions'] * LINEAR_WEIGHTS['interception']) + (row['giveaways'] * LINEAR_WEIGHTS['giveaway'])
             gar_pen = (row['pens_drawn'] * LINEAR_WEIGHTS['pen_drawn']) + (row['pens_taken'] * LINEAR_WEIGHTS['pen_taken'])
             rep_per_game = rep_baseline[row['position']]
@@ -216,7 +257,7 @@ class Command(BaseCommand):
             else:
                 gar_fo = Decimal("0")          # keeps WAR math correct
 
-            gar_above_rep = gar - rep_per_game * row['gp']
+            gar_above_rep = gar - (rep_per_game * row['gp'])
             if gar_above_rep.is_nan():
                 gar_above_rep = Decimal("0.0")
             war = gar_above_rep / G_PER_WIN
