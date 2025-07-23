@@ -39,6 +39,7 @@ class Team(models.Model):
     team_code = models.CharField(max_length=6, verbose_name="Game Matchup Code", help_text="GHL specific matchup code to be used in EA NHL games", blank=True, null=True)
     team_location = models.CharField(max_length=50, verbose_name="Team Location", help_text="Location of the team, e.g., 'New York', 'Toronto'", default="Location")
     team_name = models.CharField(max_length=50, verbose_name="Team Name", help_text="Name of the team, e.g., 'Rangers', 'Maple Leafs'", default="Name")
+    manager = models.OneToOneField('User', on_delete=models.SET_NULL, blank=True, null=True, verbose_name="Team Manager", help_text="User who manages the team in the GHL")
 
     def __str__(self):
         return self.club_full_name
