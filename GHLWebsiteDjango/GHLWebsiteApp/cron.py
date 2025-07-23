@@ -1,5 +1,5 @@
-from GHLWebsiteApp.management.commands import poll_api
+from django.core.management import call_command
 
 def run_poll_api():
-    poll_api.Command.handle()
+    call_command('poll_api')
     print("poll_api task executed via cronjob")
