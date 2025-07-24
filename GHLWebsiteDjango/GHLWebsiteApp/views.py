@@ -6,7 +6,7 @@ import datetime
 from GHLWebsiteApp.models import *
 from django.db.models import Sum, Count, Case, When, Avg, F, Window, FloatField, Q, ExpressionWrapper, Value
 from django.db.models.functions import Cast, Rank, Round, Lower, Coalesce
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, HttpResponseForbidden
 from decimal import *
 from itertools import chain
 import random
@@ -32,6 +32,35 @@ def manager_required(view_func):
         lambda u: u.is_authenticated and u.groups.filter(name="Team Managers").exists()
     )(view_func)
     return decorated_view_func
+
+def get_user_team(user):
+    return Team.objects.get(manager=user)
+
+@manager_required
+def add_trade_block_player(request):
+    if request.method == 'POST':
+        form = TradeBlockForm(request.POST)
+        if form.is_valid():
+            trade = form.save(commit=False)
+            trade.team = get_user_team(request.user)
+            trade.save()
+            messages.success(request, 'Player added to trade block successfully.')
+            return redirect('team_management')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+            return render(request, 'add_trade.html', {'form': form})
+    else:
+        form = TradeBlockForm()
+    return render(request, 'add_trade.html', {'form': form})
+
+@manager_required
+def delete_trade_block_player(request, pk):
+    trade = get_object_or_404(TradeBlockPlayer, pk=pk)
+    if trade.team.manager != request.user:
+        return HttpResponseForbidden()
+    trade.delete()
+    return redirect('team_management')
+
 
 def get_seasonSetting():
     seasonSetting = Season.objects.filter(isActive=True).first().season_num
@@ -922,11 +951,13 @@ def export_player_data(request):
     player_data = SkaterRecord.objects.all().values(
         "ea_player_num__username",  # Replace ea_player_num with username
         "ea_club_num__club_full_name",  # Replace ea_club_num with club full name
+        "game_num", # Game Number
         "position__positionShort", "build__buildShort", "goals", "assists", "points", "hits", "plus_minus", "pims", "sog", "shot_attempts", "deflections", "ppg", "shg", "pass_att", "pass_comp", "saucer_pass", "blocked_shots", "takeaways", "interceptions", "giveaways", "pens_drawn", "pk_clears", "poss_time", "fow", "fol"  # Include other fields as needed
     )
     goalie_data = GoalieRecord.objects.all().values(
         "ea_player_num__username",  # Replace ea_player_num with username
         "ea_club_num__club_full_name",  # Replace ea_club_num with club full name
+        "game_num", # Game Number
         "saves", "shots_against", "win", "loss", "otloss", "shutout", "breakaway_shots", "breakaway_saves", "ps_shots", "ps_saves"  # Include other fields as needed
     )
     player_df = pd.DataFrame(list(player_data))
@@ -1284,6 +1315,10 @@ def manager_view(request):
         messages.error(request, "You are currently not linked to a team. Either adjust your linked player, or contact the league manager.")
         redirect('user_profile')
 
+    userteam = get_user_team(request.user)
+    block = TradeBlockPlayer.objects.filter(player__current_team=userteam).order_by('player__username')
+    needs = TeamNeed.objects.filter(team=userteam)
+
     context = {
         'team': team,
         "standings": standings,
@@ -1291,6 +1326,8 @@ def manager_view(request):
         "upcoming_games": upcoming_games,
         "availability": availability_qs,
         "my_standing": my_standing,
+        "block": block,
+        "needs": needs,
     }
     return render(request, 'GHLWebsiteApp/manager_dashboard.html', context)
 
