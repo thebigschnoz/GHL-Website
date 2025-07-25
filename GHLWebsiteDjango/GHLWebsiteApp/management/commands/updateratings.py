@@ -84,7 +84,7 @@ class Command(BaseCommand):
             ])
 
             # Team Play
-            team = (
+            team = Decimal(
                 team_record.goals_for * TEAMPLAY_COEFF['goals_for'] +
                 team_record.goals_against * TEAMPLAY_COEFF['goals_against'] +
                 team_record.sog_team * TEAMPLAY_COEFF['shots_for'] +
@@ -92,7 +92,7 @@ class Command(BaseCommand):
             )
 
             # Possession
-            team += (team_record.toa_team - team_record.toa_team) * TEAMPLAY_COEFF['possession_diff']
+            team += Decimal((team_record.toa_team - team_record.toa_team) * TEAMPLAY_COEFF['possession_diff'])
 
             # Game Result Bonus
             g = skater.game_num
@@ -150,6 +150,7 @@ class Command(BaseCommand):
                     "ovr_rat": round(ovr_avg, 2),
                 }
             )
+        self.stdout.write(self.style.SUCCESS(f'Aggregated ratings for {len(ratings_map)} player-season-position combinations.'))
         
         # STEP 3 : Calculate percentiles for each position in each season
         def set_percentiles_for_season(season_id):
@@ -185,3 +186,4 @@ class Command(BaseCommand):
         # Call each season
         for season in SkaterRating.objects.values_list("season", flat=True).distinct():
             set_percentiles_for_season(season)
+            self.stdout.write(self.style.SUCCESS(f'Percentiles calculated for {season.season_text}.'))
