@@ -18,44 +18,30 @@
                 </div>
             </div>
         </div>
-        {% if skaterwar %}
+        {% if skaterratings %}
         <div class="subsection-container" style="width: 100%; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
             <div class="report-card">
                 <div class="report-card-row rowheader">
                     Skater Report Card
                 </div>
-                {% for pos in skaterwar %}
+                {% for pos in skaterratings %}
                 <div class="report-card-row">
                   <div class="pos-cell">{{ pos.position.positionShort }}</div>
                   <div class="percentile-card">
-                    <div class="percentile-number">{{ pos.war_percentile|floatformat:0 }}%</div>
-                    <div class="percentile-label">WAR</div>
+                    <div class="percentile-number">{{ pos.ovr_pct|floatformat:0 }}%</div>
+                    <div class="percentile-label" style="font-weight: 800;">Overall</div>
                   </div>
                   <div class="percentile-card">
-                    <div class="percentile-number">{{ pos.gar_offence_pct|floatformat:0 }}%</div>
+                    <div class="percentile-number">{{ pos.off_pct|floatformat:0 }}%</div>
                     <div class="percentile-label">Offense</div>
                   </div>
                   <div class="percentile-card">
-                    <div class="percentile-number">{{ pos.gar_defence_pct|floatformat:0 }}%</div>
+                    <div class="percentile-number">{{ pos.def_pct|floatformat:0 }}%</div>
                     <div class="percentile-label">Defense</div>
                   </div>
                   <div class="percentile-card">
-                    <div class="percentile-number">{{ pos.gar_turnover_pct|floatformat:0 }}%</div>
-                    <div class="percentile-label">Turnovers</div>
-                  </div>
-                  <div class="percentile-card">
-                    <div class="percentile-number">{{ pos.gar_penalties_pct|floatformat:0 }}%</div>
-                    <div class="percentile-label">Penalties</div>
-                  </div>
-                  <div class="percentile-card">
-                    <div class="percentile-number">
-                      {% if pos.gar_faceoffs_pct %}
-                          {{ pos.gar_faceoffs_pct|floatformat:0 }}%
-                      {% else %}
-                          -
-                      {% endif %}
-                    </div>
-                    <div class="percentile-label">Faceoffs</div>
+                    <div class="percentile-number">{{ pos.team_pct|floatformat:0 }}%</div>
+                    <div class="percentile-label">Teamplay</div>
                   </div>
                 </div>
                 {% endfor %}
