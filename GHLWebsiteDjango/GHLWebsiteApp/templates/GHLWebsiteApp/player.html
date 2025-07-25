@@ -54,7 +54,7 @@
         </div>
         {% endif %}
 
-        {% if skater_season_totals %}
+        {% if skater_season_totals and skater_season_totals.0.game_num__season_num__season_text == currentseason %}
         <div class="subsection-container" style="width: 100%;">
             <div class="statsbar-cards">
                 {% for season in skater_season_totals %}
@@ -271,7 +271,7 @@
             </table></div>
         </div>
         {% endif %}
-        {% if goalie_season_totals %}
+        {% if goalie_season_totals and goalie_season_totals.0.game_num__season_num__season_text == currentseason %}
         <div class="subsection-container" style="width: 100%;">
             <div class="statsbar-cards">
                 {% for season in goalie_season_totals %}
