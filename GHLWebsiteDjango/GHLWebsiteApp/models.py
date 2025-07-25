@@ -419,36 +419,30 @@ class PlayerAvailability(models.Model):
     def __str__(self):
         return f"{self.player.username} availability for week of {self.week_start}"
 
-class SkaterWAR(models.Model):
+class SkaterRating(models.Model):
     player   = models.ForeignKey(Player,  on_delete=models.CASCADE)
     season   = models.ForeignKey(Season,  on_delete=models.CASCADE)
     position = models.ForeignKey(Position, on_delete=models.SET_NULL, null=True)
-
     # building blocks
     games_played   = models.PositiveSmallIntegerField(default=0)
-    gar_offence   = models.DecimalField(max_digits=6, decimal_places=2)   # xG + primary assists
-    gar_defence   = models.DecimalField(max_digits=6, decimal_places=2)   # prevented xG
-    gar_turnover  = models.DecimalField(max_digits=6, decimal_places=2)   # take / give / intercept
-    gar_penalties = models.DecimalField(max_digits=6, decimal_places=2)   # drawn – taken
-    gar_faceoffs  = models.DecimalField(max_digits=6, decimal_places=2)   # centres only
-    gar_total     = models.DecimalField(max_digits=7, decimal_places=2)
-    war           = models.DecimalField(max_digits=6, decimal_places=2)
-    gar_offence_pct   = models.DecimalField(max_digits=5, decimal_places=2, null=True)
-    gar_defence_pct   = models.DecimalField(max_digits=5, decimal_places=2, null=True)
-    gar_turnover_pct  = models.DecimalField(max_digits=5, decimal_places=2, null=True)
-    gar_penalties_pct = models.DecimalField(max_digits=5, decimal_places=2, null=True)
-    gar_faceoffs_pct  = models.DecimalField(max_digits=5, decimal_places=2, null=True)
-    war_percentile = models.DecimalField(max_digits=5, decimal_places=2, null=True)
+    off_rat   = models.DecimalField(max_digits=6, decimal_places=2)
+    def_rat   = models.DecimalField(max_digits=6, decimal_places=2)
+    team_rat  = models.DecimalField(max_digits=6, decimal_places=2)
+    ovr_rat  = models.DecimalField(max_digits=6, decimal_places=2)
+    off_pct   = models.DecimalField(max_digits=5, decimal_places=2, null=True)
+    def_pct   = models.DecimalField(max_digits=5, decimal_places=2, null=True)
+    team_pct  = models.DecimalField(max_digits=5, decimal_places=2, null=True)
+    ovr_pct = models.DecimalField(max_digits=5, decimal_places=2, null=True)
 
     weights_version = models.CharField(max_length=10, default="v1")       # easy A/B tests
     updated_at      = models.DateTimeField(auto_now=True)
 
     class Meta:
         unique_together = ("player", "season", "position", "weights_version")
-        ordering        = ["-war"]
+        ordering        = ["-ovr_pct", "player__username"]
 
     def __str__(self):
-        return f"{self.player.username} - {self.position.positionShort} ({self.season.season_text}) - WAR: {self.war:.2f}"
+        return f"{self.player.username} - {self.position.positionShort} ({self.season.season_text}) - OVR: {self.ovr_pct:.2f}"
     
 class TradeBlockPlayer(models.Model):
     player = models.ForeignKey(Player, on_delete=models.CASCADE)
@@ -471,7 +465,7 @@ class TeamNeed(models.Model):
     ]
     
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
-    position = models.ManyToManyField(Position, null=True, blank=True, verbose_name="Position Needed")
+    position = models.ManyToManyField(Position, blank=True, verbose_name="Position Needed")
     skill = models.CharField(max_length=10, choices=TEAM_NEED_CHOICES, default='any', verbose_name="Need Type")
     note = models.CharField(max_length=100, blank=True, help_text="E.g. 'Top-4 LD', 'Faceoff specialist', etc.")
     created_at = models.DateTimeField(auto_now_add=True)
