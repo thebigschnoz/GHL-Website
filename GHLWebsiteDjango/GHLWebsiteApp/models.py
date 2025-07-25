@@ -445,7 +445,7 @@ class SkaterRating(models.Model):
         return f"{self.player.username} - {self.position.positionShort} ({self.season.season_text}) - OVR: {self.ovr_pct:.2f}"
     
 class GameSkaterRating(models.Model):
-    skater_record = models.OneToOneField(SkaterRecord, on_delete=models.CASCADE)
+    skater_record = models.OneToOneField(SkaterRecord, on_delete=models.CASCADE, related_name='gameskaterrating')
     offense_rating = models.DecimalField(max_digits=6, decimal_places=2)
     defense_rating = models.DecimalField(max_digits=6, decimal_places=2)
     teamplay_rating = models.DecimalField(max_digits=6, decimal_places=2)
