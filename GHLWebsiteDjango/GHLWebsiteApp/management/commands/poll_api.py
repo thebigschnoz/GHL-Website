@@ -332,8 +332,7 @@ class Command(BaseCommand):
             calculate_standings()
             self.stdout.write("Recalculated standings")
             calculate_leaders()
-            self.stdout.write("Recalculated leaders")
-            call_command("updateratings")            
+            self.stdout.write("Recalculated leaders")            
         
 
     def handle(self, *args, **options):
@@ -352,3 +351,4 @@ class Command(BaseCommand):
             self.fetch_and_process_games(clubnum)
             self.stdout.write(self.style.SUCCESS(f"Finished processing games for {team.club_full_name}"))
         self.stdout.write(self.style.SUCCESS("Finished polling EA API for game data"))
+        call_command("updateratings")
