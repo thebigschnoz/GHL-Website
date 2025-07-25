@@ -110,14 +110,15 @@ class Command(BaseCommand):
         allseasons = options['allseasons']
         thisseason = options['thisseason']
 
+        if force:
+            GameSkaterRating.objects.all().delete()
+            self.stdout.write(self.style.WARNING("Deleted all existing GameSkaterRatings (forced recalc)."))
+        if thisseason:
+            GameSkaterRating.objects.filter(skater_record__game_num__season_num__isActive=True).delete()
+            self.stdout.write(self.style.WARNING("Deleted all GameSkaterRatings for the current season (forced recalc)."))
+            
         # STEP 1 : Calculate per-game skater ratings
         for skater in SkaterRecord.objects.exclude(position=0).select_related('position', 'game_num', 'ea_club_num'):
-            if force:
-                GameSkaterRating.objects.all().delete()
-                self.stdout.write(self.style.WARNING("Deleted all existing GameSkaterRatings (forced recalc)."))
-            if thisseason:
-                GameSkaterRating.objects.filter(skater_record__game_num__season_num__isActive=True).delete()
-                self.stdout.write(self.style.WARNING("Deleted all GameSkaterRatings for the current season (forced recalc)."))
             if GameSkaterRating.objects.filter(skater_record=skater).exists():
                 continue  # Skip already rated
 
