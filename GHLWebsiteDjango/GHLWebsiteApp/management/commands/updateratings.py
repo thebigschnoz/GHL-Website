@@ -139,10 +139,10 @@ class Command(BaseCommand):
             ])
 
             # Defense
-            defn = min(sum([
+            defn = sum([
                 getattr(skater, field, 0) * Decimal(coeff)
                 for field, coeff in DEFENSE_COEFF.items()
-            ]),Decimal(0)) + Decimal(DEFENSE_CONSTANT)
+            ]) + Decimal(DEFENSE_CONSTANT)
             if not is_forward:
                 shots_against = self.get_opponent_sog(skater)
                 if team_record.goals_for > team_record.goals_against:
