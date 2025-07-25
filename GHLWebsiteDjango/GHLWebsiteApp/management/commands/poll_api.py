@@ -333,7 +333,7 @@ class Command(BaseCommand):
             self.stdout.write("Recalculated standings")
             calculate_leaders()
             self.stdout.write("Recalculated leaders")
-            call_command("updatewar")            
+            call_command("updateratings")            
         
 
     def handle(self, *args, **options):
