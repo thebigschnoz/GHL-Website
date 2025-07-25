@@ -974,9 +974,11 @@ def export_player_data(request):
     return response
 
 def export_war(request):
-    war_data = SkaterWAR.objects.all().values(
+    war_data = SkaterRating.objects.all().values(
         "player__username",  # Replace player with username
-        "position__positionShort", "season__season_text", "games_played", "gar_offence", "gar_defence", "gar_turnover", "gar_penalties", "gar_faceoffs", "gar_total", "war", "gar_offence_pct", "gar_defence_pct", "gar_turnover_pct", "gar_penalties_pct", "gar_faceoffs_pct", "war_percentile"
+        "position__positionShort", 
+        "season__season_text",
+        "games_played", "off_rat", "def_rat", "team_rat", "ovr_rat", "off_pct", "def_pct", "team_pct", "ovr_pct",
     )
     war_df = pd.DataFrame(list(war_data))
     output = BytesIO()
