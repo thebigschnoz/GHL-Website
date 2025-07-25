@@ -40,7 +40,7 @@ TEAMPLAY_COEFF = {
     'shots_for': 1.2,
     'power_play': 15,
     'penalty_kill': -15,
-    'possession_diff': 0.2,
+    'possession_diff': 0.05,
     'constant': 30, # Constant for standardizing team play rating
 }
 
