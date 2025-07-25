@@ -388,7 +388,7 @@ def skatersAdvanced(request, season=None):
             ), models.FloatField())*100,
         skatersshoteffperc=Cast(Sum("sog"), models.FloatField())/Cast(Case(
                 When(sumshotatt=0, then=1),
-                default=Sum("shot_attempts"),
+                default=(Sum("shot_attempts")+Sum("deflections")),
                 output_field=models.FloatField()
             ), models.FloatField())*100,
         skaterspassperc=Cast(Sum("pass_comp"), models.FloatField())/Cast(Case(
@@ -489,7 +489,7 @@ def team(request, team, season=None):
         skatersppg=Sum("ppg"),
         skatersshg=Sum("shg"),
         skatersshotperc=Cast(Sum("goals"), models.FloatField())/Cast(Sum("sog"), models.FloatField())*100,
-        skatersshoteffperc=Cast(Sum("sog"), models.FloatField())/Cast(Sum("shot_attempts"), models.FloatField())*100,
+        skatersshoteffperc=Cast(Sum("sog"), models.FloatField())/(Cast(Sum("shot_attempts") + Cast(Sum("deflections"), models.FloatField())), models.FloatField())*100,
         skaterspassperc=Cast(Sum("pass_comp"), models.FloatField())/Cast(Sum("pass_att"), models.FloatField())*100,
     ).order_by("ea_player_num")
     goalierecords = GoalieRecord.objects.filter(ea_club_num=teamnum.ea_club_num, game_num__season_num=season).values("ea_player_num", "ea_player_num__username").annotate(
@@ -659,6 +659,7 @@ def player(request, player):
         sk_poss_time=Round(Avg("poss_time"),1),
         sk_fow=Coalesce(Sum("fow"), 0),
         sk_fol=Coalesce(Sum("fol"), 0),
+        sk_deflections=Coalesce(Sum("deflections"), 0),
     ).order_by("-game_num__season_num")
 
     # Calculated values for each season
@@ -668,7 +669,7 @@ def player(request, player):
             if season["sk_sog"] > 0 else "-"
         )
         season["sk_shot_eff"] = (
-            round((season["sk_sog"] / season["sk_shot_att"]) * 100, 1)
+            round((season["sk_sog"]/ (season["sk_shot_att"] + season["sk_deflections"]) ) * 100, 1)
             if season["sk_shot_att"] > 0 else "-"
         )
         season["sk_pass_perc"] = (
@@ -750,7 +751,7 @@ def player(request, player):
         all_games = skater_games.union(goalie_games).order_by("-expected_time")
     else:
         all_games = []
-    skater_war = SkaterWAR.objects.filter(
+    skaterratings = SkaterRating.objects.filter(
         player=playernum,
         season=seasonSetting)
     
@@ -779,7 +780,7 @@ def player(request, player):
         "skater_season_totals": skater_season_totals,
         "goalie_season_totals": goalie_season_totals,
         "sk_team_num": sk_team_num,
-        "skaterwar": skater_war,
+        "skaterratings": skaterratings,
         "games": all_games,
         "position_games": position_games,
         }
