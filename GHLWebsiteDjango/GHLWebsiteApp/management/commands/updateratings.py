@@ -25,8 +25,8 @@ DEFENSE_COEFF = {
     'pens_drawn': 6,
     'plus_minus': 5,
     'hits': 0.25,
-    'def_constant': 15, # Constant for standardizing defense rating
 }
+DEFENSE_CONSTANT = 15 # Constant for standardizing defense rating
 
 DEFENSE_ONLY_COEFF = {
     'goals_against': -2.5,
@@ -142,7 +142,7 @@ class Command(BaseCommand):
             defn = min(sum([
                 getattr(skater, field, 0) * Decimal(coeff)
                 for field, coeff in DEFENSE_COEFF.items()
-            ]),Decimal(0))
+            ]),Decimal(0)) + Decimal(DEFENSE_CONSTANT)
             if not is_forward:
                 shots_against = self.get_opponent_sog(skater)
                 if team_record.goals_for > team_record.goals_against:
