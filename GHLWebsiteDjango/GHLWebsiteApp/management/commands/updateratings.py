@@ -1,6 +1,5 @@
 from django.core.management.base import BaseCommand
-from django.db.models import Avg, Count
-from GHLWebsiteApp.models import SkaterRecord, GameSkaterRating, TeamRecord, SkaterRating
+from GHLWebsiteApp.models import SkaterRecord, GameSkaterRating, TeamRecord, SkaterRating, Season
 from decimal import Decimal, ROUND_HALF_UP
 from collections import defaultdict
 from scipy.stats import rankdata
@@ -57,7 +56,7 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         count = 0
         # STEP 1 : Calculate per-game skater ratings
-        for skater in SkaterRecord.objects.select_related('position', 'game_num', 'ea_club_num'):
+        for skater in SkaterRecord.objects.exclude(position=0).select_related('position', 'game_num', 'ea_club_num'):
             if GameSkaterRating.objects.filter(skater_record=skater).exists():
                 continue  # Skip already rated
 
@@ -121,7 +120,7 @@ class Command(BaseCommand):
                 overall_rating=round(ovr, 2)
             )
             count += 1
-        self.stdout.write(self.style.SUCCESS(f'Rated {count} skater games.'))
+        self.stdout.write(f'Rated {count} skater games.')
         
         # STEP 2 : Aggregate per-player-season-position
         ratings_map = defaultdict(list)
@@ -150,7 +149,7 @@ class Command(BaseCommand):
                     "ovr_rat": round(ovr_avg, 2),
                 }
             )
-        self.stdout.write(self.style.SUCCESS(f'Aggregated ratings for {len(ratings_map)} player-season-position combinations.'))
+        self.stdout.write(f'Aggregated ratings for {len(ratings_map)} player-season-position combinations.')
         
         # STEP 3 : Calculate percentiles for each position in each season
         def set_percentiles_for_season(season_id):
@@ -186,4 +185,12 @@ class Command(BaseCommand):
         # Call each season
         for season in SkaterRating.objects.values_list("season", flat=True).distinct():
             set_percentiles_for_season(season)
-            self.stdout.write(self.style.SUCCESS(f'Percentiles calculated for {season.season_text}.'))
+        self.stdout.write(f'Percentiles calculated for Season ID {season}.')
+
+        # STEP 4 : Remove Goalie Games
+        for rating in GameSkaterRating.objects.filter(skater_record__position=0):
+            rating.delete()
+        for rating in SkaterRating.objects.filter(position=0):
+            rating.delete()
+        self.stdout.write('Removed all goalie game ratings.')
+        self.stdout.write(self.style.SUCCESS('Ratings update complete!'))
