@@ -175,7 +175,7 @@ class SkaterRecord(models.Model):
     @property
     def shoteffcalc(self):
         if self.shot_attempts > 0:
-            shoteff = ((self.sog + self.deflections) / self.shot_attempts) * 100
+            shoteff = (self.sog / (self.shot_attempts + self.deflections)) * 100
             return shoteff
         else:
             return Decimal("0")
