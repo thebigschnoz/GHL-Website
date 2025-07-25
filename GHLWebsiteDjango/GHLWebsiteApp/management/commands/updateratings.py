@@ -25,10 +25,11 @@ DEFENSE_COEFF = {
     'pens_drawn': 6,
     'plus_minus': 5,
     'hits': 0.25,
+    'def_constant': 15, # Constant for standardizing defense rating
 }
 
 DEFENSE_ONLY_COEFF = {
-    'goals_against': -2.25,
+    'goals_against': -2.5,
     'shots_against': -0.35,
     'win': 15,
 }
@@ -40,7 +41,7 @@ TEAMPLAY_COEFF = {
     'power_play': 15,
     'penalty_kill': -15,
     'possession_diff': 0.2,
-    'constant': 50
+    'constant': 50, # Constant for standardizing team play rating
 }
 
 GAME_RESULT_COEFF = {
@@ -276,5 +277,5 @@ class Command(BaseCommand):
             rating.delete()
         if skaterratingcount > 0:
             self.stdout.write(f'Removed {skaterratingcount} inadvertently calculated goalie positional ratings.')
-            
+
         self.stdout.write(self.style.SUCCESS('Ratings update complete!'))
