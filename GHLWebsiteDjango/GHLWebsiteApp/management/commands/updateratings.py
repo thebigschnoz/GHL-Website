@@ -155,14 +155,14 @@ class Command(BaseCommand):
                     win * DEFENSE_ONLY_COEFF['win']  # Compare between two records.
                 )
             # Team Play
-            team = min(Decimal(
+            team = Decimal(
                 team_record.goals_for * TEAMPLAY_COEFF['goals_for'] +
                 team_record.goals_against * TEAMPLAY_COEFF['goals_against'] +
                 team_record.sog_team * TEAMPLAY_COEFF['shots_for'] +
                 team_record.ppg_team * TEAMPLAY_COEFF['power_play'] +
                 team_record.shg_team * TEAMPLAY_COEFF['penalty_kill'] +
                 TEAMPLAY_COEFF['constant']
-            ), Decimal(0))
+            )
 
             # Possession
             team += Decimal((team_record.toa_team - self.get_opponent_toa(skater)) * TEAMPLAY_COEFF['possession_diff'])
