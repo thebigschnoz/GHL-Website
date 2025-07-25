@@ -1,5 +1,5 @@
 from django import forms
-from .models import AwardTitle, Player, User, Position, PlayerAvailability
+from .models import AwardTitle, Player, User, Position, PlayerAvailability, TradeBlockPlayer, TeamNeed
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
 from captcha.fields import CaptchaField
@@ -87,4 +87,28 @@ class PlayerAvailabilityForm(forms.ModelForm):
         ]
         widgets = {
             'week_start': forms.SelectDateWidget,
+        }
+
+class TradeBlockForm(forms.ModelForm):
+    class Meta:
+        model = TradeBlockPlayer
+        fields = ['player', 'notes']
+        widgets = {
+            'notes': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Optional notes (e.g., looking for LD or picks)'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        user_team = kwargs.pop('user_team', None)
+        super().__init__(*args, **kwargs)
+
+        # Limit player choices to players on the manager's team
+        if user_team:
+            self.fields['player'].queryset = Player.objects.filter(team=user_team)
+
+class TeamNeedForm(forms.ModelForm):
+    class Meta:
+        model = TeamNeed
+        fields = ['position', 'skill', 'note']
+        widgets = {
+            'note': forms.TextInput(attrs={'placeholder': 'e.g. Top 6 winger, shutdown RD...'}),
         }
