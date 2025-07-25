@@ -12,9 +12,11 @@
                     {{ playernum.username }}
                 </div>
                 <div class="player-logo">
+                    {% if playernum.current_team %}
                     <a href="{% url 'team' playernum.current_team.ea_club_num %}">
                         <img src="{{ playernum.current_team.team_logo_link }}" width="220" height="220" />
                     </a>
+                    {% endif %}
                 </div>
             </div>
         </div>
