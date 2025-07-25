@@ -444,6 +444,18 @@ class SkaterRating(models.Model):
     def __str__(self):
         return f"{self.player.username} - {self.position.positionShort} ({self.season.season_text}) - OVR: {self.ovr_pct:.2f}"
     
+class GameSkaterRating(models.Model):
+    skater_record = models.OneToOneField(SkaterRecord, on_delete=models.CASCADE)
+    offense_rating = models.DecimalField(max_digits=6, decimal_places=2)
+    defense_rating = models.DecimalField(max_digits=6, decimal_places=2)
+    teamplay_rating = models.DecimalField(max_digits=6, decimal_places=2)
+    game_result_bonus = models.DecimalField(max_digits=5, decimal_places=2)
+    overall_rating = models.DecimalField(max_digits=6, decimal_places=2)
+    calculated_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('skater_record',)
+    
 class TradeBlockPlayer(models.Model):
     player = models.ForeignKey(Player, on_delete=models.CASCADE)
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
