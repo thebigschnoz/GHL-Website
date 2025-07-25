@@ -228,6 +228,6 @@ custom_admin_site.register(BannedUser)
 custom_admin_site.register(Announcement, AnnouncementAdmin)
 custom_admin_site.register(PlayerAvailability, AvailabilityAdmin)
 custom_admin_site.register(SkaterRating)
+custom_admin_site.register(GameSkaterRating)
 custom_admin_site.register(TradeBlockPlayer)
 custom_admin_site.register(TeamNeed)
-
