@@ -489,7 +489,7 @@ def team(request, team, season=None):
         skatersppg=Sum("ppg"),
         skatersshg=Sum("shg"),
         skatersshotperc=Cast(Sum("goals"), models.FloatField())/Cast(Sum("sog"), models.FloatField())*100,
-        skatersshoteffperc=Cast(Sum("sog"), models.FloatField())/(Cast(Sum("shot_attempts") + Cast(Sum("deflections"), models.FloatField())), models.FloatField())*100,
+        skatersshoteffperc=Cast(Sum("sog"), models.FloatField())/(Cast(Sum("shot_attempts"), models.FloatField()) + Cast(Sum("deflections"), models.FloatField()))*100,
         skaterspassperc=Cast(Sum("pass_comp"), models.FloatField())/Cast(Sum("pass_att"), models.FloatField())*100,
     ).order_by("ea_player_num")
     goalierecords = GoalieRecord.objects.filter(ea_club_num=teamnum.ea_club_num, game_num__season_num=season).values("ea_player_num", "ea_player_num__username").annotate(
