@@ -15,7 +15,7 @@ OFFENSE_COEFF = {
 }
 
 DEFENSE_COEFF = {
-    'pass_pct': 30,
+    'pass_pct': 0.3,
     'giveaways': -0.75,
     'takeaways': 1.5,
     'interceptions': 1.2,
@@ -48,7 +48,6 @@ FORWARD_WEIGHTS = {'off': 0.60, 'def': 0.15, 'team': 0.25}
 DEFENSE_WEIGHTS = {'off': 0.15, 'def': 0.60, 'team': 0.25}
 
 FORWARD_POS = {'LW', 'RW', 'C'}
-DEF_POS = {'LD', 'RD'}
 
 class Command(BaseCommand):
     help = "Calculate per-game skater ratings"
