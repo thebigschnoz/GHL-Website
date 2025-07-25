@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
-from GHLWebsiteApp.models import SkaterRecord, GameSkaterRating, TeamRecord, SkaterRating, Season
+from GHLWebsiteApp.models import SkaterRecord, GameSkaterRating, TeamRecord, SkaterRating
+from GHLWebsiteApp.views import get_seasonSetting
 from decimal import Decimal, ROUND_HALF_UP
 from collections import defaultdict
 from scipy.stats import rankdata
@@ -19,19 +20,25 @@ DEFENSE_COEFF = {
     'giveaways': -0.75,
     'takeaways': 1.5,
     'interceptions': 1.2,
-    'blocked_shots': 2,
-    'pims': -0.5,
+    'blocked_shots': 1,
+    'pims': -1,
     'pens_drawn': 6,
     'plus_minus': 5,
     'hits': 0.25,
+}
+
+DEFENSE_ONLY_COEFF = {
+    'goals_against': -2.25,
+    'shots_against': -0.35,
+    'win': 15,
 }
 
 TEAMPLAY_COEFF = {
     'goals_for': 12.5,
     'goals_against': -12.5,
     'shots_for': 1.2,
-    'power_play': 0.15,
-    'penalty_kill': 0.15,
+    'power_play': 15,
+    'penalty_kill': -15,
     'possession_diff': 0.2,
     'constant': 50
 }
@@ -52,10 +59,64 @@ FORWARD_POS = {'LW', 'RW', 'C'}
 class Command(BaseCommand):
     help = "Calculate per-game skater ratings"
 
-    def handle(self, *args, **kwargs):
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--force',
+            action='store_true',
+            help='Force recalculation of all GameSkaterRatings (delete and recalculate)',
+        )
+        parser.add_argument(
+            '--allseasons',
+            action='store_true',
+            help='Recalculate all seasons, not just the current one',
+        )
+        parser.add_argument(
+            '--thisseason',
+            action='store_true',
+            help='Deletes and completely recalculates the active season. Best used when changing weights and coefficients.',
+        )
+
+    def get_opponent_sog(skater_record):
+        game = skater_record.game_num
+        my_team = skater_record.ea_club_num
+        opponent_team = (
+            game.h_team_num if my_team == game.a_team_num
+            else game.a_team_num
+        )
+        opponent_team_record = TeamRecord.objects.filter(
+            game_num=game,
+            ea_club_num=opponent_team
+        ).first()
+        return opponent_team_record.sog_team if opponent_team_record else 0
+    
+    def get_opponent_toa(skater_record):
+        game = skater_record.game_num
+        my_team = skater_record.ea_club_num
+        opponent_team = (
+            game.h_team_num if my_team == game.a_team_num
+            else game.a_team_num
+        )
+        opponent_team_record = TeamRecord.objects.filter(
+            game_num=game,
+            ea_club_num=opponent_team
+        ).first()
+        return opponent_team_record.toa_team if opponent_team_record else 0
+
+
+    def handle(self, *args, **options):
         count = 0
+        force = options['force']
+        allseasons = options['allseasons']
+        thisseason = options['thisseason']
+
         # STEP 1 : Calculate per-game skater ratings
         for skater in SkaterRecord.objects.exclude(position=0).select_related('position', 'game_num', 'ea_club_num'):
+            if force:
+                GameSkaterRating.objects.all().delete()
+                self.stdout.write(self.style.WARNING("Deleted all existing GameSkaterRatings (forced recalc)."))
+            if thisseason:
+                GameSkaterRating.objects.filter(skater_record__game_num__season_num__isActive=True).delete()
+                self.stdout.write(self.style.WARNING("Deleted all GameSkaterRatings for the current season (forced recalc)."))
             if GameSkaterRating.objects.filter(skater_record=skater).exists():
                 continue  # Skip already rated
 
@@ -76,21 +137,33 @@ class Command(BaseCommand):
             ])
 
             # Defense
-            defn = sum([
+            defn = min(sum([
                 getattr(skater, field, 0) * Decimal(coeff)
                 for field, coeff in DEFENSE_COEFF.items()
-            ])
-
+            ]),Decimal(0))
+            if not is_forward:
+                shots_against = self.get_opponent_sog(skater)
+                if team_record.goals_for > team_record.goals_against:
+                    win = 1
+                else:
+                    win = 0
+                defn += Decimal(
+                    team_record.goals_against * DEFENSE_ONLY_COEFF['goals_against'] +
+                    shots_against * DEFENSE_ONLY_COEFF['shots_against'] + # Pull from opposing TeamRecord
+                    win * DEFENSE_ONLY_COEFF['win']  # Compare between two records.
+                )
             # Team Play
-            team = Decimal(
+            team = min(Decimal(
                 team_record.goals_for * TEAMPLAY_COEFF['goals_for'] +
                 team_record.goals_against * TEAMPLAY_COEFF['goals_against'] +
                 team_record.sog_team * TEAMPLAY_COEFF['shots_for'] +
+                team_record.ppg_team * TEAMPLAY_COEFF['power_play'] +
+                team_record.shg_team * TEAMPLAY_COEFF['penalty_kill'] +
                 TEAMPLAY_COEFF['constant']
-            )
+            ), Decimal(0))
 
             # Possession
-            team += Decimal((team_record.toa_team - team_record.toa_team) * TEAMPLAY_COEFF['possession_diff'])
+            team += Decimal((team_record.toa_team - self.get_opponent_toa(skater)) * TEAMPLAY_COEFF['possession_diff'])
 
             # Game Result Bonus
             g = skater.game_num
@@ -182,14 +255,26 @@ class Command(BaseCommand):
                     rating.save(update_fields=["off_pct", "def_pct", "team_pct", "ovr_pct"])
 
         # Call each season
-        for season in SkaterRating.objects.values_list("season", flat=True).distinct():
+        if allseasons:
+            for season in SkaterRating.objects.values_list("season", flat=True).distinct():
+                set_percentiles_for_season(season)
+            self.stdout.write('Percentiles calculated for all seasons.')
+        else:
+            season = get_seasonSetting()
             set_percentiles_for_season(season)
-        self.stdout.write(f'Percentiles calculated for Season ID {season}.')
+            self.stdout.write(f'Percentiles calculated for Season ID {season}.')
 
         # STEP 4 : Remove Goalie Games
+        gameskaterratingcount = skaterratingcount = 0
         for rating in GameSkaterRating.objects.filter(skater_record__position=0):
+            gameskaterratingcount += 1
             rating.delete()
+        if gameskaterratingcount > 0:
+            self.stdout.write(f'Removed {gameskaterratingcount} inadvertently calculated goalie game ratings.')
         for rating in SkaterRating.objects.filter(position=0):
+            skaterratingcount += 1
             rating.delete()
-        self.stdout.write('Removed all goalie game ratings.')
+        if skaterratingcount > 0:
+            self.stdout.write(f'Removed {skaterratingcount} inadvertently calculated goalie positional ratings.')
+            
         self.stdout.write(self.style.SUCCESS('Ratings update complete!'))
