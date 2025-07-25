@@ -205,6 +205,14 @@ class AnnouncementAdmin(admin.ModelAdmin):
 class AvailabilityAdmin(admin.ModelAdmin):
     list_display = ("player", "week_start")
 
+class SkaterRatingAdmin(admin.ModelAdmin):
+    list_display = ("season", "player", "position", "ovr_pct")
+    list_filter = ("season__season_text",)
+
+class GameSkaterRatingAdmin(admin.ModelAdmin):
+    list_display = ("skater_record__ea_player_num", "skater_record__game_num__game_num", "skater_record__game_num__season_num__season_text", "overall_rating", "offense_rating", "defense_rating", "teamplay_rating", "game_result_bonus")
+    list_filter = ("skater_record__game_num__season_num__season_text",)
+
 custom_admin_site.register(Season, SeasonsAdmin)
 custom_admin_site.register(Game, GameAdmin)
 custom_admin_site.register(AwardTitle)
@@ -227,7 +235,7 @@ custom_admin_site.register(Schedule, ScheduleAdmin)
 custom_admin_site.register(BannedUser)
 custom_admin_site.register(Announcement, AnnouncementAdmin)
 custom_admin_site.register(PlayerAvailability, AvailabilityAdmin)
-custom_admin_site.register(SkaterRating)
-custom_admin_site.register(GameSkaterRating)
+custom_admin_site.register(SkaterRating, SkaterRatingAdmin)
+custom_admin_site.register(GameSkaterRating, GameSkaterRatingAdmin)
 custom_admin_site.register(TradeBlockPlayer)
 custom_admin_site.register(TeamNeed)
