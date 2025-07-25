@@ -77,7 +77,7 @@ class Command(BaseCommand):
             help='Deletes and completely recalculates the active season. Best used when changing weights and coefficients.',
         )
 
-    def get_opponent_sog(skater_record):
+    def get_opponent_sog(self, skater_record):
         game = skater_record.game_num
         my_team = skater_record.ea_club_num
         opponent_team = (
@@ -90,7 +90,7 @@ class Command(BaseCommand):
         ).first()
         return opponent_team_record.sog_team if opponent_team_record else 0
     
-    def get_opponent_toa(skater_record):
+    def get_opponent_toa(self, skater_record):
         game = skater_record.game_num
         my_team = skater_record.ea_club_num
         opponent_team = (
