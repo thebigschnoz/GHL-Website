@@ -745,7 +745,7 @@ def player(request, player):
     else:
         sk_team_num = playernum.current_team.ea_club_num
 
-    skater_games = Game.objects.filter(skaterrecord__ea_player_num=playernum, season_num=seasonSetting)
+    skater_games = Game.objects.filter(skaterrecord__ea_player_num=playernum, season_num=seasonSetting).select_related("gameskaterrating")
     goalie_games = Game.objects.filter(goalierecord__ea_player_num=playernum, season_num=seasonSetting)
     if skater_games.exists() or goalie_games.exists():
         all_games = skater_games.union(goalie_games).order_by("-expected_time")
@@ -772,7 +772,8 @@ def player(request, player):
         position_mapping.get(entry["position"], "Unknown"): entry["gp"]
         for entry in position_counts
     }
-
+    currentseason = Season.objects.get(season_num=get_seasonSetting()).season_text
+    print(currentseason)
 
     # TODO: Make the season pass through context and use it for the top stats line (Vallee shows this season's G stats but last season's P stats)
     context = {
@@ -783,6 +784,7 @@ def player(request, player):
         "skaterratings": skaterratings,
         "games": all_games,
         "position_games": position_games,
+        "currentseason": currentseason,
         }
     return render(request, "GHLWebsiteApp/player.html", context)
 
@@ -1058,7 +1060,8 @@ def weekly_stats_view(request):
         # Filter Skater Records
         skater_qs = SkaterRecord.objects.filter(
             game_num__played_time__gte=start_date,
-            game_num__played_time__lt=end_date
+            game_num__played_time__lt=end_date,
+            game_num__season_num = season_num
         ).exclude(position=0)
 
         print("start_date =", start_date)
@@ -1069,7 +1072,8 @@ def weekly_stats_view(request):
         # Filter Goalie Records
         goalie_qs = GoalieRecord.objects.filter(
             game_num__played_time__gte=start_date,
-            game_num__played_time__lt=end_date
+            game_num__played_time__lt=end_date,
+            game_num__season_num = season_num
         )
     else:
         skater_qs = SkaterRecord.objects.none()
