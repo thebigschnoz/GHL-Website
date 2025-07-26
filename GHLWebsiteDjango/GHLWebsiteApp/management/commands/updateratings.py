@@ -1,13 +1,13 @@
 from django.core.management.base import BaseCommand
 from GHLWebsiteApp.models import SkaterRecord, GameSkaterRating, TeamRecord, SkaterRating
 from GHLWebsiteApp.views import get_seasonSetting
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import Decimal
 from collections import defaultdict
 from scipy.stats import rankdata
 
 # Coefficient Maps (abbreviated for clarity)
 OFFENSE_COEFF = {
-    'goals': 22.5,
+    'goals': 20,
     'assists': 9.5,
     'sog': 2.0,
     'poss_time': 0.05,
