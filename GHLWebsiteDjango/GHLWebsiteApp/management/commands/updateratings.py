@@ -40,7 +40,7 @@ TEAMPLAY_COEFF = {
     'shots_for': 1.2,
     'power_play': 15,
     'penalty_kill': -15,
-    'possession_diff': 0.05,
+    'possession_diff': 0.025,
     'constant': 30, # Constant for standardizing team play rating
 }
 
@@ -184,7 +184,7 @@ class Command(BaseCommand):
                 team * Decimal(weights['team']) +
                 result_bonus
             )
-
+            ovr = max(Decimal(0), min(Decimal(100), ovr))
             GameSkaterRating.objects.create(
                 skater_record=skater,
                 offense_rating=round(off, 2),
