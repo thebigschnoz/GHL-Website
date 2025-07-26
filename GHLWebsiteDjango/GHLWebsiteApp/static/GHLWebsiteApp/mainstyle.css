@@ -1644,8 +1644,10 @@ ul li ul li a {
       margin-bottom: 5px;
   }
 }
-.gamelog-row .game-away,
-.gamelog-row .game-home {
+.game-away,
+.game-home,
+.game-status,
+.game-meta {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1654,6 +1656,13 @@ ul li ul li a {
     font-weight: bold;
     flex: 1;
     min-width: 100px;
+}
+
+.game-meta {
+  font-size: 13px;
+  color: #e0e0e0;
+  white-space: nowrap;
+  margin-left: auto; /* push to far right */
 }
 
 .gamelog-row .game-away {
@@ -2198,4 +2207,25 @@ td.hoverlink:hover a {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+}
+
+.game-meta {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  font-size: 13px;
+  flex-wrap: wrap;
+}
+
+.meta-rating, .meta-position {
+  color: #fff;
+  -webkit-text-stroke: 3px black;
+  paint-order: stroke fill;
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  text-align: center;
+  min-width: 36px;
+  transition: background-color 0.3s ease;
 }

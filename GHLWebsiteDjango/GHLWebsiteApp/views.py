@@ -751,9 +751,15 @@ def player(request, player):
         all_games = skater_games.union(goalie_games).order_by("-expected_time")
     else:
         all_games = []
-    skaterratings = SkaterRating.objects.filter(
-        player=playernum,
-        season=seasonSetting)
+    game_data = []
+    for game in all_games:
+        skater_record = SkaterRecord.objects.filter(game_num=game, ea_player_num=playernum).first()
+        rating = GameSkaterRating.objects.filter(skater_record=skater_record).first()
+        game_data.append({
+            "game": game,
+            "position": skater_record.position.positionShort if skater_record and skater_record.position else "G",
+            "rating": rating.overall_rating if rating else "-",
+        })
     
     position_mapping = {
         0: 'G',   # Goalie
@@ -763,6 +769,9 @@ def player(request, player):
         2: 'LD',  # Left Defense
         1: 'RD',  # Right Defense
     }
+    skaterratings = SkaterRating.objects.filter(
+        player=playernum,
+        season=seasonSetting)
     position_counts = SkaterRecord.objects.filter(
         ea_player_num=playernum,
         game_num__season_num=seasonSetting,
@@ -775,16 +784,15 @@ def player(request, player):
     currentseason = Season.objects.get(season_num=get_seasonSetting()).season_text
     print(currentseason)
 
-    # TODO: Make the season pass through context and use it for the top stats line (Vallee shows this season's G stats but last season's P stats)
     context = {
         "playernum": playernum, 
         "skater_season_totals": skater_season_totals,
         "goalie_season_totals": goalie_season_totals,
         "sk_team_num": sk_team_num,
-        "skaterratings": skaterratings,
-        "games": all_games,
+        "games": game_data,
         "position_games": position_games,
         "currentseason": currentseason,
+        "skaterratings": skaterratings,
         }
     return render(request, "GHLWebsiteApp/player.html", context)
 

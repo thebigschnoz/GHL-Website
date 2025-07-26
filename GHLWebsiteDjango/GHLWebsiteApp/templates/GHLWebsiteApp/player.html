@@ -436,27 +436,33 @@
                 {% for game in games %}
                 <div class="gamelog-row">
                     <div class="game-time">
-                        {{ game.expected_time|date:"n/j/y g:i" }}
+                        {{ game.game.expected_time|date:"n/j/y g:i" }}
                     </div>
                     <div class="game-details">
                         <div class="game-away">
-                            <a href="{% url 'team' game.a_team_num.ea_club_num %}" class="team-name">
-                            {{ game.a_team_num.club_abbr }}
+                            <a href="{% url 'team' game.game.a_team_num.ea_club_num %}" class="team-name">
+                            {{ game.game.a_team_num.club_abbr }}
                             </a>
-                            <span class="team-score">{{ game.a_team_gf }}</span>
+                            <span class="team-score">{{ game.game.a_team_gf }}</span>
                         </div>
                         <div class="game-status">
-                            {% if game.gamelength > 3600 %}
-                            <a href="{% url 'game' game.game_num %}">F/OT</a>
-                            {% else %}
-                            <a href="{% url 'game' game.game_num %}">F</a>
-                            {% endif %}
+                            <a href="{% url 'game' game.game.game_num %}">
+                                {% if game.game.gamelength > 3600 %} F/OT {% else %} F {% endif %}
+                            </a>
                         </div>
                         <div class="game-home">
-                            <span class="team-score">{{ game.h_team_gf }}</span>
-                            <a href="{% url 'team' game.h_team_num.ea_club_num %}" class="team-name">
-                            {{ game.h_team_num.club_abbr }}
+                            <span class="team-score">{{ game.game.h_team_gf }}</span>
+                            <a href="{% url 'team' game.game.h_team_num.ea_club_num %}" class="team-name">
+                            {{ game.game.h_team_num.club_abbr }}
                             </a>
+                        </div>
+                        <div class="game-meta">
+                            <div class="meta-position">
+                                {{ game.position|default:"" }}
+                            </div>
+                            <div class="meta-rating" data-rating="{{ game.rating|default:50 }}">
+                                {{ game.rating|floatformat:0|default:"-" }}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -660,6 +666,35 @@
       const chart = new ApexCharts(document.querySelector("#positionPieChart"), options);
       chart.render();
     });
-  </script>
+</script>
+<script>
+    function getGradientColor(value) {
+      value = Math.max(0, Math.min(100, value)); // clamp between 0-100
+    
+      if (value < 50) {
+        // Red to White
+        let ratio = value / 50;
+        let r = 255;
+        let g = Math.round(255 * ratio);
+        let b = Math.round(255 * ratio);
+        return `rgb(${r},${g},${b})`;
+      } else {
+        // White to Blue
+        let ratio = (value - 50) / 50;
+        let r = Math.round(255 * (1 - ratio));
+        let g = Math.round(255 * (1 - ratio));
+        let b = 255;
+        return `rgb(${r},${g},${b})`;
+      }
+    }
+    
+    document.querySelectorAll('.meta-rating').forEach(el => {
+      const val = parseFloat(el.dataset.rating);
+      if (!isNaN(val)) {
+        el.style.backgroundColor = getGradientColor(val);
+      }
+    });
+</script>
+    
   
 {% endblock %}
