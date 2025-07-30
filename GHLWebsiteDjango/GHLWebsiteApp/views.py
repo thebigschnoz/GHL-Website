@@ -347,9 +347,17 @@ def leaders(request):
     return render(request, "GHLWebsiteApp/leaders.html", context)
 
 def skaters(request, season=None):
+    pos_filter = request.GET.get("pos")  # "F", "D", or None
     if season is None:
         season = get_seasonSetting()
-    all_skaters = SkaterRecord.objects.filter(game_num__season_num=season).exclude(position=0).values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(
+    skater_qs = SkaterRecord.objects.filter(
+        game_num__season_num=season
+    ).exclude(position=0)
+    if pos_filter == "F":
+        skater_qs = skater_qs.filter(position__positionShort__in=["LW", "C", "RW"])
+    elif pos_filter == "D":
+        skater_qs = skater_qs.filter(position__positionShort__in=["LD", "RD"])
+    all_skaters = skater_qs.values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(
         skatersgp=Count("game_num"),
         skatersgoals=Sum("goals"),
         skatersassists=Sum("assists"),
@@ -368,6 +376,7 @@ def skaters(request, season=None):
         "all_skaters": all_skaters,
         "season": season,
         "seasonlist": seasonlist,
+        "pos_filter": pos_filter,
     }
     return render(request, "GHLWebsiteApp/skaters.html", context)
 
