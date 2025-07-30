@@ -381,9 +381,15 @@ def skaters(request, season=None):
     return render(request, "GHLWebsiteApp/skaters.html", context)
 
 def skatersAdvanced(request, season=None):
+    pos_filter = request.GET.get("pos")  # "F", "D", or None
     if season is None:
         season = get_seasonSetting()
-    all_skaters = SkaterRecord.objects.filter(game_num__season_num=season).exclude(position=0).values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(
+    skater_qs = SkaterRecord.objects.filter(game_num__season_num=season).exclude(position=0)
+    if pos_filter == "F":
+        skater_qs = skater_qs.filter(position__positionShort__in=["LW", "C", "RW"])
+    elif pos_filter == "D":
+        skater_qs = skater_qs.filter(position__positionShort__in=["LD", "RD"])
+    all_skaters = skater_qs.values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(
         total_fow=Coalesce(Sum("fow"), 0),
         total_fol=Coalesce(Sum("fol"), 0),
     ).annotate(

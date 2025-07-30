@@ -26,6 +26,17 @@
           });
         </script>
       </div>
+      <div class="selectionmenu">
+        <form method="get" style="margin-bottom: 10px;">
+          <label for="posFilter">Show:</label>
+          <select name="pos" id="posFilter" onchange="this.form.submit()">
+            <option value="" {% if not pos_filter %}selected{% endif %}>All Skaters</option>
+            <option value="F" {% if pos_filter == "F" %}selected{% endif %}>Forwards</option>
+            <option value="D" {% if pos_filter == "D" %}selected{% endif %}>Defensemen</option>
+          </select>
+          <input type="hidden" name="season" value="{{ season.season_num }}">
+        </form>
+      </div>
       <div><a href="{% url 'skaters' %}"><i>(Return to Basic Stats)</i></a></div>
       <table id="fullstandings" class="sortable">
         <col style="width: 240px;"> <!-- Player -->
