@@ -1272,7 +1272,8 @@ nav.primary-navigation ul li ul {
   background: #e4b61a;
 }
 nav.primary-navigation ul li:hover > ul,
-nav.primary-navigation ul li ul:hover {
+nav.primary-navigation ul li ul:hover,
+nav.primary-navigation ul li.open > ul {
   visibility: visible;
   opacity: 1;
   display: block;
@@ -1281,6 +1282,27 @@ nav.primary-navigation ul li ul:hover {
   padding-top: 10px;
   box-shadow: 0px 3px 5px -1px #ccc;
 }
+
+.dropdown-parent .dropdown {
+  visibility: hidden;
+  display: none;
+}
+
+.dropdown-parent:hover .dropdown,
+.dropdown-parent.open .dropdown {
+  visibility: visible;
+  display: block;
+}
+
+@media (hover: none) {
+  nav.primary-navigation ul li:hover > ul {
+    /* disable hover on touch */
+    visibility: hidden;
+    opacity: 0;
+    display: none;
+  }
+}
+
 nav.primary-navigation ul li ul li {
   /* Stroke?
   text-shadow:
