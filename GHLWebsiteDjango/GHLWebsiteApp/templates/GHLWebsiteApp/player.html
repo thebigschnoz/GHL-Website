@@ -49,7 +49,10 @@
                 {% endfor %}
             </div> 
             <div class="position-pie-container">
-                <div id="positionPieChart" style="max-width: 300px;"></div>
+                <div id="positionPieChart" style="max-width: 300px; min-height: 315px;"></div>
+            </div>
+            <div class="position-pie-container">
+                <div id="ratingsChart" style="max-width: 700px;"></div>
             </div>
         </div>
         {% endif %}
@@ -644,6 +647,7 @@
             type: 'pie',
             background: '#1e1e1e',
             foreColor: '#fbe134',
+            height: 300,
             },
             labels: labels,
             series: data,
@@ -695,6 +699,65 @@
       }
     });
 </script>
-    
+<script>
+  const ratingsChartOptions = {
+    chart: {
+      type: 'line',
+      background: '#1e1e1e',
+      height: 300,
+      toolbar: { show: false }
+    },
+    title: {
+      text: 'Recent Ratings',
+      style: { color: '#fbe134', fontSize: '18px', },
+      
+    },
+    series: [{
+      name: 'Overall Rating',
+      data: {{ recent_ratings|safe }}
+    }],
+    xaxis: {
+      type: 'category',
+      labels: {
+        rotate: -45,
+        style: {
+          colors: '#888888',  // White text
+          fontSize: '12px',
+          fontFamily: 'Arial'
+        }
+      }
+    },
+    yaxis: {
+      min: 0,
+      max: 100,
+      tickAmount: 5,
+      labels: {
+        style: {
+          colors: '#888888',  // White text
+          fontSize: '12px',
+          fontFamily: 'Arial'
+        }
+      }
+    },
+    colors: ['#ffffff'],
+    stroke: {
+      width: 3,
+      curve: 'smooth'
+    },
+    markers: {
+      size: 4
+    },
+    tooltip: {
+        theme: 'dark',
+        y: {
+            formatter: val => val.toFixed(1)
+        }
+    }
+  };
+
+  const ratingsChart = new ApexCharts(document.querySelector("#ratingsChart"), ratingsChartOptions);
+  ratingsChart.render();
+</script>
+
   
 {% endblock %}

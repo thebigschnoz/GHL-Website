@@ -798,7 +798,20 @@ def player(request, player):
         for entry in position_counts
     }
     currentseason = Season.objects.get(season_num=get_seasonSetting()).season_text
-    print(currentseason)
+    recent_ratings_qs = GameSkaterRating.objects.filter(
+        skater_record__ea_player_num=playernum,
+        skater_record__game_num__season_num=seasonSetting,
+        skater_record__game_num__expected_time__isnull=False,
+        skater_record__game_num__played_time__isnull=False
+    ).select_related('skater_record__game_num').order_by('-skater_record__game_num__expected_time')[:10]
+
+    recent_ratings = [
+        {
+            "x": rating.skater_record.game_num.expected_time.strftime("%b %d"),
+            "y": float(round(rating.overall_rating, 1)) if rating.overall_rating is not None else 0.0
+        }
+        for rating in reversed(recent_ratings_qs)
+    ]
 
     context = {
         "playernum": playernum, 
@@ -809,6 +822,7 @@ def player(request, player):
         "position_games": position_games,
         "currentseason": currentseason,
         "skaterratings": skaterratings,
+        "recent_ratings": recent_ratings,
         }
     return render(request, "GHLWebsiteApp/player.html", context)
 
