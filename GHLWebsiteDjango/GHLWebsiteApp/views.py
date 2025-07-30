@@ -432,6 +432,7 @@ def skatersAdvanced(request, season=None):
         "all_skaters": all_skaters,
         "season": season,
         "seasonlist": seasonlist,
+        "pos_filter": pos_filter,
     }
     return render(request, "GHLWebsiteApp/advanced.html", context)
 
