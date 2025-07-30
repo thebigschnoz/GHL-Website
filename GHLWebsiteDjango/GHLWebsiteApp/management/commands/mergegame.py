@@ -82,6 +82,10 @@ class Command(BaseCommand):
         skaterlist_survivor = SkaterRecord.objects.filter(game_num=game_num)
         skaterlist_merge = SkaterRecord.objects.filter(game_num=merge_game_num)
 
+        GameSkaterRating.objects.filter(skater_record__in=skaterlist_survivor).delete()
+        GameSkaterRating.objects.filter(skater_record__in=skaterlist_merge).delete()
+        self.stdout.write("Deleted associated GameSkaterRatings")
+
         for merge_skater in skaterlist_merge:
             # Match SkaterRecords by ea_player_num
             survivor_skater = skaterlist_survivor.filter(ea_player_num=merge_skater.ea_player_num).first()
@@ -159,4 +163,5 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(f"Successfully merged game {merge_game_num} into game {game_num}."))
         calculate_leaders()
         calculate_standings()
+        call_command('updateratings')
         self.stdout.write(self.style.SUCCESS("Leaders and standings refreshed."))
