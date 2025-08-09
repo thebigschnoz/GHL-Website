@@ -1044,7 +1044,7 @@ def export_war(request):
             weighted_rat = primary_rat
         return pd.Series({
             "Primary Position": primary_pos,
-            "Primary Rating": round(primary_rat, 2) if primary_pos else "",
+            "Primary Rating": (round(primary_rat, 2) if primary_pos else ""),
             "Secondary Position": secondary_pos,
             "Secondary Rating": (round(secondary_rat, 2) if secondary_pos else ""),
             "Weighted Rating": round(weighted_rat, 2)
