@@ -1023,12 +1023,14 @@ def export_war(request):
         "Offensive Rating", "Defensive Rating", "Team Rating", "Overall Rating", 
         "Offensive Percentile", "Defensive Percentile", "Team Percentile", "Overall Percentile"
     ]
+    for col in ["Games Played", "Overall Percentile"]:
+        war_df[col] = pd.to_numeric(war_df[col], errors="coerce")
     ranked = war_df.sort_values(
         ["Username", "Season", "Games Played", "Overall Percentile"],
         ascending=[True, True, False, False]
     )
     def pick_top2(g):
-        # g is already sorted by our criteria
+        # Pick the top two (or one if only one) ratings for each player in a season, and combine to a weighted overall.
         primary_pos = g.iloc[0]["Position"]
         primary_rat = g.iloc[0]["Overall Percentile"]
         if len(g) > 1:
@@ -1040,7 +1042,7 @@ def export_war(request):
                 ) / (g.iloc[0]["Games Played"] + g.iloc[1]["Games Played"])
         else:
             secondary_pos = ""
-            secondary_rat = ""
+            secondary_rat = pd.NA
             weighted_rat = primary_rat
         return pd.Series({
             "Primary Position": primary_pos,
