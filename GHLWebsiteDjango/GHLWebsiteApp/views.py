@@ -1034,14 +1034,20 @@ def export_war(request):
         if len(g) > 1:
             secondary_pos = g.iloc[1]["Position"]
             secondary_rat = g.iloc[1]["Overall Percentile"]
+            weighted_rat = (
+                primary_rat * g.iloc[0]["Games Played"] +
+                secondary_rat * g.iloc[1]["Games Played"]
+                ) / (g.iloc[0]["Games Played"] + g.iloc[1]["Games Played"])
         else:
             secondary_pos = ""
             secondary_rat = ""
+            weighted_rat = primary_rat
         return pd.Series({
             "Primary Position": primary_pos,
             "Primary Rating": round(primary_rat, 2),
             "Secondary Position": secondary_pos,
-            "Secondary Rating": (round(secondary_rat, 2) if secondary_pos else "")
+            "Secondary Rating": (round(secondary_rat, 2) if secondary_pos else ""),
+            "Weighted Rating": round(weighted_rat, 2)
         })
     primsec = (
         ranked.groupby(["Username", "Season"], as_index=False)
