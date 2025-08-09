@@ -1018,9 +1018,40 @@ def export_war(request):
         "games_played", "off_rat", "def_rat", "team_rat", "ovr_rat", "off_pct", "def_pct", "team_pct", "ovr_pct",
     )
     war_df = pd.DataFrame(list(war_data))
+    war_df.columns = [
+        "Username", "Position", "Season", "Games Played", 
+        "Offensive Rating", "Defensive Rating", "Team Rating", "Overall Rating", 
+        "Offensive Percentile", "Defensive Percentile", "Team Percentile", "Overall Percentile"
+    ]
+    ranked = war_df.sort_values(
+        ["Username", "Season", "Games Played", "Overall Percentile"],
+        ascending=[True, True, False, False]
+    )
+    def pick_top2(g):
+        # g is already sorted by our criteria
+        primary_pos = g.iloc[0]["Position"]
+        primary_rat = g.iloc[0]["Overall Percentile"]
+        if len(g) > 1:
+            secondary_pos = g.iloc[1]["Position"]
+            secondary_rat = g.iloc[1]["Overall Percentile"]
+        else:
+            secondary_pos = ""
+            secondary_rat = ""
+        return pd.Series({
+            "Primary Position": primary_pos,
+            "Primary Rating": round(primary_rat, 2),
+            "Secondary Position": secondary_pos,
+            "Secondary Rating": (round(secondary_rat, 2) if secondary_pos else "")
+        })
+    primsec = (
+        ranked.groupby(["Username", "Season"], as_index=False)
+              .apply(pick_top2)
+              .reset_index(drop=True)
+    )
     output = BytesIO()
     with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-        war_df.to_excel(writer, sheet_name='WAR Data', index=False)
+        war_df.to_excel(writer, sheet_name='Ratings Data', index=False)
+        primsec.to_excel(writer, sheet_name='Primary-Secondary', index=False)
     output.seek(0)
     response = HttpResponse(output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = 'attachment; filename="ghl_war.xlsx"'
