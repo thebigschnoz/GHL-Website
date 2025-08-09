@@ -1011,7 +1011,7 @@ def export_player_data(request):
     return response
 
 def export_war(request):
-    war_data = SkaterRating.objects.all().values(
+    war_data = SkaterRating.objects.all().exclude(position=0).values(
         "player__username",  # Replace player with username
         "position__positionShort", 
         "season__season_text",
