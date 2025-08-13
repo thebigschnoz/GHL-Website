@@ -772,7 +772,11 @@ def player(request, player):
     game_data = []
     for game in all_games:
         skater_record = SkaterRecord.objects.filter(game_num=game, ea_player_num=playernum).first()
-        rating = GameSkaterRating.objects.filter(skater_record=skater_record).first()
+        if not skater_record.position.positionShort == "G":
+            rating = GameSkaterRating.objects.filter(skater_record=skater_record).first()
+        else:
+            goalie_record = GoalieRecord.objects.filter(game_num=game, ea_player_num=playernum).first()
+            rating = GameGoalieRating.objects.filter(goalie_record=goalie_record).first()
         game_data.append({
             "game": game,
             "position": skater_record.position.positionShort if skater_record and skater_record.position else "G",
