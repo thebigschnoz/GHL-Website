@@ -64,7 +64,10 @@ def delete_trade_block_player(request, pk):
 
 
 def get_seasonSetting():
-    seasonSetting = Season.objects.filter(isActive=True).first().season_num or 1
+    try:
+        seasonSetting = Season.objects.filter(isActive=True).first().season_num
+    except AttributeError:
+        seasonSetting = 1
     return seasonSetting # Returns an integer
 
 def calculate_leaders():
