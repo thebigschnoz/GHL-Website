@@ -239,7 +239,7 @@ def calculate_standings():
 
 def get_scoreboard():
     season = get_seasonSetting()
-    data = Game.objects.filter(season_num=season).order_by("-played_time")[:20]
+    data = Game.objects.filter(season_num=season).order_by("-played_time", "expected_time")[:20]
     return data
 
 def get_default_week_start():
