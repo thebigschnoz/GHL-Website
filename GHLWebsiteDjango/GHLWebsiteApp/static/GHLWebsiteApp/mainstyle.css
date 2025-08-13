@@ -827,6 +827,7 @@ span.contract-tiny {
   display: block;
   margin-left: -3px;
   flex: 1;
+  max-width: 50vw;
 }
 
 .tournament-bracket__round-title {
@@ -876,6 +877,7 @@ span.contract-tiny {
   position: relative;
   padding: 2% 0;
   width: 48%;
+  max-width: 50vw;
   transition: padding 0.2s linear;
 }
 
