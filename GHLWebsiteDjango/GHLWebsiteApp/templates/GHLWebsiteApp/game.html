@@ -276,6 +276,7 @@
         <div class="section_lg" style="align-items: auto; width: 90%; overflow-x: scroll; margin-bottom: 10px;"><center>
             <table class="statsbar betweenrows">
                 <col style="width: 240px;"><!-- Player -->
+                <col style="width: 60px;"><!-- OVR -->
                 <col style="width: 80px;"><!-- Shots Against -->
                 <col style="width: 80px;"><!-- Saves -->
                 <col style="width: 80px;"><!-- SV% -->
@@ -290,6 +291,7 @@
                 <thead>
                     <tr>
                         <th>Goalie</th>
+                        <th>OVR</th>
                         <th>Shots Against</th>
                         <th>Saves</th>
                         <th>SV%</th>
@@ -307,6 +309,7 @@
                     {% for player in a_goalie_records %}
                     <tr class="no-bg">
                         <td><a href="{% url 'player' player.ea_player_num.ea_player_num %}">{{ player.ea_player_num.username }}</a></td>
+                        <td class="meta-rating" data-rating="{{player.gamegoalierating.overall_rating}}" style="border-radius: 0;">{{ player.gamegoalierating.overall_rating|floatformat:0|default:"-" }}</td>
                         <td>{{player.shots_against}}</td>
                         <td>{{player.saves}}</td>
                         <td>{{player.save_pct|floatformat:1}}%</td>
@@ -440,6 +443,7 @@
         <div class="section_lg" style="align-items: auto; width: 90%; overflow-x: scroll; margin-bottom: 10px;"><center>
             <table class="statsbar betweenrows">
                 <col style="width: 240px;"><!-- Player -->
+                <col style="width: 60px;"><!-- OVR -->
                 <col style="width: 80px;"><!-- Shots Against -->
                 <col style="width: 80px;"><!-- Saves -->
                 <col style="width: 80px;"><!-- SV% -->
@@ -454,6 +458,7 @@
                 <thead>
                     <tr>
                         <th>Goalie</th>
+                        <th>OVR</th>
                         <th>Shots Against</th>
                         <th>Saves</th>
                         <th>SV%</th>
@@ -471,6 +476,7 @@
                     {% for player in h_goalie_records %}
                     <tr class="no-bg">
                         <td><a href="{% url 'player' player.ea_player_num.ea_player_num %}">{{ player.ea_player_num.username }}</a></td>
+                        <td class="meta-rating" data-rating="{{player.gamegoalierating.overall_rating}}" style="border-radius: 0;">{{ player.gamegoalierating.overall_rating|floatformat:0|default:"-" }}</td>
                         <td>{{player.shots_against}}</td>
                         <td>{{player.saves}}</td>
                         <td>{{player.save_pct|floatformat:1}}%</td>
