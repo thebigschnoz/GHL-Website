@@ -456,6 +456,39 @@ class GameSkaterRating(models.Model):
     class Meta:
         unique_together = ('skater_record',)
     
+class GameGoalieRating(models.Model):
+    goalie_record = models.OneToOneField(GoalieRecord, on_delete=models.CASCADE, related_name='gamegoalierating')
+    goalie_rating = models.DecimalField(max_digits=6, decimal_places=2)
+    teamplay_rating = models.DecimalField(max_digits=6, decimal_places=2)
+    game_result_bonus = models.DecimalField(max_digits=6, decimal_places=2)
+    overall_rating = models.DecimalField(max_digits=6, decimal_places=2)
+    calculated_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('goalie_record',)
+
+class GoalieRating(models.Model):
+    player = models.ForeignKey(Player, on_delete=models.CASCADE)
+    season = models.ForeignKey(Season, on_delete=models.CASCADE)
+
+    games_played = models.PositiveSmallIntegerField(default=0)
+    gk_rat = models.DecimalField(max_digits=6, decimal_places=2)
+    team_rat = models.DecimalField(max_digits=6, decimal_places=2)
+    ovr_rat = models.DecimalField(max_digits=6, decimal_places=2)
+    gk_pct = models.DecimalField(max_digits=5, decimal_places=2, null=True)
+    team_pct = models.DecimalField(max_digits=5, decimal_places=2, null=True)
+    ovr_pct = models.DecimalField(max_digits=5, decimal_places=2, null=True)
+
+    weights_version = models.CharField(max_length=10, default="v1")
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ("player", "season", "weights_version")
+        ordering = ["-gk_pct", "player__username"]
+
+    def __str__(self):
+        return f"{self.player.username} (G) ({self.season.season_text}) - RAT: {self.gk_pct or 0:.2f}"
+
 class TradeBlockPlayer(models.Model):
     player = models.ForeignKey(Player, on_delete=models.CASCADE)
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
