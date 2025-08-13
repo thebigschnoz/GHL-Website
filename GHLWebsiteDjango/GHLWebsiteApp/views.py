@@ -794,6 +794,10 @@ def player(request, player):
     skaterratings = SkaterRating.objects.filter(
         player=playernum,
         season=seasonSetting)
+    goalieratings = GoalieRating.objects.filter(
+        player=playernum,
+        season=seasonSetting
+    )
     position_counts = SkaterRecord.objects.filter(
         ea_player_num=playernum,
         game_num__season_num=seasonSetting,
@@ -824,6 +828,7 @@ def player(request, player):
         "position_games": position_games,
         "currentseason": currentseason,
         "skaterratings": skaterratings,
+        "goalieratings": goalieratings,
         "recent_ratings": json.dumps(recent_rating_data),
         }
     return render(request, "GHLWebsiteApp/player.html", context)

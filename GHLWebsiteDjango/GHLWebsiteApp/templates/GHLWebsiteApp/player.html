@@ -20,31 +20,49 @@
                 </div>
             </div>
         </div>
-        {% if skaterratings %}
+        
         <div class="subsection-container" style="width: 100%; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
+        {% if skaterratings or goalieratings %}
             <div class="report-card">
                 <div class="report-card-row rowheader">
-                    Skater Report Card
+                    Report Card
                 </div>
                 {% for pos in skaterratings %}
                 <div class="report-card-row">
-                  <div class="pos-cell">{{ pos.position.positionShort }}</div>
-                  <div class="percentile-card">
-                    <div class="percentile-number">{{ pos.ovr_pct|floatformat:0 }}%</div>
-                    <div class="percentile-label" style="font-weight: 800;">Overall</div>
-                  </div>
-                  <div class="percentile-card">
-                    <div class="percentile-number">{{ pos.off_pct|floatformat:0 }}%</div>
-                    <div class="percentile-label">Offense</div>
-                  </div>
-                  <div class="percentile-card">
-                    <div class="percentile-number">{{ pos.def_pct|floatformat:0 }}%</div>
-                    <div class="percentile-label">Defense</div>
-                  </div>
-                  <div class="percentile-card">
-                    <div class="percentile-number">{{ pos.team_pct|floatformat:0 }}%</div>
-                    <div class="percentile-label">Teamplay</div>
-                  </div>
+                    <div class="pos-cell">{{ pos.position.positionShort }}</div>
+                    <div class="percentile-card">
+                        <div class="percentile-number">{{ pos.ovr_pct|floatformat:0 }}%</div>
+                        <div class="percentile-label" style="font-weight: 800;">Overall</div>
+                    </div>
+                    <div class="percentile-card">
+                        <div class="percentile-number">{{ pos.off_pct|floatformat:0 }}%</div>
+                        <div class="percentile-label">Offense</div>
+                    </div>
+                    <div class="percentile-card">
+                        <div class="percentile-number">{{ pos.def_pct|floatformat:0 }}%</div>
+                        <div class="percentile-label">Defense</div>
+                    </div>
+                    <div class="percentile-card">
+                        <div class="percentile-number">{{ pos.team_pct|floatformat:0 }}%</div>
+                        <div class="percentile-label">Teamplay</div>
+                    </div>
+                </div>
+                {% endfor %}
+                {% for rating in goalieratings %}
+                <div class="report-card-row">
+                    <div class="pos-cell">G</div>
+                    <div class="percentile-card">
+                        <div class="percentile-number">{{ rating.ovr_pct|floatformat:0 }}%</div>
+                        <div class="percentile-label" style="font-weight: 800;">Overall</div>
+                    </div>
+                    <div class="percentile-card">
+                        <div class="percentile-number">{{ rating.gk_pct|floatformat:0 }}%</div>
+                        <div class="percentile-label">Tending</div>
+                    </div>
+                    <div class="percentile-card">
+                        <div class="percentile-number">{{ rating.team_pct|floatformat:0 }}%</div>
+                        <div class="percentile-label">Teamplay</div>
+                    </div>
                 </div>
                 {% endfor %}
             </div> 
@@ -54,8 +72,8 @@
             <div class="position-pie-container">
                 <div id="ratingsChart" style="max-width: 700px;"></div>
             </div>
-        </div>
         {% endif %}
+        </div>
 
         {% if skater_season_totals and skater_season_totals.0.game_num__season_num__season_text == currentseason %}
         <div class="subsection-container" style="width: 100%;">
