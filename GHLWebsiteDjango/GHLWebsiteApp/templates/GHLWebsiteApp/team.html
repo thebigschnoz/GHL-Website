@@ -15,25 +15,16 @@
                         <center>
                             <font style="font-weight: 700; font-size: 64px">{{ team.club_full_name }}</font>
                             <div class="selectionmenu">
-                                <form>
-                                    <select id="seasonSel" name="season">
-                                        <optgroup>
-                                            <option selected value="">Choose Another Season</option>
-                                            {% for season in seasons %}
-                                            <option value="/team/{{ team.ea_club_num }}?season-{{ season.season_num }}">{{ season.season_text }}</option>
-                                            {% endfor %}
-                                        </optgroup>
+                                <form method="get">
+                                    <label for="season">Select Week:</label>
+                                    <select name="season" id="season" onchange="this.form.submit()">
+                                        {% for season in seasons %}
+                                            <option value="{{season}}">
+                                                {{ season.season_text }}
+                                            </option>
+                                        {% endfor %}
                                     </select>
                                 </form>
-                                <script>
-                                    const dropdown = document.getElementById('seasonSel');
-                                    dropdown.addEventListener('change', function() {
-                                        const selectedValue = dropdown.value;
-                                        if (selectedValue) {
-                                            window.location.href = selectedValue;
-                                        }
-                                    });
-                                </script>
                             </div>
                             <div style="font-size: 12px; font-weight: 400; margin-top: 5px;">
                                 <a href="{% url 'export_team' team.ea_club_num %}">Get Upcoming Schedule CSV</a>
