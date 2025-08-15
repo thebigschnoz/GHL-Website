@@ -20,7 +20,7 @@
                                         <optgroup>
                                             <option selected value="">Choose Another Season</option>
                                             {% for season in seasons %}
-                                            <option value="/team/{{ team.ea_club_num }}/seasonnum-{{ season.season_num }}">{{ season.season_text }}</option>
+                                            <option value="/team/{{ team.ea_club_num }}?seasonnum-{{ season.season_num }}">{{ season.season_text }}</option>
                                             {% endfor %}
                                         </optgroup>
                                     </select>
