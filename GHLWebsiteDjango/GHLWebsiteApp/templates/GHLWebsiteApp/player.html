@@ -3,7 +3,7 @@
 {% block body %}
 <center>
     <div class="section section_lg"><center>
-        <div class="subsection-container">
+        <div class="subsection-container-vert">
             <div class="player-header">
                 <div class="player-photo">
                     <img src="{% static 'GHLWebsiteApp/stock-user-photo.jpg' %}" width="220" height="220" />
@@ -18,6 +18,11 @@
                     </a>
                     {% endif %}
                 </div>
+            </div>
+            <div style="text-align: center;">
+                <a href="{% url 'playerlog' playernum.ea_player_num %}" class="playerlog-link">
+                    View Game Log
+                </a>
             </div>
         </div>
         

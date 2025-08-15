@@ -14,6 +14,7 @@ urlpatterns = [
     path('team/<int:team>/', views.team, name="team"),
     path('player/', views.skaters, name="playernonum"),
     path('player/<int:player>/', views.player, name="player"),
+    path('playerlog/<int:player>/', views.playerlog, name="playerlog"),
     path('playerlist/', views.playerlist, name="playerlist"),
     path('awards/', views.awardsDef, name="awardsDef"),
     path('awards/<int:awardnum>/', views.awards, name="awards"),

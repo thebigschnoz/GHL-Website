@@ -842,6 +842,30 @@ def player(request, player):
         }
     return render(request, "GHLWebsiteApp/player.html", context)
 
+def playerlog(request, player):
+    playernum = get_object_or_404(Player, pk=player)
+    skater_games = Game.objects.filter(skaterrecord__ea_player_num=playernum).exclude(season_num__season_text__in="Test")
+    goalie_games = Game.objects.filter(goalierecord__ea_player_num=playernum).exclude(season_num__season_text__in="Test")
+    if skater_games.exists() or goalie_games.exists():
+        all_games = skater_games.union(goalie_games).order_by("-expected_time")
+    else:
+        all_games = []
+    game_data = []
+    for game in all_games:
+        skater_record = SkaterRecord.objects.filter(game_num=game, ea_player_num=playernum).first()
+        if not skater_record.position.positionShort == "G":
+            rating = GameSkaterRating.objects.filter(skater_record=skater_record).first()
+        else:
+            goalie_record = GoalieRecord.objects.filter(game_num=game, ea_player_num=playernum).first()
+            rating = GameGoalieRating.objects.filter(goalie_record=goalie_record).first()
+        game_data.append({
+            "game": game,
+            "position": skater_record.position.positionShort if skater_record and skater_record.position else "G",
+            "rating": rating.overall_rating if rating else "-",
+        })
+    context = {"playernum": playernum, "games": game_data}
+    return render(request, "GHLWebsiteApp/playerlog.html", context)
+
 def draft(request):
     return render(request, "GHLWebsiteApp/draft.html")
 
