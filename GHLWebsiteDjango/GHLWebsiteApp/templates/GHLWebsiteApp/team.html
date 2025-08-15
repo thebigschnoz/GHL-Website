@@ -16,10 +16,10 @@
                             <font style="font-weight: 700; font-size: 64px">{{ team.club_full_name }}</font>
                             <div class="selectionmenu">
                                 <form method="get">
-                                    <label for="season">Select Week:</label>
                                     <select name="season" id="season" onchange="this.form.submit()">
+                                        <option selected value="">Choose Another Season</option>
                                         {% for season in seasons %}
-                                            <option value="{{season}}">
+                                            <option value="{{season.season_num}}">
                                                 {{ season.season_text }}
                                             </option>
                                         {% endfor %}
