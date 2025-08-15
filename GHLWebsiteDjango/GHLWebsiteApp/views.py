@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from .forms import *
 import datetime
 from GHLWebsiteApp.models import *
-from django.db.models import Sum, Count, Case, When, Avg, F, Window, FloatField, Q, ExpressionWrapper, Value
+from django.db.models import Sum, Count, Case, When, Avg, F, Window, FloatField, Q, ExpressionWrapper, Value, Prefetch
 from django.db.models.functions import Cast, Rank, Round, Lower, Coalesce
 from django.http import JsonResponse, HttpResponse, HttpResponseForbidden
 from decimal import *
@@ -304,13 +304,22 @@ def index(request):
 
 def standings(request):
     season = Season.objects.get(season_num=get_seasonSetting())
-    if not season.season_type == "playoffs":
-        standings = Standing.objects.filter(season=season).order_by('-points', '-wins', '-goalsfor', 'goalsagainst', 'team__club_full_name')
+    if season.season_type != "playoffs":
+        standings = Standing.objects.filter(season=season)\
+            .order_by('-points', '-wins', '-goalsfor', 'goalsagainst', 'team__club_full_name')
         rounds = None
     else:
-        standings = PlayoffSeries.objects.filter(season=season).order_by('round_num', 'low_seed_num')
-        rounds = PlayoffRound.objects.filter(season=season).order_by('round_num')
-    return render(request, "GHLWebsiteApp/standings.html", {"standings": standings, "season": season, "rounds": rounds})
+        series_qs = (PlayoffSeries.objects
+                     .filter(season=season)
+                     .select_related('low_seed', 'high_seed', 'round_num')
+                     .order_by('low_seed_num'))
+        rounds = (PlayoffRound.objects
+                  .filter(season=season)
+                  .order_by('round_num')
+                  .prefetch_related(Prefetch('series_in_round', queryset=series_qs)))
+        standings = None  # not used in playoffs template now
+    return render(request, "GHLWebsiteApp/standings.html",
+                  {"standings": standings, "season": season, "rounds": rounds})
 
 def leaders(request):
     season = get_seasonSetting()
