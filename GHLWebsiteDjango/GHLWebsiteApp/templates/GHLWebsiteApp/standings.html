@@ -86,45 +86,23 @@
       </div>
     
       <div class="container">
-        <div class="tournament-bracket tournament-bracket--rounded">
-          {% for round in rounds %}
-            <div class="tournament-bracket__round tournament-bracket__round--{{ round.round_name|lower }}">
-              <h3 class="tournament-bracket__round-title">{{ round.round_name }}</h3>
-              <ul class="tournament-bracket__list">
-                {% for matchup in round.series_in_round.all %}
-                  <li class="tournament-bracket__item">
-                    <div class="tournament-bracket__match">
-                      <table class="tournament-bracket__table">
-                        <tbody class="tournament-bracket__content">
-                          <tr class="tournament-bracket__team no-bg {% if matchup.high_seed_wins >= 4 %}tournament-bracket__team--winner{% endif %}">
-                            <td class="tournament-bracket__country">
-                              <abbr class="tournament-bracket__code" title="{{ matchup.high_seed.club_full_name }}">{{ matchup.high_seed.club_abbr }}</abbr>
-                              <span class="tournament-bracket__flag"><img src="{{ matchup.high_seed.team_logo_link }}"></span>
-                            </td>
-                            <td class="tournament-bracket__score">
-                              <span class="tournament-bracket__number">{{ matchup.high_seed_wins }}</span>
-                            </td>
-                          </tr>
-                          <tr class="tournament-bracket__team no-bg {% if matchup.low_seed_wins >= 4 %}tournament-bracket__team--winner{% endif %}">
-                            <td class="tournament-bracket__country">
-                              <abbr class="tournament-bracket__code" title="{{ matchup.low_seed.club_full_name }}">{{ matchup.low_seed.club_abbr }}</abbr>
-                              <span class="tournament-bracket__flag"><img src="{{ matchup.low_seed.team_logo_link }}"></span>
-                            </td>
-                            <td class="tournament-bracket__score">
-                              <span class="tournament-bracket__number">{{ matchup.low_seed_wins }}</span>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </li>
-                {% empty %}
-                  <li class="tournament-bracket__item"><em>No series in this round yet.</em></li>
-                {% endfor %}
-              </ul>
-            </div>
-          {% endfor %}
-        </div>
+        <div id="brackets-viewer" class="brackets-viewer"></div>
+        <!-- Data + render -->
+        <script>
+          
+          const data = {{ brackets_json|safe }};
+
+          // Optional options (theme, round labels, etc.)
+          const options = {
+            selector: '#brackets-viewer',
+            participantOriginPlacement: 'before',
+            showSlotsOrigin: false,
+            separatedChildCountLabel: true,
+          };
+
+          // Render:
+          window.bracketsViewer.render(data, options).catch(console.error);
+        </script>
       </div>
       {% endif %}
     </div>

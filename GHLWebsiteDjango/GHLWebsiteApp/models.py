@@ -348,10 +348,10 @@ class PlayoffRound(models.Model):
 class PlayoffSeries(models.Model):
     season = models.ForeignKey(Season, on_delete=models.CASCADE, verbose_name="Season")
     round_num = models.ForeignKey(PlayoffRound, on_delete=models.CASCADE, verbose_name="Round Number", related_name="series_in_round")
-    low_seed = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="low_seed_series", verbose_name="Low Seed")
-    high_seed = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="high_seed_series", verbose_name="High Seed")
-    low_seed_num = models.PositiveSmallIntegerField(default=0, verbose_name="Low Seed Number", help_text="1 for lowest seed, 2 for second lowest, etc.")
-    high_seed_num = models.PositiveSmallIntegerField(default=0, verbose_name="High Seed Number", help_text="8 for highest seed, 7 for second highest, etc.")
+    low_seed = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="low_seed_series", verbose_name="Low Seed", null=True, blank=True)
+    high_seed = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="high_seed_series", verbose_name="High Seed", null=True, blank=True)
+    low_seed_num = models.PositiveSmallIntegerField(default=0, verbose_name="Low Seed Number", help_text="1 for lowest seed, 2 for second lowest, etc.", null=True, blank=True)
+    high_seed_num = models.PositiveSmallIntegerField(default=0, verbose_name="High Seed Number", help_text="8 for highest seed, 7 for second highest, etc.", null=True, blank=True)
     low_seed_wins = models.PositiveSmallIntegerField(default=0, verbose_name="Low Seed Wins")
     high_seed_wins = models.PositiveSmallIntegerField(default=0, verbose_name="High Seed Wins")
     series_winner = models.ForeignKey(Team, on_delete=models.SET_NULL, null=True, blank=True, related_name="series_winner", verbose_name="Series Winner")
@@ -365,9 +365,6 @@ class PlayoffSeries(models.Model):
         else:
             self.series_winner = None
         self.save()
-
-    def __str__(self):
-        return f"Round {self.round_num}: {self.low_seed.club_full_name} vs {self.high_seed.club_full_name}"
 
 class AwardVote(models.Model):
     ea_player_num = models.ForeignKey(Player, on_delete=models.CASCADE, verbose_name="Player")

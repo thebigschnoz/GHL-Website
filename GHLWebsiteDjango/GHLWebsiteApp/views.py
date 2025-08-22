@@ -308,18 +308,185 @@ def standings(request):
         standings = Standing.objects.filter(season=season)\
             .order_by('-points', '-wins', '-goalsfor', 'goalsagainst', 'team__club_full_name')
         rounds = None
+        brackets_payload = None
     else:
-        series_qs = (PlayoffSeries.objects
-                     .filter(season=season)
-                     .select_related('low_seed', 'high_seed', 'round_num')
-                     .order_by('low_seed_num'))
-        rounds = (PlayoffRound.objects
-                  .filter(season=season)
-                  .order_by('round_num')
-                  .prefetch_related(Prefetch('series_in_round', queryset=series_qs)))
+    # --- Playoffs path: build brackets-viewer payload with zero-based ids ---
+
+        # All series in order by round then low seed
+        series_qs = (
+            PlayoffSeries.objects
+            .filter(season=season)
+            .select_related('low_seed', 'high_seed', 'round_num')
+            .order_by('round_num__round_num', 'low_seed_num')
+        )
+
+        # participants: map Team.ea_club_num -> 0-based participant id
+        team_to_pid = {}
+        participants = []
+        next_pid = 0
+
+        def pid(team: Team | None):
+            nonlocal next_pid
+            if team is None:
+                return None
+            key = team.ea_club_num
+            if key not in team_to_pid:
+                team_to_pid[key] = next_pid
+                participants.append({
+                    "id": next_pid,                 # <-- 0-based participant id
+                    "tournament_id": 0,             # arbitrary (viewer ignores it)
+                    "name": team.club_full_name,    # or team.club_abbr if you prefer
+                    "icon": team.team_logo_link or None,
+                })
+                next_pid += 1
+            return team_to_pid[key]
+
+        # Exactly one stage and one group, both zero-based ids
+        seedOrdering = len(series_qs)
+        stages = [{
+            "id": 0,                                # <-- 0-based stage id
+            "name": f"{season.season_text}",
+            "type": "single_elimination",
+            "number": 1,                            # viewer display number (1-based)
+            "settings": {
+                "seedOrdering": ['natural', 'reverse', 'natural'],
+                "grandFinal": "none",
+            },
+        }]
+        groups = [{
+            "id": 0,                                # <-- 0-based group id
+            "stage_id": 0,
+            "number": 1,                            # viewer display number (1-based)
+        }]
+
+        # Build rounds structure and matches
+        rounds = []
+        matches = []
+        matchGames = []  # optional (we're not using per-game entries for a series)
+
+        # Grab round metadata; round.number (display) must be contiguous 1..N
+        ordered_rounds = (
+            PlayoffRound.objects
+            .filter(season=season)
+            .order_by('round_num')
+            .values('round_num', 'round_name')
+        )
+        roundnum_to_meta = {r['round_num']: r for r in ordered_rounds}
+
+        # Group series by logical round number from DB
+        by_round: dict[int, list[PlayoffSeries]] = defaultdict(list)
+        for s in series_qs:
+            by_round[s.round_num.round_num].append(s)
+
+        # Build fast index: for each round, which series involve a given team?
+        index_by_round_team = defaultdict(lambda: defaultdict(list))
+        for rnd, lst in by_round.items():
+            for s in lst:
+                index_by_round_team[rnd][s.high_seed_id].append(s)
+                index_by_round_team[rnd][s.low_seed_id].append(s)
+
+        min_round = min(by_round.keys()) if by_round else 0
+        max_round = max(by_round.keys()) if by_round else 0
+
+        # 0-based ids for rounds & matches
+        next_round_id = 0
+        next_match_id = 0
+
+        # Iterate rounds in logical order
+        for display_idx, logical_round_num in enumerate(sorted(by_round.keys()), start=1):
+            round_series = by_round[logical_round_num]
+
+            # Create the round object
+            rounds.append({
+                "id": next_round_id,                # <-- 0-based round id
+                "group_id": 0,
+                "stage_id": 0,
+                "number": display_idx,             # viewer display number (1..N), resets at 1 for first round
+                "name": roundnum_to_meta.get(logical_round_num, {}).get("round_name")
+                        or f"Round {display_idx}",
+            })
+
+            # Per-round match numbering (1..M within this round)
+            match_number = 1
+
+            # Create matches for this round
+            for s in round_series:
+                high_w = getattr(s, "high_seed_wins", 0) or 0
+                low_w  = getattr(s, "low_seed_wins", 0) or 0
+
+                # ---- STATUS COMPUTATION ----
+                # Completed / Archived check
+                if s.series_winner_id:
+                    # Completed by default
+                    status = 4
+                    # Archived if a next-round series including the winner is also completed
+                    next_round = logical_round_num + 1
+                    if next_round <= max_round:
+                        next_series_list = index_by_round_team.get(next_round, {}).get(s.series_winner_id, [])
+                        if any(ns.series_winner_id for ns in next_series_list):
+                            status = 5
+                else:
+                    # Readiness vs previous round
+                    if logical_round_num == min_round:
+                        # First round: both entrants are seeded/ready
+                        high_ready = True
+                        low_ready = True
+                    else:
+                        prev_round = logical_round_num - 1
+                        prev_high_list = index_by_round_team.get(prev_round, {}).get(s.high_seed_id, [])
+                        prev_low_list  = index_by_round_team.get(prev_round, {}).get(s.low_seed_id, [])
+                        high_ready = any(ps.series_winner_id == s.high_seed_id for ps in prev_high_list)
+                        low_ready  = any(ps.series_winner_id == s.low_seed_id  for ps in prev_low_list)
+
+                    if high_ready and low_ready:
+                        # Running if games have started (wins recorded) but no winner yet
+                        status = 3 if (high_w + low_w) > 0 else 2
+                    elif high_ready or low_ready:
+                        status = 1
+                    else:
+                        status = 0
+
+                if s.series_winner is None:
+                    high_res = None
+                    low_res  = None
+                else:
+                    high_res = "win" if s.series_winner_id == s.high_seed_id else "loss"
+                    low_res  = "win" if s.series_winner_id == s.low_seed_id else "loss"
+
+                matches.append({
+                    "id": next_match_id,            # <-- 0-based match id (unique globally)
+                    "stage_id": 0,
+                    "group_id": 0,
+                    "round_id": next_round_id,      # link to 0-based round id above
+                    "number": match_number,         # per-round order (1..), resets every round
+                    "status": status,
+                    "opponent1": {
+                        "id": pid(s.high_seed),
+                        "score": high_w,
+                        "result": high_res,
+                    } if pid(s.high_seed) is not None else None,
+                    "opponent2": {
+                        "id": pid(s.low_seed),
+                        "score": low_w,
+                        "result": low_res,
+                    } if pid(s.low_seed) is not None else None,
+                })
+                next_match_id += 1
+                match_number += 1
+
+            next_round_id += 1
+
+        brackets_payload = {
+            "stages": stages,
+            "groups": groups,
+            "rounds": rounds,
+            "matches": matches,
+            "matchGames": matchGames,
+            "participants": participants,
+        }
         standings = None  # not used in playoffs template now
     return render(request, "GHLWebsiteApp/standings.html",
-                  {"standings": standings, "season": season, "rounds": rounds})
+                  {"standings": standings, "season": season, "brackets_json": json.dumps(brackets_payload)})
 
 def leaders(request):
     season = get_seasonSetting()
