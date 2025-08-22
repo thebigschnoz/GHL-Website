@@ -100,6 +100,11 @@
             separatedChildCountLabel: true,
           };
 
+          window.bracketsViewer.setParticipantImages(data.participants.map(participant => ({
+            participantId: participant.id,
+            imageUrl: participant.icon,
+          })));
+
           // Render:
           window.bracketsViewer.render(data, options).catch(console.error);
         </script>
