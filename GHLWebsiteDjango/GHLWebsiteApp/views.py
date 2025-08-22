@@ -88,24 +88,24 @@ def calculate_leaders():
         ]
     )
     else:
-        leaders_goals = SkaterRecord.objects.filter(game_num__season_num=season).values("ea_player_num").annotate(numgoals=Sum("goals")).order_by("-numgoals").first()
-        leaders_assists = SkaterRecord.objects.filter(game_num__season_num=season).values("ea_player_num").annotate(numassists=Sum("assists")).order_by("-numassists").first()
-        leaders_points = SkaterRecord.objects.filter(game_num__season_num=season).values("ea_player_num").annotate(numpoints=Sum("points")).order_by("-numpoints").first()
-        leaders_shooting = SkaterRecord.objects.filter(game_num__season_num=season).values("ea_player_num").annotate(shootperc=(Cast(Sum("goals"), models.FloatField())/Cast(Sum("sog"), models.FloatField()))*100).order_by("-shootperc").first()
-        leaders_svp = GoalieRecord.objects.filter(game_num__season_num=season).values("ea_player_num").annotate(savepercsum=(Cast(Sum("saves"), models.FloatField())/Cast(Sum("shots_against"), models.FloatField()))*100).order_by("-savepercsum").first()
-        leaders_shutouts = GoalieRecord.objects.filter(game_num__season_num=season).values("ea_player_num").annotate(
+        leaders_goals = SkaterRecord.objects.filter(game_num__season_num=season).exclude(ea_player_num__banneduser__isnull=False).values("ea_player_num").annotate(numgoals=Sum("goals")).order_by("-numgoals").first()
+        leaders_assists = SkaterRecord.objects.filter(game_num__season_num=season).exclude(ea_player_num__banneduser__isnull=False).values("ea_player_num").annotate(numassists=Sum("assists")).order_by("-numassists").first()
+        leaders_points = SkaterRecord.objects.filter(game_num__season_num=season).exclude(ea_player_num__banneduser__isnull=False).values("ea_player_num").annotate(numpoints=Sum("points")).order_by("-numpoints").first()
+        leaders_shooting = SkaterRecord.objects.filter(game_num__season_num=season).exclude(ea_player_num__banneduser__isnull=False).values("ea_player_num").annotate(shootperc=(Cast(Sum("goals"), models.FloatField())/Cast(Sum("sog"), models.FloatField()))*100).order_by("-shootperc").first()
+        leaders_svp = GoalieRecord.objects.filter(game_num__season_num=season).exclude(ea_player_num__banneduser__isnull=False).values("ea_player_num").annotate(savepercsum=(Cast(Sum("saves"), models.FloatField())/Cast(Sum("shots_against"), models.FloatField()))*100).order_by("-savepercsum").first()
+        leaders_shutouts = GoalieRecord.objects.filter(game_num__season_num=season).exclude(ea_player_num__banneduser__isnull=False).values("ea_player_num").annotate(
             shutoutcount=Sum(Case(
             When(shutout=True, then=1),
             default=0,
             output_field=models.IntegerField()
         ))).filter(shutoutcount__gte=1).order_by("-shutoutcount").first()
-        leaders_wins = GoalieRecord.objects.filter(game_num__season_num=season).values("ea_player_num").annotate(
+        leaders_wins = GoalieRecord.objects.filter(game_num__season_num=season).exclude(ea_player_num__banneduser__isnull=False).values("ea_player_num").annotate(
             wincount=Sum(Case(
             When(win=True, then=1),
             default=0,
             output_field=models.IntegerField()
         ))).filter(wincount__gte=1).order_by("-wincount").first()
-        leaders_gaa = GoalieRecord.objects.filter(game_num__season_num=season).values("ea_player_num").annotate(
+        leaders_gaa = GoalieRecord.objects.filter(game_num__season_num=season).exclude(ea_player_num__banneduser__isnull=False).values("ea_player_num").annotate(
             gaatotal=((Cast(Sum("shots_against"), 
                 models.FloatField())-Cast(Sum("saves"), 
                 models.FloatField()))/Cast(Sum("game_num__gamelength"),
@@ -268,13 +268,13 @@ def GamesRequest(request):
 
 def index(request):
     season = get_seasonSetting()
-    allgames = SkaterRecord.objects.filter(game_num__season_num=season)
+    allgames = SkaterRecord.objects.filter(game_num__season_num=season).exclude(ea_player_num__banneduser__isnull=False)
     if not allgames:
         if not SkaterRecord.objects.all():
             randomplayer = gp = goals = assists = plusminus = pims = "(No GP yet)"
             thisseason = 0
         else:
-            randomplayer = random.choice(Player.objects.all())
+            randomplayer = random.choice(Player.objects.all().exclude(banneduser__isnull=False))
             username = randomplayer.username
             gp = SkaterRecord.objects.filter(ea_player_num=randomplayer).count()
             goals = SkaterRecord.objects.filter(ea_player_num=randomplayer).aggregate(Sum("goals"))["goals__sum"]
@@ -541,24 +541,24 @@ def standings(request):
 
 def leaders(request):
     season = get_seasonSetting()
-    leaders_goals = SkaterRecord.objects.filter(game_num__season_num=season).exclude(game_num__played_time=None).values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(numgoals=Sum("goals")).filter(numgoals__gt=0).order_by("-numgoals")[:10]
-    leaders_assists = SkaterRecord.objects.filter(game_num__season_num=season).exclude(game_num__played_time=None).values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(numassists=Sum("assists")).filter(numassists__gt=0).order_by("-numassists")[:10]
-    leaders_points = SkaterRecord.objects.filter(game_num__season_num=season).exclude(game_num__played_time=None).values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(numpoints=Sum("points")).filter(numpoints__gt=0).order_by("-numpoints")[:10]
-    leaders_shooting = SkaterRecord.objects.filter(game_num__season_num=season).exclude(game_num__played_time=None).values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(shootperc=(Cast(Sum("goals"), models.FloatField())/Cast(Sum("sog"), models.FloatField()))*100).filter(shootperc__gt=0).order_by("-shootperc")[:10]
-    leaders_svp = GoalieRecord.objects.filter(game_num__season_num=season).exclude(game_num__played_time=None).values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(savepercsum=(Cast(Sum("saves"), models.FloatField())/Cast(Sum("shots_against"), models.FloatField()))*100).order_by("-savepercsum")[:10]
-    leaders_shutouts = GoalieRecord.objects.filter(game_num__season_num=season).exclude(game_num__played_time=None).values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(
+    leaders_goals = SkaterRecord.objects.filter(game_num__season_num=season).exclude(game_num__played_time=None).exclude(ea_player_num__banneduser__isnull=False).values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(numgoals=Sum("goals")).filter(numgoals__gt=0).order_by("-numgoals")[:10]
+    leaders_assists = SkaterRecord.objects.filter(game_num__season_num=season).exclude(game_num__played_time=None).exclude(ea_player_num__banneduser__isnull=False).values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(numassists=Sum("assists")).filter(numassists__gt=0).order_by("-numassists")[:10]
+    leaders_points = SkaterRecord.objects.filter(game_num__season_num=season).exclude(game_num__played_time=None).exclude(ea_player_num__banneduser__isnull=False).values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(numpoints=Sum("points")).filter(numpoints__gt=0).order_by("-numpoints")[:10]
+    leaders_shooting = SkaterRecord.objects.filter(game_num__season_num=season).exclude(game_num__played_time=None).exclude(ea_player_num__banneduser__isnull=False).values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(shootperc=(Cast(Sum("goals"), models.FloatField())/Cast(Sum("sog"), models.FloatField()))*100).filter(shootperc__gt=0).order_by("-shootperc")[:10]
+    leaders_svp = GoalieRecord.objects.filter(game_num__season_num=season).exclude(game_num__played_time=None).exclude(ea_player_num__banneduser__isnull=False).values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(savepercsum=(Cast(Sum("saves"), models.FloatField())/Cast(Sum("shots_against"), models.FloatField()))*100).order_by("-savepercsum")[:10]
+    leaders_shutouts = GoalieRecord.objects.filter(game_num__season_num=season).exclude(game_num__played_time=None).exclude(ea_player_num__banneduser__isnull=False).values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(
         shutoutcount=Sum(Case(
         When(shutout=True, then=1),
         default=0,
         output_field=models.IntegerField()
     ))).filter(shutoutcount__gte=1).order_by("-shutoutcount")[:10]
-    leaders_wins = GoalieRecord.objects.filter(game_num__season_num=season).exclude(game_num__played_time=None).values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(
+    leaders_wins = GoalieRecord.objects.filter(game_num__season_num=season).exclude(game_num__played_time=None).exclude(ea_player_num__banneduser__isnull=False).values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(
         wincount=Sum(Case(
         When(win=True, then=1),
         default=0,
         output_field=models.IntegerField()
     ))).filter(wincount__gte=1).order_by("-wincount")[:10]
-    leaders_gaa = GoalieRecord.objects.filter(game_num__season_num=season).exclude(game_num__played_time=None).values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(gaatotal=((Cast(Sum("shots_against"), models.FloatField())-Cast(Sum("saves"), models.FloatField()))/Cast(Sum("game_num__gamelength"), models.FloatField()))*3600).order_by("gaatotal")[:10]
+    leaders_gaa = GoalieRecord.objects.filter(game_num__season_num=season).exclude(game_num__played_time=None).exclude(ea_player_num__banneduser__isnull=False).values("ea_player_num", "ea_player_num__username", "ea_player_num__current_team__club_abbr").annotate(gaatotal=((Cast(Sum("shots_against"), models.FloatField())-Cast(Sum("saves"), models.FloatField()))/Cast(Sum("game_num__gamelength"), models.FloatField()))*3600).order_by("gaatotal")[:10]
     missing_shutouts = max(10 - len(leaders_shutouts), 0)
     missing_wins = max(10 - len(leaders_wins), 0)
     context = {
