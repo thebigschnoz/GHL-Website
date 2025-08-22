@@ -335,24 +335,13 @@ def standings(request):
                 participants.append({
                     "id": next_pid,                 # <-- 0-based participant id
                     "tournament_id": 0,             # arbitrary (viewer ignores it)
-                    "name": team.club_full_name,    # or team.club_abbr if you prefer
+                    "name": team.club_abbr,
                     "icon": team.team_logo_link or None,
                 })
                 next_pid += 1
             return team_to_pid[key]
 
         # Exactly one stage and one group, both zero-based ids
-        seedOrdering = len(series_qs)
-        stages = [{
-            "id": 0,                                # <-- 0-based stage id
-            "name": f"{season.season_text}",
-            "type": "single_elimination",
-            "number": 1,                            # viewer display number (1-based)
-            "settings": {
-                "seedOrdering": ['natural', 'reverse', 'natural'],
-                "grandFinal": "none",
-            },
-        }]
         groups = [{
             "id": 0,                                # <-- 0-based group id
             "stage_id": 0,
@@ -378,6 +367,67 @@ def standings(request):
         for s in series_qs:
             by_round[s.round_num.round_num].append(s)
 
+        # Build seeding from the first (earliest) round
+        min_round = min(by_round.keys()) if by_round else None
+        seed_entries = []  # list of (team, seed_num)
+
+        if min_round is not None:
+            for s in by_round[min_round]:
+                # Note: In your help text, high_seed_num: 8 = highest seed, 7 = next...
+                if s.high_seed:
+                    seed_entries.append((s.high_seed, s.high_seed_num or 0))
+                if s.low_seed:
+                    seed_entries.append((s.low_seed, s.low_seed_num or 0))
+
+            # If a team appears twice (shouldn't in a clean bracket), keep the better (higher) seed number.
+            best_seed_for_team = {}
+            for team, seed in seed_entries:
+                if team is None:
+                    continue
+                if team.ea_club_num not in best_seed_for_team:
+                    best_seed_for_team[team.ea_club_num] = seed
+                else:
+                    # Keep the higher seed number since your schema says higher = better
+                    best_seed_for_team[team.ea_club_num] = max(best_seed_for_team[team.ea_club_num], seed)
+
+            # Order by seed DESC (8,7,6,...1)
+            ordered_team_ids = sorted(best_seed_for_team.keys(), key=lambda k: best_seed_for_team[k], reverse=False)
+
+            # Build the seeding array as NAMES (Brackets Manager typical format)
+            seeding_names = []
+            for team_id in ordered_team_ids:
+                # find team object back from the series lists (fast path: use one of the series)
+                # since we still have series_qs, build a small cache
+                # or just reconstruct from a Team queryset if you prefer
+                # here we’ll scan once into a dict for O(1) lookup:
+                pass
+
+        # Build a quick lookup of team_id -> Team object (from the series we already have)
+        team_obj_by_id = {}
+        for series in series_qs:
+            if series.high_seed:
+                team_obj_by_id[series.high_seed.ea_club_num] = series.high_seed
+            if series.low_seed:
+                team_obj_by_id[series.low_seed.ea_club_num] = series.low_seed
+
+        seeding_names = []
+        if min_round is not None:
+            for team_id in ordered_team_ids:
+                team_obj = team_obj_by_id.get(team_id)
+                if team_obj:
+                    seeding_names.append(team_obj.club_full_name)
+
+        stages = [{
+            "id": 0,                                # <-- 0-based stage id
+            "name": f"{season.season_text}",
+            "type": "single_elimination",
+            "number": 1,                            # viewer display number (1-based)
+            "settings": {
+                "seedOrdering": ['natural', 'reverse', 'natural'],
+                "grandFinal": "none",
+            },
+            "seeding": seeding_names,
+        }]
         # Build fast index: for each round, which series involve a given team?
         index_by_round_team = defaultdict(lambda: defaultdict(list))
         for rnd, lst in by_round.items():
