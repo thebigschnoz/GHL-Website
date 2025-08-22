@@ -43,7 +43,20 @@
                             </tbody>
                         </table>
                         {% else %}
-                        <a href="{% url 'standings' %}" style="text-decoration: none;">Click here for playoff tree</a>
+                        <div style="flex: auto;">
+                            <div id="teamlistcontainer" style="display: inline-flex; margin: 5px;">
+                            {% for team in activeteams %}
+                                <a href="{% url 'team' team.ea_club_num %}">
+                                    <div class="teamlogo" title="{{ team.club_full_name }}" style="padding: 2px;">
+                                        <img src="{{ team.team_logo_link }}" height=24 width=24 />
+                                    </div>
+                                </a>
+                            {% endfor %}
+                            </div>
+                            <div>
+                                <a href="{% url 'standings' %}" style="text-decoration: none;">Click here for playoff tree</a>
+                            </div>
+                        </div>
                         {% endif %}
                     </center>
                 </div>

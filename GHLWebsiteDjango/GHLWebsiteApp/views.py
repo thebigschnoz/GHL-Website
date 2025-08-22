@@ -299,7 +299,8 @@ def index(request):
     paginator = Paginator(announcements, 1)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    context = {"standings": standings, "leaders": leaders, "thisseason": thisseason, "username": username, "gp": gp, "goals": goals, "assists": assists, "plusminus": plusminus, "pims": pims, "season": season, "announcement": page_obj}
+    activeteams = Team.objects.filter(isActive=True)
+    context = {"standings": standings, "leaders": leaders, "thisseason": thisseason, "username": username, "gp": gp, "goals": goals, "assists": assists, "plusminus": plusminus, "pims": pims, "season": season, "announcement": page_obj, "activeteams": activeteams}
     return render(request, "GHLWebsiteApp/index.html", context)
 
 def standings(request):
