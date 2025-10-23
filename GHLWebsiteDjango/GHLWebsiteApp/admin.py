@@ -52,8 +52,8 @@ class TeamListAdmin(admin.ModelAdmin):
     list_filter = ("isActive",)
 
 class TeamRecordAdmin(admin.ModelAdmin):
-    list_display = ("ea_club_num__club_abbr", "season_num__season_text", "game_num")
-    list_filter = ("season_num__season_text", "ea_club_num__club_abbr")
+    list_display = ("ea_club_num__club_abbr", "game_num__season_num__season_text", "game_num")
+    list_filter = ("game_num__season_num__season_text", "ea_club_num__club_abbr")
 
 class BuildsAdmin(admin.ModelAdmin):
     list_display = ("build", "buildShort")
