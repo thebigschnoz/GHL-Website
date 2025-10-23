@@ -51,6 +51,10 @@ class TeamListAdmin(admin.ModelAdmin):
     list_display = ("club_full_name", "ea_club_num", "club_abbr", "isActive", "team_color", "team_code")
     list_filter = ("isActive",)
 
+class TeamRecordAdmin(admin.ModelAdmin):
+    list_display = ("ea_club_num__club_abbr", "season_num__season_text", "game_num")
+    list_filter = ("season_num__season_text", "ea_club_num__club_abbr")
+
 class BuildsAdmin(admin.ModelAdmin):
     list_display = ("build", "buildShort")
 
@@ -223,7 +227,7 @@ custom_admin_site.register(Build, BuildsAdmin)
 custom_admin_site.register(AwardAssign, AwardAssignAdmin)
 custom_admin_site.register(SkaterRecord, SkaterRecordAdmin)
 custom_admin_site.register(GoalieRecord, GoalieRecordAdmin)
-custom_admin_site.register(TeamRecord)
+custom_admin_site.register(TeamRecord, TeamRecordAdmin)
 custom_admin_site.register(Standing)
 custom_admin_site.register(Leader)
 custom_admin_site.register(AwardVote)
