@@ -31,7 +31,7 @@
 			<a href="{% url 'game' game.game_num %}">
 				<div class="game__container" data-index="{{ forloop.counter }}">
 					<div class="game__top-bar">
-						<span class="game__time">{% if expected_time %}{{ game.expected_time|date:"D M j" }}, {{ game.expected_time|time:"g:i" }}{% else %}No Time Schduled{% endif %}</span>
+						<span class="game__time">{% if game.expected_time %}{{ game.expected_time|date:"D M j" }}, {{ game.expected_time|time:"g:i" }}{% else %}No Time Schduled{% endif %}</span>
 					</div>
 					<div class="info-split">
 						<div class="team__container">
