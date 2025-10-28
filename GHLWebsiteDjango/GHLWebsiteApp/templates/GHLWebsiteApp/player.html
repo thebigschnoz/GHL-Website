@@ -6,7 +6,7 @@
         <div class="subsection-container-vert">
             <div class="player-header">
                 <div class="player-photo">
-                    <img src="{% static 'GHLWebsiteApp/stock-user-photo.jpg' %}" width="220" height="220" />
+                    <img src="{% static 'GHLWebsiteApp/stock-user-photo.jpg' %}" width="200" height="200" />
                 </div>
                 <div class="player-name">
                     {{ playernum.username }}
@@ -14,20 +14,18 @@
                 <div class="player-logo">
                     {% if playernum.current_team %}
                     <a href="{% url 'team' playernum.current_team.ea_club_num %}">
-                        <img src="{{ playernum.current_team.team_logo_link }}" width="220" height="220" />
+                        <img src="{{ playernum.current_team.team_logo_link }}" width="200" height="200" />
                     </a>
                     {% endif %}
                 </div>
-            </div>
-            <div style="text-align: center;">
-                <a href="{% url 'playerlog' playernum.ea_player_num %}" class="playerlog-link">
-                    View Game Log
-                </a>
             </div>
         </div>
         
         <div class="subsection-container" style="width: 100%; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
         {% if skaterratings or goalieratings %}
+            <div class="position-pie-container">
+                <div id="positionPieChart" style="max-width: 300px; min-height: 315px;"></div>
+            </div>
             <div class="report-card">
                 <div class="report-card-row rowheader">
                     Report Card
@@ -71,12 +69,18 @@
                 </div>
                 {% endfor %}
             </div> 
-            <div class="position-pie-container">
-                <div id="positionPieChart" style="max-width: 300px; min-height: 315px;"></div>
+            {% if award_totals %}
+            <div class="dashboard-panel player-awards">
+              <h2>Awards</h2>
+              <ul class="awards-list">
+                {% for award in award_totals %}
+                  <li>
+                    {{ award.count }}x🏆 {{ award.award_name }}
+                  </li>
+                {% endfor %}
+              </ul>
             </div>
-            <div class="position-pie-container">
-                <div id="ratingsChart" style="max-width: 700px;"></div>
-            </div>
+            {% endif %}
         {% endif %}
         </div>
 
@@ -457,6 +461,11 @@
         <div class="subsection-container" style="flex-direction: column;">
             <div class="header" style="width: 100%; text-align: center; margin-bottom: 1px;">
                 Game Log
+            </div>
+            <div style="text-align: center;">
+                <a href="{% url 'playerlog' playernum.ea_player_num %}" class="playerlog-link" style="text-decoration: none;">
+                    Click to View All Seasons
+                </a>
             </div><br>
             <div class="gamelog-table">
                 {% for game in games %}
@@ -670,7 +679,8 @@
             type: 'pie',
             background: '#1e1e1e',
             foreColor: '#fbe134',
-            height: 300,
+            height: 200,
+            width: 200,
             },
             labels: labels,
             series: data,
@@ -720,64 +730,6 @@
       if (!isNaN(val)) {
         el.style.backgroundColor = getGradientColor(val);
       }
-    });
-</script>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const ratingsChartOptions = {
-            chart: {
-            type: 'line',
-            background: '#1e1e1e',
-            height: 300,
-            width: 600,
-            toolbar: { show: false }
-            },
-            title: {
-            text: 'Recent Ratings',
-            style: { color: '#fbe134', fontSize: '18px', },
-            
-            },
-            series: [{
-            name: 'Overall Rating',
-            data: {{ recent_ratings|safe }}
-            }],
-            xaxis: {
-            type: 'category',
-            labels: {
-                show: false
-            }
-            },
-            yaxis: {
-            min: 0,
-            max: 100,
-            tickAmount: 5,
-            labels: {
-                style: {
-                colors: '#888888',  // White text
-                fontSize: '12px',
-                fontFamily: 'Arial'
-                }
-            }
-            },
-            colors: ['#fbe134'],
-            stroke: {
-            width: 3,
-            curve: 'smooth'
-            },
-            markers: {
-            size: 4
-            },
-            tooltip: {
-                theme: 'dark',
-                y: {
-                    formatter: val => val.toFixed(1)
-                }
-            }
-        };
-    
-
-        const ratingsChart = new ApexCharts(document.querySelector("#ratingsChart"), ratingsChartOptions);
-        ratingsChart.render();
     });
 </script>
 

@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from .forms import *
 import datetime
 from GHLWebsiteApp.models import *
-from django.db.models import Sum, Count, Case, When, Avg, F, Window, FloatField, Q, ExpressionWrapper, Value, Prefetch
+from django.db.models import Sum, Count, Case, When, Avg, F, Window, FloatField, Q, ExpressionWrapper, Value, OuterRef, Subquery, CharField
 from django.db.models.functions import Cast, Rank, Round, Lower, Coalesce
 from django.http import JsonResponse, HttpResponse, HttpResponseForbidden
 from decimal import *
@@ -1035,16 +1035,45 @@ def player(request, player):
         for entry in position_counts
     }
     currentseason = Season.objects.get(season_num=get_seasonSetting()).season_text
-    recent_ratings = list(GameSkaterRating.objects.filter(
-        skater_record__ea_player_num=playernum,
-        skater_record__game_num__season_num=seasonSetting,
-        skater_record__game_num__expected_time__isnull=False,
-        skater_record__game_num__played_time__isnull=False
-    ).select_related('skater_record__game_num').order_by('-skater_record__game_num__expected_time')[:10])
-    recent_ratings.reverse()
-    recent_rating_data = [
-        {'x': i + 1, 'y': float(rating.overall_rating)} for i, rating in enumerate(recent_ratings)
-    ]
+
+    # 1) Directly-assigned awards
+    assigned_qs = (
+        AwardAssign.objects
+        .filter(players=playernum)
+        .select_related("award_type")
+        .annotate(award_name=F("award_type__award_Name"))
+        .values("award_name")
+    )
+
+    # 2) Vote winners = rows where votes_num == MAX(votes_num) per (award_type, season)
+    top_votes_sq = (
+        AwardVote.objects
+        .filter(season_num=OuterRef("season_num"), award_type=OuterRef("award_type"))
+        .order_by("-votes_num")
+        .values("votes_num")[:1]
+    )
+
+    winners_qs = (
+        AwardVote.objects
+        .annotate(top_votes=Subquery(top_votes_sq))
+        .filter(votes_num=F("top_votes"), ea_player_num=player)
+        .select_related("award_type")
+        .annotate(award_name=F("award_type__award_Name"))
+        .values("award_name")
+    )
+
+    # Combine, de-duplicate (in case your admin both assigned & voted the same award-season), and sort
+    combined = list(chain(assigned_qs, winners_qs))
+
+    # Aggregate counts manually since combined is a list (not queryset)
+    award_counts = {}
+    for row in combined:
+        name = row["award_name"]
+        award_counts[name] = award_counts.get(name, 0) + 1
+
+    # 4️⃣ Convert to list for template rendering
+    award_totals = [{"award_name": k, "count": v} for k, v in award_counts.items()]
+    award_totals.sort(key=lambda a: (-a["count"], a["award_name"]))  # sort by most wins first
 
     context = {
         "playernum": playernum, 
@@ -1056,7 +1085,7 @@ def player(request, player):
         "currentseason": currentseason,
         "skaterratings": skaterratings,
         "goalieratings": goalieratings,
-        "recent_ratings": json.dumps(recent_rating_data),
+        "award_totals": award_totals,
         }
     return render(request, "GHLWebsiteApp/player.html", context)
 

@@ -2171,3 +2171,30 @@ td.hoverlink:hover a {
 .brackets-viewer [popover] .match:not(:last-of-type) {
 	margin-bottom: 20px
 }
+
+.player-awards {
+  background-color: #1e1e1e;
+  color: #fff;
+  padding: 15px 20px;
+  border: 2px solid #fbe134;
+  border-radius: 6px;
+  margin: 20px auto;
+  min-width: 200px;
+  max-width: 100%;
+}
+
+.player-awards h2 {
+  font-size: 20px;
+  margin-bottom: 10px;
+  color: #fbe134;
+}
+
+.awards-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.awards-list li {
+  padding: 5px 0;
+  font-size: 16px;
+}
