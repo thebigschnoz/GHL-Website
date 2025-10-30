@@ -52,129 +52,150 @@
                 </div>
             </div>
         </div>
-        <table class="stats-table">
-            <thead>
-                <tr>
-                    <th style="border-bottom: 1px solid #444;">{{ game.a_team_num.club_abbr }}</th>
-                    <th style="border-bottom: 1px solid #444;">vs.</th>
-                    <th style="border-bottom: 1px solid #444;">{{ game.h_team_num.club_abbr }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="no-bg stat-row">
-                    <td class="stats-value">{{ a_team_record.sog_team }}</td>
-                    <td class="stats-label">Shots</td>
-                    <td class="stats-value">{{ h_team_record.sog_team }}</td>
-                </tr>
-                <tr class="no-bg stats-bar-row">
-                    <td colspan="3">
-                      <div class="stats-bar-container">
-                        <div class="stats-bar" style="width: {{ comparison_stats.away_sogperc }}%; background-color: {{game.a_team_num.team_color}};"></div>
-                        <div style="width: 1px; background-color: black"></div>
-                        <div style="width: 3px; background-color: white"></div>
-                        <div style="width: 1px; background-color: black"></div>
-                        <div class="stats-bar" style="width: {{ comparison_stats.home_sogperc }}%; background-color: {{game.h_team_num.team_color}};"></div>
-                      </div>
-                    </td>
-                </tr>
-                <tr class="no-bg stat-row">
-                    <td class="stats-value">{{ a_team_record.hits_team }}</td>
-                    <td class="stats-label">Hits</td>
-                    <td class="stats-value">{{ h_team_record.hits_team }}</td>
-                </tr>
-                <tr class="no-bg stats-bar-row">
-                    <td colspan="3">
-                      <div class="stats-bar-container">
-                        <div class="stats-bar" style="width: {{ comparison_stats.away_hitsperc }}%; background-color: {{game.a_team_num.team_color}};"></div>
-                        <div style="width: 1px; background-color: black"></div>
-                        <div style="width: 3px; background-color: white"></div>
-                        <div style="width: 1px; background-color: black"></div>
-                        <div class="stats-bar" style="width: {{ comparison_stats.home_hitsperc }}%; background-color: {{game.h_team_num.team_color}};"></div>
-                      </div>
-                    </td>
-                </tr>
-                <tr class="no-bg stat-row">
-                    <td class="stats-value">{{ a_team_toa }}</td>
-                    <td class="stats-label">Time On Attack</td>
-                    <td class="stats-value">{{ h_team_toa }}</td>
-                </tr>
-                <tr class="no-bg stats-bar-row">
-                    <td colspan="3">
-                      <div class="stats-bar-container">
-                        <div class="stats-bar" style="width: {{ comparison_stats.away_toaperc }}%; background-color: {{game.a_team_num.team_color}};"></div>
-                        <div style="width: 1px; background-color: black"></div>
-                        <div style="width: 3px; background-color: white"></div>
-                        <div style="width: 1px; background-color: black"></div>
-                        <div class="stats-bar" style="width: {{ comparison_stats.home_toaperc }}%; background-color: {{game.h_team_num.team_color}};"></div>
-                      </div>
-                    </td>
-                </tr>
-                <tr class="no-bg stat-row">
-                    <td class="stats-value">{{ a_team_record.pass_comp_team }} / {{ a_team_record.pass_att_team }}</td>
-                    <td class="stats-label">Passing</td>
-                    <td class="stats-value">{{ h_team_record.pass_comp_team }} / {{ h_team_record.pass_att_team }}</td>
-                </tr>
-                <tr class="no-bg stats-bar-row">
-                    <td colspan="3">
-                      <div class="stats-bar-container">
-                        <div class="stats-bar" style="width: {{ comparison_stats.away_passperc }}%; background-color: {{game.a_team_num.team_color}};"></div>
-                        <div style="width: 1px; background-color: black"></div>
-                        <div style="width: 3px; background-color: white"></div>
-                        <div style="width: 1px; background-color: black"></div>
-                        <div class="stats-bar" style="width: {{ comparison_stats.home_passperc }}%; background-color: {{game.h_team_num.team_color}};"></div>
-                      </div>
-                    </td>
-                </tr>
-                <tr class="no-bg stat-row">
-                    <td class="stats-value">{{ a_team_record.fow_team }}</td>
-                    <td class="stats-label">Faceoffs</td>
-                    <td class="stats-value">{{ h_team_record.fow_team }}</td>
-                </tr>
-                <tr class="no-bg stats-bar-row">
-                    <td colspan="3">
-                      <div class="stats-bar-container">
-                        <div class="stats-bar" style="width: {{ comparison_stats.away_fowperc }}%; background-color: {{game.a_team_num.team_color}};"></div>
-                        <div style="width: 1px; background-color: black"></div>
-                        <div style="width: 3px; background-color: white"></div>
-                        <div style="width: 1px; background-color: black"></div>
-                        <div class="stats-bar" style="width: {{ comparison_stats.home_fowperc }}%; background-color: {{game.h_team_num.team_color}};"></div>
-                      </div>
-                    </td>
-                </tr>
-                <tr class="no-bg stat-row">
-                    <td class="stats-value">{{ a_team_record.pims_team }}</td>
-                    <td class="stats-label">Penalty Minutes</td>
-                    <td class="stats-value">{{ h_team_record.pims_team }}</td>
-                </tr>
-                <tr class="no-bg stats-bar-row">
-                    <td colspan="3">
-                      <div class="stats-bar-container">
-                        <div class="stats-bar" style="width: {{ comparison_stats.away_pimsperc }}%; background-color: {{game.a_team_num.team_color}};"></div>
-                        <div style="width: 1px; background-color: black"></div>
-                        <div style="width: 3px; background-color: white"></div>
-                        <div style="width: 1px; background-color: black"></div>
-                        <div class="stats-bar" style="width: {{ comparison_stats.home_pimsperc }}%; background-color: {{game.h_team_num.team_color}};"></div>
-                      </div>
-                    </td>
-                </tr>
-                <tr class="no-bg stat-row">
-                    <td class="stats-value">{{ a_team_record.ppg_team }} / {{ a_team_record.ppo_team }}</td>
-                    <td class="stats-label">Powerplays</td>
-                    <td class="stats-value">{{ h_team_record.ppg_team }} / {{ h_team_record.ppo_team }}</td>
-                </tr>
-                <tr class="no-bg stats-bar-row">
-                    <td colspan="3">
-                      <div class="stats-bar-container">
-                        <div class="stats-bar" style="width: {{ comparison_stats.away_ppperc }}%; background-color: {{game.a_team_num.team_color}};"></div>
-                        <div style="width: 1px; background-color: black"></div>
-                        <div style="width: 3px; background-color: white"></div>
-                        <div style="width: 1px; background-color: black"></div>
-                        <div class="stats-bar" style="width: {{ comparison_stats.home_ppperc }}%; background-color: {{game.h_team_num.team_color}};"></div>
-                      </div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="game-details">
+            <table class="stats-table">
+                <thead>
+                    <tr>
+                        <th style="border-bottom: 1px solid #444;">{{ game.a_team_num.club_abbr }}</th>
+                        <th style="border-bottom: 1px solid #444;">vs.</th>
+                        <th style="border-bottom: 1px solid #444;">{{ game.h_team_num.club_abbr }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="no-bg stat-row">
+                        <td class="stats-value">{{ a_team_record.sog_team }}</td>
+                        <td class="stats-label">Shots</td>
+                        <td class="stats-value">{{ h_team_record.sog_team }}</td>
+                    </tr>
+                    <tr class="no-bg stats-bar-row">
+                        <td colspan="3">
+                        <div class="stats-bar-container">
+                            <div class="stats-bar" style="width: {{ comparison_stats.away_sogperc }}%; background-color: {{game.a_team_num.team_color}};"></div>
+                            <div style="width: 1px; background-color: black"></div>
+                            <div style="width: 3px; background-color: white"></div>
+                            <div style="width: 1px; background-color: black"></div>
+                            <div class="stats-bar" style="width: {{ comparison_stats.home_sogperc }}%; background-color: {{game.h_team_num.team_color}};"></div>
+                        </div>
+                        </td>
+                    </tr>
+                    <tr class="no-bg stat-row">
+                        <td class="stats-value">{{ a_team_record.hits_team }}</td>
+                        <td class="stats-label">Hits</td>
+                        <td class="stats-value">{{ h_team_record.hits_team }}</td>
+                    </tr>
+                    <tr class="no-bg stats-bar-row">
+                        <td colspan="3">
+                        <div class="stats-bar-container">
+                            <div class="stats-bar" style="width: {{ comparison_stats.away_hitsperc }}%; background-color: {{game.a_team_num.team_color}};"></div>
+                            <div style="width: 1px; background-color: black"></div>
+                            <div style="width: 3px; background-color: white"></div>
+                            <div style="width: 1px; background-color: black"></div>
+                            <div class="stats-bar" style="width: {{ comparison_stats.home_hitsperc }}%; background-color: {{game.h_team_num.team_color}};"></div>
+                        </div>
+                        </td>
+                    </tr>
+                    <tr class="no-bg stat-row">
+                        <td class="stats-value">{{ a_team_toa }}</td>
+                        <td class="stats-label">Time On Attack</td>
+                        <td class="stats-value">{{ h_team_toa }}</td>
+                    </tr>
+                    <tr class="no-bg stats-bar-row">
+                        <td colspan="3">
+                        <div class="stats-bar-container">
+                            <div class="stats-bar" style="width: {{ comparison_stats.away_toaperc }}%; background-color: {{game.a_team_num.team_color}};"></div>
+                            <div style="width: 1px; background-color: black"></div>
+                            <div style="width: 3px; background-color: white"></div>
+                            <div style="width: 1px; background-color: black"></div>
+                            <div class="stats-bar" style="width: {{ comparison_stats.home_toaperc }}%; background-color: {{game.h_team_num.team_color}};"></div>
+                        </div>
+                        </td>
+                    </tr>
+                    <tr class="no-bg stat-row">
+                        <td class="stats-value">{{ a_team_record.pass_comp_team }} / {{ a_team_record.pass_att_team }}</td>
+                        <td class="stats-label">Passing</td>
+                        <td class="stats-value">{{ h_team_record.pass_comp_team }} / {{ h_team_record.pass_att_team }}</td>
+                    </tr>
+                    <tr class="no-bg stats-bar-row">
+                        <td colspan="3">
+                        <div class="stats-bar-container">
+                            <div class="stats-bar" style="width: {{ comparison_stats.away_passperc }}%; background-color: {{game.a_team_num.team_color}};"></div>
+                            <div style="width: 1px; background-color: black"></div>
+                            <div style="width: 3px; background-color: white"></div>
+                            <div style="width: 1px; background-color: black"></div>
+                            <div class="stats-bar" style="width: {{ comparison_stats.home_passperc }}%; background-color: {{game.h_team_num.team_color}};"></div>
+                        </div>
+                        </td>
+                    </tr>
+                    <tr class="no-bg stat-row">
+                        <td class="stats-value">{{ a_team_record.fow_team }}</td>
+                        <td class="stats-label">Faceoffs</td>
+                        <td class="stats-value">{{ h_team_record.fow_team }}</td>
+                    </tr>
+                    <tr class="no-bg stats-bar-row">
+                        <td colspan="3">
+                        <div class="stats-bar-container">
+                            <div class="stats-bar" style="width: {{ comparison_stats.away_fowperc }}%; background-color: {{game.a_team_num.team_color}};"></div>
+                            <div style="width: 1px; background-color: black"></div>
+                            <div style="width: 3px; background-color: white"></div>
+                            <div style="width: 1px; background-color: black"></div>
+                            <div class="stats-bar" style="width: {{ comparison_stats.home_fowperc }}%; background-color: {{game.h_team_num.team_color}};"></div>
+                        </div>
+                        </td>
+                    </tr>
+                    <tr class="no-bg stat-row">
+                        <td class="stats-value">{{ a_team_record.pims_team }}</td>
+                        <td class="stats-label">Penalty Minutes</td>
+                        <td class="stats-value">{{ h_team_record.pims_team }}</td>
+                    </tr>
+                    <tr class="no-bg stats-bar-row">
+                        <td colspan="3">
+                        <div class="stats-bar-container">
+                            <div class="stats-bar" style="width: {{ comparison_stats.away_pimsperc }}%; background-color: {{game.a_team_num.team_color}};"></div>
+                            <div style="width: 1px; background-color: black"></div>
+                            <div style="width: 3px; background-color: white"></div>
+                            <div style="width: 1px; background-color: black"></div>
+                            <div class="stats-bar" style="width: {{ comparison_stats.home_pimsperc }}%; background-color: {{game.h_team_num.team_color}};"></div>
+                        </div>
+                        </td>
+                    </tr>
+                    <tr class="no-bg stat-row">
+                        <td class="stats-value">{{ a_team_record.ppg_team }} / {{ a_team_record.ppo_team }}</td>
+                        <td class="stats-label">Powerplays</td>
+                        <td class="stats-value">{{ h_team_record.ppg_team }} / {{ h_team_record.ppo_team }}</td>
+                    </tr>
+                    <tr class="no-bg stats-bar-row">
+                        <td colspan="3">
+                        <div class="stats-bar-container">
+                            <div class="stats-bar" style="width: {{ comparison_stats.away_ppperc }}%; background-color: {{game.a_team_num.team_color}};"></div>
+                            <div style="width: 1px; background-color: black"></div>
+                            <div style="width: 3px; background-color: white"></div>
+                            <div style="width: 1px; background-color: black"></div>
+                            <div class="stats-bar" style="width: {{ comparison_stats.home_ppperc }}%; background-color: {{game.h_team_num.team_color}};"></div>
+                        </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="three-stars-section">
+                <h3 style="width: auto;">⭐ Three Stars of the Game</h3>
+                {% if three_stars %}
+                <ol class="three-stars-list">
+                {% for star in three_stars %}
+                    <li>
+                        <strong>{{ star.username }}</strong> — 
+                        {% if star.goals is not None %}
+                            G: {{ star.goals }}, A: {{ star.assists }}, Hits: {{ star.hits }}, BS: {{ star.blocked_shots }}
+                        {% elif star.saves is not None %}
+                            SV%: {{ star.sv_perc|floatformat:1 }}%, GAA: {{ star.gaa|floatformat:2 }}, Saves: {{ star.saves }}
+                        {% endif %}
+                    </li>
+                {% endfor %}
+                </ol>
+                {% else %}
+                <p>No three stars recorded for this game.</p>
+                {% endif %}
+            </div>
+        </div>
         <div id="divider"></div>
         <div class="header" style="color: #fbe134; text-decoration: none;">{{ game.a_team_num.club_full_name }}</div>
         <div class="section_lg" style="align-items: auto; width: 90%; overflow-x: scroll; margin-bottom: 10px;"><center>

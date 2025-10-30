@@ -852,6 +852,36 @@ def game(request, game):
     gamelength_min = gamenum.gamelength // 60
     gamelength_sec = gamenum.gamelength % 60
     gamelength_formatted = f"{gamelength_min}:{gamelength_sec:02d}"
+
+    skater_ratings = (
+        GameSkaterRating.objects
+        .filter(skater_record__game_num=game)
+        .select_related("skater_record__ea_player_num")
+        .annotate(
+            username=F("skater_record__ea_player_num__username"),
+            goals=F("skater_record__goals"),
+            assists=F("skater_record__assists"),
+            hits=F("skater_record__hits"),
+            blocked_shots=F("skater_record__blocked_shots"),
+        )
+        .values("username", "overall_rating", "goals", "assists", "hits", "blocked_shots")
+    )
+    goalie_ratings = (
+        GameGoalieRating.objects
+        .filter(goalie_record__game_num=game)
+        .select_related("goalie_record__ea_player_num")
+        .annotate(
+            username=F("goalie_record__ea_player_num__username"),
+            saves=F("goalie_record__saves"),
+            shots_against=F("goalie_record__shots_against"),
+            sv_perc=F("goalie_record__save_pct"),
+            gaa=F("goalie_record__gaa"),
+        )
+        .values("username", "overall_rating", "saves", "sv_perc", "gaa")
+    )
+    all_ratings = list(skater_ratings) + list(goalie_ratings)
+    all_ratings.sort(key=lambda r: float(r["overall_rating"]), reverse=True)
+    three_stars = all_ratings[:3]
     context = {"game": gamenum,
                "a_skater_records": a_skater_records,
                "h_skater_records": h_skater_records,
@@ -865,6 +895,7 @@ def game(request, game):
                "h_team_toa": h_team_toa_formatted,
                "comparison_stats": comparison_stats,
                "gamelength": gamelength_formatted,
+               "three_stars": three_stars,
     }
     return render(request, "GHLWebsiteApp/game.html", context)
 

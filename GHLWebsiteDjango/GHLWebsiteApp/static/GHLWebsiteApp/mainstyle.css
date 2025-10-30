@@ -2198,3 +2198,35 @@ td.hoverlink:hover a {
   padding: 5px 0;
   font-size: 16px;
 }
+
+div.three-stars-section {
+  padding: 20px;
+  border: 2px solid #fbe134;
+  border-radius: 8px;
+  width: fit-content;
+  height: fit-content;
+  margin: 0px 10px auto;
+  min-width: 220px;
+}
+
+div.three-stars-section h3 {
+  margin-top: auto;
+}
+
+div.three-stars-section ol {
+  display: inline-block;
+  margin: 0 auto;
+  padding-inline-start: 0;
+}
+
+div.three-stars-section ol li {
+  width: auto;
+  box-sizing: content-box;
+  list-style-position: inside;
+}
+
+.game-details {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: flex-start;
+}
