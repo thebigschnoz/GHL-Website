@@ -70,7 +70,7 @@ async def statsskater(interaction: discord.Interaction, username: str):
             return
 
         def get_skater_stats():           
-            return SkaterRecord.objects.filter(game_num__season_num=season, ea_player_num=player).exclude(position=0).annotate(
+            return SkaterRecord.objects.filter(game_num__season_num=season, ea_player_num=player).exclude(position=0).aggregate(
                 total_fow=Coalesce(Sum("fow"), 0),
                 total_fol=Coalesce(Sum("fol"), 0),
             ).annotate(
@@ -118,12 +118,12 @@ async def statsskater(interaction: discord.Interaction, username: str):
             return
         logger.info("Sending response.")
         response_message = (
-            f"🏒 **{player.username}** — Season Stats ({stats.sgp} GP)\n"
-            f"Goals: **{stats.sgoals}** ({stats.sppg} PP, {stats.sshg} SH)\n"
-            f"Assists: **{stats.sassists}**\n"
-            f"S%: **{stats.sshotperc}**\n"
-            f"Pass%: **{stats.spassperc}**\n"
-            f"Hits/GP: **{stats.shits}**, PIMs/GP: **{stats.spims}**, Drawn/GP: **{stats.sdrawn}**, Blocks/GP: **{stats.sbs}**, FO%: **{stats.sfaceoffperc}**"
+            f"🏒 **{player.username}** — Season Stats ({stats['sgp']} GP)\n"
+            f"Goals: **{stats.sgoals}** ({stats['sppg']} PP, {stats['sshg']} SH)\n"
+            f"Assists: **{stats['sassists']}**\n"
+            f"S%: **{stats['sshotperc']}**\n"
+            f"Pass%: **{stats['spassperc']}**\n"
+            f"Hits/GP: **{stats['shits']}**, PIMs/GP: **{stats['spims']}**, Drawn/GP: **{stats['sdrawn']}**, Blocks/GP: **{stats['sbs']}**, FO%: **{stats['sfaceoffperc']}**"
         )
         await interaction.followup.send(response_message)
     except Exception as e:
@@ -164,7 +164,7 @@ async def statsgoalie(interaction: discord.Interaction, username: str):
             logger.warning("No active season found.")
             return
         def get_goalie_stats():
-            return GoalieRecord.objects.filter(game_num__season_num=season, ea_player_num=player).annotate(
+            return GoalieRecord.objects.filter(game_num__season_num=season, ea_player_num=player).aggregate(
                 ggp = Count("game_num"),
                 gsvp = (Cast(Sum("saves"), models.FloatField())/Cast(Sum("shots_against"), models.FloatField()))*100,
                 ggaa = ((Cast(Sum("shots_against"), models.FloatField())-Cast(Sum("saves"), models.FloatField()))/Cast(Sum("game_num__gamelength"), models.FloatField()))*3600,
@@ -188,7 +188,7 @@ async def statsgoalie(interaction: discord.Interaction, username: str):
                     default=0,
                     output_field=models.IntegerField()
                 )),
-            ).first()
+            )
         logger.info("Querying goalie stats...")
         try:
             stats = await asyncio.wait_for(sync_to_async(get_goalie_stats)(), timeout=10)
@@ -202,11 +202,11 @@ async def statsgoalie(interaction: discord.Interaction, username: str):
             return
         logger.info("Sending response.")
         response_message = (
-            f"🏒 **{player.username}** — Season Stats ({stats.ggp} GP)\n"
-            f"SV%: **{stats.gsvp}**\n"
-            f"GAA: **{stats.ggaa}**\n"
-            f"Shutouts: **{stats.gshutouts}**\n"
-            f"Record: **{stats.gwins}-{stats.glosses}-{stats.gotlosses}**"
+            f"🏒 **{player.username}** — Season Stats ({stats['ggp']} GP)\n"
+            f"SV%: **{stats['gsvp']}**\n"
+            f"GAA: **{stats['ggaa']}**\n"
+            f"Shutouts: **{stats['gshutouts']}**\n"
+            f"Record: **{stats['gwins']}-{stats['glosses']}-{stats['gotlosses']}**"
         )
         # Return as Discord webhook-compatible JSON
         await interaction.followup.send(response_message)
