@@ -351,7 +351,7 @@ async def team(interaction: discord.Interaction, teamname: str):
             return
 
         def get_team_stats():
-            return Standing.objects.filter(team=team, season=season)
+            return Standing.objects.filter(team=team, season=season).first()
         leaders = await sync_to_async(get_team_leaders)(team)
         leader_lines = "\n".join(
             f"**{label}**: {username} ({value})" for label, (username, value) in leaders.items()
