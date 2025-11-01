@@ -114,9 +114,9 @@ async def statsskater(interaction: discord.Interaction, username: str):
             f"**{player.username}** — Season Stats ({stats['sgp']} GP)\n"
             f"Goals: **{stats['goals']}** ({stats['sppg']} PP, {stats['sshg']} SH)\n"
             f"Assists: **{stats['sassists']}**\n"
-            f"S%: **{shotperc:.1f}**\n"
-            f"Pass%: **{passperc:.1f}**\n"
-            f"Hits/GP: **{stats['shits']:.1f}**, PIMs/GP: **{stats['spims']:.1f}**, Drawn/GP: **{stats['sdrawn']:.1f}**, Blocks/GP: **{stats['sbs']:.1f}**, FO%: **{faceoffperc:.1f}**"
+            f"S%: **{shotperc:.1f}%**\n"
+            f"Pass%: **{passperc:.1f}%**\n"
+            f"Hits/GP: **{stats['shits']:.1f}**, PIMs/GP: **{stats['spims']:.1f}**, Drawn/GP: **{stats['sdrawn']:.1f}**, Blocks/GP: **{stats['sbs']:.1f}**, FO%: **{faceoffperc:.1f}%**"
         )
         await interaction.followup.send(response_message)
     except Exception as e:
@@ -196,7 +196,7 @@ async def statsgoalie(interaction: discord.Interaction, username: str):
         logger.info("Sending response.")
         response_message = (
             f"**{player.username}** — Season Stats ({stats['ggp']} GP)\n"
-            f"SV%: **{stats['gsvp']:.1f}**\n"
+            f"SV%: **{stats['gsvp']:.2f}%**\n"
             f"GAA: **{stats['ggaa']:.2f}**\n"
             f"Shutouts: **{stats['gshutouts']}**\n"
             f"Record: **{stats['gwins']}-{stats['glosses']}-{stats['gotlosses']}**"
