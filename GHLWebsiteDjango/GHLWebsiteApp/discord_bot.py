@@ -112,7 +112,7 @@ async def statsskater(interaction: discord.Interaction, username: str):
         logger.info("Sending response.")
         response_message = (
             f"**{player.username}** — Season Stats ({stats['sgp']} GP)\n"
-            f"Goals: **{stats.sgoals}** ({stats['sppg']} PP, {stats['sshg']} SH)\n"
+            f"Goals: **{stats['goals']}** ({stats['sppg']} PP, {stats['sshg']} SH)\n"
             f"Assists: **{stats['sassists']}**\n"
             f"S%: **{shotperc:.1f}**\n"
             f"Pass%: **{passperc:.1f}**\n"
