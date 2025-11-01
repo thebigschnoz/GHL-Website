@@ -79,6 +79,7 @@ async def statsskater(interaction: discord.Interaction, username: str):
                 sumsog=Sum("sog"),
                 sumshotatt=Sum("shot_attempts"),
                 sumpassatt=Sum("pass_att"),
+                sumpasscomp=Sum("pass_comp"),
                 shits=Avg("hits"),
                 spims=Avg("pims"),
                 sdrawn=Avg("pens_drawn"),
@@ -98,7 +99,7 @@ async def statsskater(interaction: discord.Interaction, username: str):
             await interaction.followup.send(f"⚠️ No stats found for player '{username}' in the current season.")
             return
         shotperc = (
-            (stats["goals"] or 0) / (stats["sumsog"] or 1) * 100
+            (stats["sgoals"] or 0) / (stats["sumsog"] or 1) * 100
             if stats["sumsog"] else 0
         )
         passperc = (
@@ -112,7 +113,7 @@ async def statsskater(interaction: discord.Interaction, username: str):
         logger.info("Sending response.")
         response_message = (
             f"**{player.username}** — Season Stats ({stats['sgp']} GP)\n"
-            f"Goals: **{stats['goals']}** ({stats['sppg']} PP, {stats['sshg']} SH)\n"
+            f"Goals: **{stats['sgoals']}** ({stats['sppg']} PP, {stats['sshg']} SH)\n"
             f"Assists: **{stats['sassists']}**\n"
             f"S%: **{shotperc:.1f}%**\n"
             f"Pass%: **{passperc:.1f}%**\n"
