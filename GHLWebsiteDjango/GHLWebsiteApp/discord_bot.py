@@ -41,10 +41,10 @@ def get_team_ranking(team):
     ordered_teams = list(
         Standing.objects.select_related("team")
         .order_by('-points', '-wins', '-goalsfor', 'goalsagainst', 'team__club_full_name')
-        .values_list("team_id", flat=True)
+        .values_list("team__ea_club_num", flat=True)
     )
     try:
-        position = ordered_teams.index(team.id) + 1
+        position = ordered_teams.index(team.ea_club_num) + 1
         total = len(ordered_teams)
         return position, total
     except ValueError:
