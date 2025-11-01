@@ -5,6 +5,7 @@ from discord import app_commands
 from discord.ext import commands
 from django.conf import settings
 from asgiref.sync import sync_to_async
+import asyncio
 from GHLWebsiteApp.models import Player, SkaterRecord
 from GHLWebsiteApp.models import *
 from django.db.models import Sum, Count, Case, When, Avg, F, Window, FloatField, Q, ExpressionWrapper, Value, OuterRef, Subquery, CharField
@@ -90,7 +91,10 @@ async def statsskater(interaction: discord.Interaction, username: str):
                     output_field=FloatField()
                 )
             ).first()
-        stats = await sync_to_async(get_skater_stats)()
+        try:
+            stats = await asyncio.wait_for(get_skater_stats(player, season), timeout=10)
+        except asyncio.TimeoutError:
+            await interaction.response.send_message("⚠️ Stats are taking too long. Try again later.")
         if stats is None:
             await interaction.response.send_message(f"⚠️ No stats found for player '{username}' in the current season.")
             return
@@ -154,7 +158,10 @@ async def statsgoalie(interaction: discord.Interaction, username: str):
                 )),
             ).first()
         
-        stats = await sync_to_async(get_goalie_stats)()
+        try:
+            stats = await asyncio.wait_for(get_goalie_stats(player, season), timeout=10)
+        except asyncio.TimeoutError:
+            await interaction.response.send_message("⚠️ Stats are taking too long. Try again later.")
         if stats is None:
             await interaction.response.send_message(f"⚠️ No stats found for player '{username}' in the current season.")
             return
