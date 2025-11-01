@@ -71,9 +71,6 @@ async def statsskater(interaction: discord.Interaction, username: str):
 
         def get_skater_stats():           
             return SkaterRecord.objects.filter(game_num__season_num=season, ea_player_num=player).exclude(position=0).aggregate(
-                total_fow=Coalesce(Sum("fow"), 0),
-                total_fol=Coalesce(Sum("fol"), 0),
-            ).annotate(
                 sgp=Count("game_num"),
                 sgoals=Sum("goals"),
                 sppg=Sum("ppg"),
@@ -82,29 +79,13 @@ async def statsskater(interaction: discord.Interaction, username: str):
                 sumsog=Sum("sog"),
                 sumshotatt=Sum("shot_attempts"),
                 sumpassatt=Sum("pass_att"),
-                sshotperc=Cast(Sum("goals"), models.FloatField())/Cast(Case(
-                        When(sumsog=0, then=1),
-                        default=Sum("sog"),
-                        output_field=models.FloatField()
-                    ), models.FloatField())*100,
-                spassperc=Cast(Sum("pass_comp"), models.FloatField())/Cast(Case(
-                        When(sumpassatt=0, then=1),
-                        default=Sum("pass_att"),
-                        output_field=models.FloatField()
-                    ), models.FloatField())*100,
                 shits=Avg("hits"),
                 spims=Avg("pims"),
                 sdrawn=Avg("pens_drawn"),
                 sbs=Avg("blocked_shots"),
-                sfaceoffperc = Case(
-                    When(
-                        Q(total_fow__gt=0) | Q(total_fol__gt=0),
-                        then=Cast(F("total_fow") * 100.0 / (F("total_fow") + F("total_fol")), FloatField())
-                    ),
-                    default=0,
-                    output_field=FloatField()
-                )
-            ).first()
+                total_fow=Coalesce(Sum("fow"), 0),
+                total_fol=Coalesce(Sum("fol"), 0),
+            )
         logger.info("Querying skater stats...")
         try:
             stats = await asyncio.wait_for(sync_to_async(get_skater_stats)(), timeout=10)
@@ -116,14 +97,26 @@ async def statsskater(interaction: discord.Interaction, username: str):
             logger.info("No stats found for player.")
             await interaction.followup.send(f"⚠️ No stats found for player '{username}' in the current season.")
             return
+        shotperc = (
+            (stats["goals"] or 0) / (stats["sumsog"] or 1) * 100
+            if stats["sumsog"] else 0
+        )
+        passperc = (
+            (stats["sumpasscomp"] or 0) / (stats["sumpassatt"] or 1) * 100
+            if stats["sumpassatt"] else 0
+        )
+        faceoffperc = (
+            (stats["total_fow"] * 100.0 / (stats["total_fow"] + stats["total_fol"]))
+            if (stats["total_fow"] + stats["total_fol"]) > 0 else 0
+        )
         logger.info("Sending response.")
         response_message = (
-            f"🏒 **{player.username}** — Season Stats ({stats['sgp']} GP)\n"
+            f"**{player.username}** — Season Stats ({stats['sgp']} GP)\n"
             f"Goals: **{stats.sgoals}** ({stats['sppg']} PP, {stats['sshg']} SH)\n"
             f"Assists: **{stats['sassists']}**\n"
-            f"S%: **{stats['sshotperc']}**\n"
-            f"Pass%: **{stats['spassperc']}**\n"
-            f"Hits/GP: **{stats['shits']}**, PIMs/GP: **{stats['spims']}**, Drawn/GP: **{stats['sdrawn']}**, Blocks/GP: **{stats['sbs']}**, FO%: **{stats['sfaceoffperc']}**"
+            f"S%: **{shotperc:.1f}**\n"
+            f"Pass%: **{passperc:.1f}**\n"
+            f"Hits/GP: **{stats['shits']:.1f}**, PIMs/GP: **{stats['spims']:.1f}**, Drawn/GP: **{stats['sdrawn']:.1f}**, Blocks/GP: **{stats['sbs']:.1f}**, FO%: **{faceoffperc:.1f}**"
         )
         await interaction.followup.send(response_message)
     except Exception as e:
@@ -202,9 +195,9 @@ async def statsgoalie(interaction: discord.Interaction, username: str):
             return
         logger.info("Sending response.")
         response_message = (
-            f"🏒 **{player.username}** — Season Stats ({stats['ggp']} GP)\n"
-            f"SV%: **{stats['gsvp']}**\n"
-            f"GAA: **{stats['ggaa']}**\n"
+            f"**{player.username}** — Season Stats ({stats['ggp']} GP)\n"
+            f"SV%: **{stats['gsvp']:.1f}**\n"
+            f"GAA: **{stats['ggaa']:.2f}**\n"
             f"Shutouts: **{stats['gshutouts']}**\n"
             f"Record: **{stats['gwins']}-{stats['glosses']}-{stats['gotlosses']}**"
         )
