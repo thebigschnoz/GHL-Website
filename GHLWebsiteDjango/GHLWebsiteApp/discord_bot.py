@@ -68,6 +68,16 @@ async def statsskater(interaction: discord.Interaction, username: str):
             await interaction.followup.send("⚠️ No active season found. Please try again later when Schnoz isn't breaking the website.")
             logger.warning("No active season found.")
             return
+        
+        has_skater_stats = await sync_to_async(
+            lambda: SkaterRecord.objects.filter(
+                game_num__season_num=season,
+                ea_player_num=player
+            ).exclude(position=0).exists()
+        )()
+        if not has_skater_stats:
+            await interaction.followup.send(f"⚠️ Player '{username}' has not played any skater games this season.")
+            return
 
         def get_skater_stats():           
             return SkaterRecord.objects.filter(game_num__season_num=season, ea_player_num=player).exclude(position=0).aggregate(
@@ -156,6 +166,15 @@ async def statsgoalie(interaction: discord.Interaction, username: str):
         if season is None:
             await interaction.followup.send("⚠️ No active season found. Please try again later when Schnoz isn't breaking the website.")
             logger.warning("No active season found.")
+            return
+        has_goalie_stats = await sync_to_async(
+            lambda: GoalieRecord.objects.filter(
+                game_num__season_num=season,
+                ea_player_num=player
+            ).exists()
+        )()
+        if not has_goalie_stats:
+            await interaction.followup.send(f"⚠️ Player '{username}' has not played any goalie games this season.")
             return
         def get_goalie_stats():
             return GoalieRecord.objects.filter(game_num__season_num=season, ea_player_num=player).aggregate(
