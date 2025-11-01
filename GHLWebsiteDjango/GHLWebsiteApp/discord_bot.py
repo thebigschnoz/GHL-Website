@@ -377,7 +377,7 @@ async def team(interaction: discord.Interaction, teamname: str):
             f"**{team.club_full_name}** — Team Stats\n"
             f"{standing_line}"
             f"Record: **{stats.wins}-{stats.losses}-{stats.otlosses}**, Streak: **{stats.streak}\n**"
-            f"GF/GA (Diff): **{stats.goals_for}/{stats.goals_against} ({stats.goals_for - stats.goals_against})**\n"
+            f"GF/GA (Diff): **{stats.goalsfor}/{stats.goalsagainst} ({stats.goalsfor - stats.goalsagainst})**\n"
             f"PP%: **{stats.ppperc:.2f}%**, PK%: **{stats.pkperc:.2f}%**\n\n"
         )
         if leader_lines:
