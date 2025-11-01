@@ -8,7 +8,7 @@ from GHLWebsiteApp.models import Player, SkaterRecord
 from GHLWebsiteApp.models import *
 from django.db.models import Sum, Count, Case, When, Avg, F, Window, FloatField, Q, ExpressionWrapper, Value, OuterRef, Subquery, CharField
 from django.db.models.functions import Cast, Rank, Round, Lower, Coalesce
-from views import get_seasonSetting
+from GHLWebsiteApp.views import get_seasonSetting
 
 load_dotenv()
 
