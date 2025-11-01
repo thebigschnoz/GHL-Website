@@ -9,8 +9,7 @@ from django.db.models import Sum, Count, Case, When, Avg, F, Window, FloatField,
 from django.db.models.functions import Cast, Rank, Round, Lower, Coalesce
 from views import get_seasonSetting
 
-TOKEN = "39241b86c669e7f6380849f548f5adf26a82a7a21e26fc762abd1396cd5413e2"
-GUILD_ID = 123456789012345678  # optional – for faster command sync
+TOKEN = "MTMyNDk0OTYxNTg4MzMyNTQ1MA.GiVUYx.hPeE9kxo5UEKN9VLoH3LqeR7Lhacl5VmSokqqw"
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -21,10 +20,8 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 async def on_ready():
     print(f"✅ Discord bot logged in as {bot.user}")
     try:
-        guild = discord.Object(id=GUILD_ID)
-        bot.tree.copy_global_to(guild=guild)
-        await bot.tree.sync(guild=guild)
-        print(f"🔁 Slash commands synced to guild {GUILD_ID}")
+        await bot.tree.sync()
+        print(f"🔁 Slash commands synced")
     except Exception as e:
         print(f"❌ Sync failed: {e}")
 

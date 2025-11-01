@@ -1,0 +1,253 @@
+[33mcommit 5558b4b672c38212eeffb82aca8e542bee2e0a6f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Sat Nov 1 03:27:29 2025 -0400
+
+    Updated TOKEN retrieval
+
+[33mcommit 8a6db08aea2eb78a1c8564e547de6bcade13a311[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Sat Nov 1 03:19:00 2025 -0400
+
+    Fixed discord bot token
+
+[33mcommit 6629ed8c052148eac1d91f824d805c5858f28e56[m[33m ([m[1;31morigin/main[m[33m)[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Sat Nov 1 03:11:22 2025 -0400
+
+    Fixed bot async issue
+
+[33mcommit 10ff23744d109855bbe6bfbd871e0f3a4296b703[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Sat Nov 1 03:08:27 2025 -0400
+
+    fix threading issue
+
+[33mcommit 8e86472f289e35676aa2a54ba92c23a11a455917[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Sat Nov 1 03:02:33 2025 -0400
+
+    Removed init line
+
+[33mcommit b1cd25239d6586415eb9464d2a2a8f2c012052ba[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Sat Nov 1 02:58:51 2025 -0400
+
+    Adjusted bot response
+
+[33mcommit 97e1fd5d535ad3d1946db79fbba907b7aa3ddf76[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Sat Nov 1 02:26:35 2025 -0400
+
+    Fixed bot response
+
+[33mcommit c4f45fcbac6c0d12c603221df0c4d061999f08fa[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Sat Nov 1 02:20:30 2025 -0400
+
+    Added discord_webhook
+
+[33mcommit f8c0e9bf0de848f139f1581b1eef778189edbea9[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Thu Oct 30 00:28:05 2025 -0400
+
+    Small layout update
+
+[33mcommit e137f04f0e14d81ebce549f8ca8c81b0cd3895a4[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Thu Oct 30 00:19:54 2025 -0400
+
+    Created 3 Stars for games
+
+[33mcommit 1b6ffb53c95be9cdd690b230a6aedba9ec3a0db2[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Tue Oct 28 04:48:08 2025 -0400
+
+    Updated player view to include awards won; removed recent games chart and adjusted format.
+
+[33mcommit d627a012ee5dfd83490acfdb6a23447ff1eab121[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Fri Oct 24 23:32:48 2025 -0400
+
+    Updated schedule creation script to allow for blocked days
+
+[33mcommit 0a4f4110c002ec895f741644d5a7fa51fed5769f[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Thu Oct 23 22:55:04 2025 -0400
+
+    Fixed layout issue with if statement
+
+[33mcommit a8ede5a36b58db0ece8ce362761b187e35fec00f[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Thu Oct 23 15:03:33 2025 -0400
+
+    Fixed seasons in TeamRecord view
+
+[33mcommit b03ee8e35d26e4a37502fedbef7855144190ded9[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Thu Oct 23 15:00:04 2025 -0400
+
+    Updated admin view for TeamRecord
+
+[33mcommit 191d19414dd12ddf06b81d792ebcada3d34af1cf[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Tue Sep 16 05:02:23 2025 -0400
+
+    Added line for games displayed with no expected_time
+
+[33mcommit af645c09a459bd73014005b8f831caab2471195e[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Fri Aug 22 13:54:54 2025 -0400
+
+    Updated leader pages and calculations to not include banned users
+
+[33mcommit 17e46e13a42cb349b7d50333d67072c10f622749[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Fri Aug 22 12:49:10 2025 -0400
+
+    Added list of active teams on index
+
+[33mcommit f34c1f7dfa3049bf4a28a6695c3732f213517f21[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Fri Aug 22 12:38:15 2025 -0400
+
+    Removed header for better readability
+
+[33mcommit dccf6a7b42c5a117e46f59ee350b99400188a5ef[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Fri Aug 22 12:37:36 2025 -0400
+
+    Added team icons
+
+[33mcommit 15e9f68fbc8bb63cabc2c2da3181eef6b918a746[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Fri Aug 22 12:29:26 2025 -0400
+
+    Fully customized playoff bracket
+
+[33mcommit f96df0e87bbe49bdf5b3af60ff4eae954c4fa4de[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Fri Aug 22 02:19:30 2025 -0400
+
+    Add brackets-viewer integration and update playoff series model fields
+
+[33mcommit b71f2d978f44f67b412892b1890bc446b3f0b54a[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Fri Aug 15 01:14:32 2025 -0400
+
+    Added playerlog page to view each player's entire game history
+
+[33mcommit e6323ed79f4da5dfde2268300ed3275440404301[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Fri Aug 15 00:44:56 2025 -0400
+
+    Fixed GET passing of season name instead of season_num
+
+[33mcommit a4bc3c98d7e20377ac6ad44e6f5a36f63b6cd289[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Fri Aug 15 00:37:14 2025 -0400
+
+    Fixed GET for team seasons
+
+[33mcommit 80ca1d5554840b0ff49a587834b5087168195084[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Fri Aug 15 00:25:58 2025 -0400
+
+    Fixed extra url
+
+[33mcommit cc08ceb9f98dd9b2f8bb37959733bc34e6e243ce[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Fri Aug 15 00:19:40 2025 -0400
+
+    Changed GET to season instead of seasonnum
+
+[33mcommit c4b21ee2bd244e65feda684c1668206956964698[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Fri Aug 15 00:18:54 2025 -0400
+
+    Fixed bracket title
+
+[33mcommit f21c3c42723881330afd218a445c97f537a7facb[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Fri Aug 15 00:14:28 2025 -0400
+
+    Fixed querystring on team page
+
+[33mcommit 875bf99bd4e5ec47be0fcd90f7c36b7a20ce1fe7[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Fri Aug 15 00:05:26 2025 -0400
+
+    Maximize the size of a round to 25vw
+
+[33mcommit 3110b84f5965e13698fb84f4f06fa7c837b92e1f[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Fri Aug 15 00:04:37 2025 -0400
+
+    Fixed playoff bracket to show series appropriately
+
+[33mcommit 5d5edfafc4d88267e9a4ac1560f69ad3e66bad64[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Wed Aug 13 04:59:56 2025 -0400
+
+    Make playoff tree look a little better formatted
+
+[33mcommit 7b6c1c6ade3b1137f682861a868f348bdcbcb2a6[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Wed Aug 13 04:48:17 2025 -0400
+
+    Edited style on game pages
+
+[33mcommit 54a04705eda38540b76898f9580a759ebc9dd731[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Wed Aug 13 04:45:27 2025 -0400
+
+    Added G overall and teamplay scores to player report card
+
+[33mcommit 72de3f1f68a3733c2294660f336e0b82365f6083[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Wed Aug 13 04:39:23 2025 -0400
+
+    Updated game log on player page to include rating for goalies
+
+[33mcommit 1acb64e5551ce12ab29ae418bf8ea64da7b153a1[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Wed Aug 13 04:33:50 2025 -0400
+
+    Include goalie ratings on each game
+
+[33mcommit 464f251b87024969c0ec7f3e492e5b75ee951baf[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Wed Aug 13 04:24:10 2025 -0400
+
+    Added GoalieRating and GameGoalieRating to admin screen
+
+[33mcommit 1bfeb11f99ed6f5042934ea6070e20b17e7fe567[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Wed Aug 13 04:23:08 2025 -0400
+
+    Created goalie ratings and calculations for overall
+
+[33mcommit e2e01ad1383ae7a17fecd3593e250bb0232c938f[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Wed Aug 13 00:21:56 2025 -0400
+
+    Add expected time as additional ordering for scoreboard
+
+[33mcommit aeeec2e4ef58cd5edc56d09fa989e19c1e4bec16[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Wed Aug 13 00:11:16 2025 -0400
+
+    Add error handling for season setting retrieval to use fallback value
+
+[33mcommit ade9e7705848101a900af529c50a988b9e64a50b[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Wed Aug 13 00:10:22 2025 -0400
+
+    Simplify season setting retrieval by using a fallback value
+
+[33mcommit 3dcb91105cf567328e7cc4b5c3f518afde08edee[m
+Author: thebigschnoz <pendletongoodguy@gmail.com>
+Date:   Sun Aug 10 05:09:56 2025 -0400
+
+    Reverse game search orders to match reversed order in API
+
+[33mcommit 3e89dbf8c69b95c7876a7ff72073e547864
