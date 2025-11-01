@@ -74,29 +74,29 @@ async def statsskater(interaction: discord.Interaction, username: str):
                 total_fow=Coalesce(Sum("fow"), 0),
                 total_fol=Coalesce(Sum("fol"), 0),
             ).annotate(
-                gp=Count("game_num"),
-                goals=Sum("goals"),
-                ppg=Sum("ppg"),
-                shg=Sum("shg"),
-                assists=Sum("assists"),
+                sgp=Count("game_num"),
+                sgoals=Sum("goals"),
+                sppg=Sum("ppg"),
+                sshg=Sum("shg"),
+                sassists=Sum("assists"),
                 sumsog=Sum("sog"),
                 sumshotatt=Sum("shot_attempts"),
                 sumpassatt=Sum("pass_att"),
-                shotperc=Cast(Sum("goals"), models.FloatField())/Cast(Case(
+                sshotperc=Cast(Sum("goals"), models.FloatField())/Cast(Case(
                         When(sumsog=0, then=1),
                         default=Sum("sog"),
                         output_field=models.FloatField()
                     ), models.FloatField())*100,
-                passperc=Cast(Sum("pass_comp"), models.FloatField())/Cast(Case(
+                spassperc=Cast(Sum("pass_comp"), models.FloatField())/Cast(Case(
                         When(sumpassatt=0, then=1),
                         default=Sum("pass_att"),
                         output_field=models.FloatField()
                     ), models.FloatField())*100,
-                hits=Avg("hits"),
-                pims=Avg("pims"),
-                drawn=Avg("pens_drawn"),
-                bs=Avg("blocked_shots"),
-                faceoffperc = Case(
+                shits=Avg("hits"),
+                spims=Avg("pims"),
+                sdrawn=Avg("pens_drawn"),
+                sbs=Avg("blocked_shots"),
+                sfaceoffperc = Case(
                     When(
                         Q(total_fow__gt=0) | Q(total_fol__gt=0),
                         then=Cast(F("total_fow") * 100.0 / (F("total_fow") + F("total_fol")), FloatField())
@@ -118,17 +118,20 @@ async def statsskater(interaction: discord.Interaction, username: str):
             return
         logger.info("Sending response.")
         response_message = (
-            f"🏒 **{player.username}** — Season Stats ({stats.gp} GP)\n"
-            f"Goals: **{stats.goals}** ({stats.ppg} PP, {stats.shg} SH)\n"
-            f"Assists: **{stats.assists}**\n"
-            f"S%: **{stats.shotperc}**\n"
-            f"Pass%: **{stats.passperc}**\n"
-            f"Hits/GP: **{stats.hits}**, PIMs/GP: **{stats.pims}**, Drawn/GP: **{stats.drawn}**, Blocks/GP: **{stats.bs}**, FO%: **{stats.faceoffperc}**"
+            f"🏒 **{player.username}** — Season Stats ({stats.sgp} GP)\n"
+            f"Goals: **{stats.sgoals}** ({stats.sppg} PP, {stats.sshg} SH)\n"
+            f"Assists: **{stats.sassists}**\n"
+            f"S%: **{stats.sshotperc}**\n"
+            f"Pass%: **{stats.spassperc}**\n"
+            f"Hits/GP: **{stats.shits}**, PIMs/GP: **{stats.spims}**, Drawn/GP: **{stats.sdrawn}**, Blocks/GP: **{stats.sbs}**, FO%: **{stats.sfaceoffperc}**"
         )
         await interaction.response.send_message(response_message)
     except Exception as e:
         logger.exception(f"Error in /statsskater command: {e}")
-        await interaction.response.send_message(f"❌ Error: {e}")
+        try:
+            await interaction.followup.send(f"❌ Error: {e}")
+        except discord.InteractionResponded:
+            logger.warning("Interaction already responded to. Skipping follow-up.")
         return
 
 @bot.tree.command(name="statsgoalie", description="Show a player's goalie stats for this season")
@@ -162,25 +165,25 @@ async def statsgoalie(interaction: discord.Interaction, username: str):
             return
         def get_goalie_stats():
             return GoalieRecord.objects.filter(game_num__season_num=season, ea_player_num=player).annotate(
-                gp = Count("game_num"),
-                svp = (Cast(Sum("saves"), models.FloatField())/Cast(Sum("shots_against"), models.FloatField()))*100,
-                gaa = ((Cast(Sum("shots_against"), models.FloatField())-Cast(Sum("saves"), models.FloatField()))/Cast(Sum("game_num__gamelength"), models.FloatField()))*3600,
-                shutouts =Sum(Case(
+                ggp = Count("game_num"),
+                gsvp = (Cast(Sum("saves"), models.FloatField())/Cast(Sum("shots_against"), models.FloatField()))*100,
+                ggaa = ((Cast(Sum("shots_against"), models.FloatField())-Cast(Sum("saves"), models.FloatField()))/Cast(Sum("game_num__gamelength"), models.FloatField()))*3600,
+                gshutouts =Sum(Case(
                     When(shutout=True, then=1),
                     default=0,
                     output_field=models.IntegerField()
                 )),
-                wins = Sum(Case(
+                gwins = Sum(Case(
                     When(win=True, then=1),
                     default=0,
                     output_field=models.IntegerField()
                 )),
-                losses = Sum(Case(
+                glosses = Sum(Case(
                     When(loss=True, then=1),
                     default=0,
                     output_field=models.IntegerField()
                 )),
-                otlosses = Sum(Case(
+                gotlosses = Sum(Case(
                     When(otloss=True, then=1),
                     default=0,
                     output_field=models.IntegerField()
@@ -199,15 +202,18 @@ async def statsgoalie(interaction: discord.Interaction, username: str):
             return
         logger.info("Sending response.")
         response_message = (
-            f"🏒 **{player.username}** — Season Stats ({stats.gp} GP)\n"
-            f"SV%: **{stats.svp}**\n"
-            f"GAA: **{stats.gaa}**\n"
-            f"Shutouts: **{stats.shutouts}**\n"
-            f"Record: **{stats.wins}-{stats.losses}-{stats.otlosses}**"
+            f"🏒 **{player.username}** — Season Stats ({stats.ggp} GP)\n"
+            f"SV%: **{stats.gsvp}**\n"
+            f"GAA: **{stats.ggaa}**\n"
+            f"Shutouts: **{stats.gshutouts}**\n"
+            f"Record: **{stats.gwins}-{stats.glosses}-{stats.gotlosses}**"
         )
         # Return as Discord webhook-compatible JSON
         await interaction.response.send_message(response_message)
     except Exception as e:
         logger.exception(f"Error in /statsgoalie command: {e}")
-        await interaction.response.send_message(f"❌ Error: {e}")
+        try:
+            await interaction.followup.send(f"❌ Error: {e}")
+        except discord.InteractionResponded:
+            logger.warning("Interaction already responded to. Skipping follow-up.")
         return
