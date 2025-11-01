@@ -15,4 +15,4 @@ class GhlwebsiteappConfig(AppConfig):
             asyncio.set_event_loop(loop)
             loop.run_until_complete(bot.start(TOKEN))
 
-        threading.Thread(target=start_bot, daemon=True).start()
+        #threading.Thread(target=start_bot, daemon=True).start()
