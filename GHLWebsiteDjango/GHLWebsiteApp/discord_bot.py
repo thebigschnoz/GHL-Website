@@ -1,4 +1,5 @@
-import asyncio
+import os
+from dotenv import load_dotenv
 import discord
 from discord import app_commands
 from discord.ext import commands
@@ -9,7 +10,12 @@ from django.db.models import Sum, Count, Case, When, Avg, F, Window, FloatField,
 from django.db.models.functions import Cast, Rank, Round, Lower, Coalesce
 from views import get_seasonSetting
 
-TOKEN = "MTMyNDk0OTYxNTg4MzMyNTQ1MA.GiVUYx.hPeE9kxo5UEKN9VLoH3LqeR7Lhacl5VmSokqqw"
+load_dotenv()
+
+TOKEN = os.getenv("DISCORD_TOKEN")
+
+if not TOKEN:
+    raise ValueError("❌ DISCORD_TOKEN not found. Make sure it's in your .env file.")
 
 intents = discord.Intents.default()
 intents.message_content = True
