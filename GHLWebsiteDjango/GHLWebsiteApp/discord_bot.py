@@ -44,6 +44,7 @@ async def statsskater(interaction: discord.Interaction, username: str):
             player = await sync_to_async(Player.objects.filter)(username__icontains=username)
         if not await sync_to_async(player.exists)():
             await interaction.response.send_message(f"⚠️ Player '{username}' not found.")
+            return
         if await sync_to_async(player.count)() > 1:
             matches = await sync_to_async(lambda:", ".join(player.values_list("username", flat=True)[:5]))
             await interaction.response.send_message(f"⚠️ Multiple matches found: {matches}\nPlease be more specific.")
@@ -95,6 +96,7 @@ async def statsskater(interaction: discord.Interaction, username: str):
             stats = await asyncio.wait_for(sync_to_async(get_skater_stats)(), timeout=10)
         except asyncio.TimeoutError:
             await interaction.response.send_message("⚠️ Stats are taking too long. Try again later.")
+            return
         if stats is None:
             await interaction.response.send_message(f"⚠️ No stats found for player '{username}' in the current season.")
             return
@@ -109,6 +111,7 @@ async def statsskater(interaction: discord.Interaction, username: str):
         await interaction.response.send_message(response_message)
     except Exception as e:
         await interaction.response.send_message(f"❌ Error: {e}")
+        return
 
 @bot.tree.command(name="statsgoalie", description="Show a player's goalie stats for this season")
 @app_commands.describe(username="Enter a player's username")
@@ -117,9 +120,10 @@ async def statsgoalie(interaction: discord.Interaction, username: str):
     try:
         player = await sync_to_async(Player.objects.filter)(username__iexact=username)
         if not await sync_to_async(player.exists)():
-            player = await sync_to_async(Player.objects.filter)(username__icontaines=username)
+            player = await sync_to_async(Player.objects.filter)(username__icontains=username)
         if not await sync_to_async(player.exists)():
             await interaction.response.send_message(f"⚠️ Player '{username}' not found.")
+            return
         if await sync_to_async(player.count)() > 1:
             matches = await sync_to_async(lambda:", ".join(player.values_list("username", flat=True)[:5]))
             await interaction.response.send_message(f"⚠️ Multiple matches found: {matches}\nPlease be more specific.")
@@ -177,3 +181,4 @@ async def statsgoalie(interaction: discord.Interaction, username: str):
         await interaction.response.send_message(response_message)
     except Exception as e:
         await interaction.response.send_message(f"❌ Error: {e}")
+        return
