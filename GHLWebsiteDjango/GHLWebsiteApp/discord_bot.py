@@ -37,7 +37,6 @@ async def on_ready():
     except Exception as e:
         print(f"❌ Sync failed: {e}")
 
-@sync_to_async
 def get_team_ranking(team):
     ordered_teams = list(
         Standing.objects.select_related("team")
