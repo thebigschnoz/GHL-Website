@@ -24,6 +24,10 @@ intents.message_content = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 @bot.event
 async def on_ready():
     print(f"✅ Discord bot logged in as {bot.user}")
@@ -37,23 +41,32 @@ async def on_ready():
 @bot.tree.command(name="statsskater", description="Show a player's skater stats for this season")
 @app_commands.describe(username="Enter a player's username")
 async def statsskater(interaction: discord.Interaction, username: str):
+    logger.info(f"Command /statsskater triggered for username: {username}")
     await interaction.response.defer()
     try:
+        logger.info("Trying exact username match")
         player = await sync_to_async(Player.objects.filter)(username__iexact=username)
         if not await sync_to_async(player.exists)():
+            logger.info("Trying partial username match")
             player = await sync_to_async(Player.objects.filter)(username__icontains=username)
         if not await sync_to_async(player.exists)():
             await interaction.response.send_message(f"⚠️ Player '{username}' not found.")
+            logger.warning("Player not found.")
             return
-        if await sync_to_async(player.count)() > 1:
-            matches = await sync_to_async(lambda:", ".join(player.values_list("username", flat=True)[:5]))
+        count = await sync_to_async(player.count)()
+        if count > 1:
+            logger.info(f"Multiple players found: {count} total")
+            matches = await sync_to_async(lambda: ", ".join(player.values_list("username", flat=True)[:5]))()
             await interaction.response.send_message(f"⚠️ Multiple matches found: {matches}\nPlease be more specific.")
+            return
         player = await sync_to_async(player.first)()
+        logger.info(f"Found player: {player.username}")
 
         # Aggregate skater stats
         season = await sync_to_async(get_seasonSetting)()
         if season is None:
-            await interaction.response.send_message("⚠️ No active season found. Please try again later when Schnoz isn't breaking the website.") 
+            await interaction.response.send_message("⚠️ No active season found. Please try again later when Schnoz isn't breaking the website.")
+            logger.warning("No active season found.")
             return
 
         def get_skater_stats():           
@@ -92,14 +105,18 @@ async def statsskater(interaction: discord.Interaction, username: str):
                     output_field=FloatField()
                 )
             ).first()
+        logger.info("Querying skater stats...")
         try:
             stats = await asyncio.wait_for(sync_to_async(get_skater_stats)(), timeout=10)
         except asyncio.TimeoutError:
+            logger.error("Skater stats query timed out.")
             await interaction.response.send_message("⚠️ Stats are taking too long. Try again later.")
             return
         if stats is None:
+            logger.info("No stats found for player.")
             await interaction.response.send_message(f"⚠️ No stats found for player '{username}' in the current season.")
             return
+        logger.info("Sending response.")
         response_message = (
             f"🏒 **{player.username}** — Season Stats ({stats.gp} GP)\n"
             f"Goals: **{stats.goals}** ({stats.ppg} PP, {stats.shg} SH)\n"
@@ -110,30 +127,38 @@ async def statsskater(interaction: discord.Interaction, username: str):
         )
         await interaction.response.send_message(response_message)
     except Exception as e:
+        logger.exception(f"Error in /statsskater command: {e}")
         await interaction.response.send_message(f"❌ Error: {e}")
         return
 
 @bot.tree.command(name="statsgoalie", description="Show a player's goalie stats for this season")
 @app_commands.describe(username="Enter a player's username")
 async def statsgoalie(interaction: discord.Interaction, username: str):
+    logger.info(f"Command /statsgoalie triggered for username: {username}")
     await interaction.response.defer()
     try:
+        logger.info("Trying exact username match")
         player = await sync_to_async(Player.objects.filter)(username__iexact=username)
         if not await sync_to_async(player.exists)():
+            logger.info("Trying partial username match")
             player = await sync_to_async(Player.objects.filter)(username__icontains=username)
         if not await sync_to_async(player.exists)():
             await interaction.response.send_message(f"⚠️ Player '{username}' not found.")
+            logger.warning("Player not found.")
             return
-        if await sync_to_async(player.count)() > 1:
-            matches = await sync_to_async(lambda:", ".join(player.values_list("username", flat=True)[:5]))
+        count = await sync_to_async(player.count)()
+        if count > 1:
+            logger.info(f"Multiple players found: {count} total")
+            matches = await sync_to_async(lambda: ", ".join(player.values_list("username", flat=True)[:5]))()
             await interaction.response.send_message(f"⚠️ Multiple matches found: {matches}\nPlease be more specific.")
             return
         player = await sync_to_async(player.first)()
-
+        logger.info(f"Found player: {player.username}")
         # Aggregate skater stats
         season = await sync_to_async(get_seasonSetting)()
         if season is None:
             await interaction.response.send_message("⚠️ No active season found. Please try again later when Schnoz isn't breaking the website.")
+            logger.warning("No active season found.")
             return
         def get_goalie_stats():
             return GoalieRecord.objects.filter(game_num__season_num=season, ea_player_num=player).annotate(
@@ -161,15 +186,18 @@ async def statsgoalie(interaction: discord.Interaction, username: str):
                     output_field=models.IntegerField()
                 )),
             ).first()
-        
+        logger.info("Querying goalie stats...")
         try:
             stats = await asyncio.wait_for(sync_to_async(get_goalie_stats)(), timeout=10)
         except asyncio.TimeoutError:
             await interaction.response.send_message("⚠️ Stats are taking too long. Try again later.")
+            logger.error("Goalie stats query timed out.")
             return
         if stats is None:
             await interaction.response.send_message(f"⚠️ No stats found for player '{username}' in the current season.")
+            logger.info("No stats found for player.")
             return
+        logger.info("Sending response.")
         response_message = (
             f"🏒 **{player.username}** — Season Stats ({stats.gp} GP)\n"
             f"SV%: **{stats.svp}**\n"
@@ -180,5 +208,6 @@ async def statsgoalie(interaction: discord.Interaction, username: str):
         # Return as Discord webhook-compatible JSON
         await interaction.response.send_message(response_message)
     except Exception as e:
+        logger.exception(f"Error in /statsgoalie command: {e}")
         await interaction.response.send_message(f"❌ Error: {e}")
         return
