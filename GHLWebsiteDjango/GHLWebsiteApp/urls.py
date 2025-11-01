@@ -30,6 +30,7 @@ urlpatterns = [
     path('profile/availability/', views.player_availability_view, name="player_availability"),
     path('register/', views.register, name='register'),
     path('api/player/<int:player_id>/', views.player_details, name='player-details'),
+    path('discord/', views.discord_webhook, name='discord_webhook'),
     path('media/weekly-stats/', views.weekly_stats_view, name='weekly_stats'),
     path('manageteam/', views.manager_view, name='manager_view'),
 ]
