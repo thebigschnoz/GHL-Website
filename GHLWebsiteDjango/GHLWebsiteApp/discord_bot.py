@@ -114,10 +114,10 @@ def get_team_leaders(team):
         ea_player_num__current_team=team,
         game_num__season_num=season
     ).annotate(
-        gaa=((Cast(Sum("shots_against"), FloatField()) - Cast(Sum("saves"), FloatField())) / Cast(Sum("game_num__gamelength"), FloatField())) * 3600
-    ).values("ea_player_num__username", "gaa").order_by("gaa").first()
+        ggaa=((Cast(Sum("shots_against"), FloatField()) - Cast(Sum("saves"), FloatField())) / Cast(Sum("game_num__gamelength"), FloatField())) * 3600
+    ).values("ea_player_num__username", "ggaa").order_by("ggaa").first()
     if leader_goalie_gaa:
-        leaders["GAA"] = (leader_goalie_gaa["ea_player_num__username"], round(leader_goalie_gaa["gaa"], 2))
+        leaders["GAA"] = (leader_goalie_gaa["ea_player_num__username"], round(leader_goalie_gaa["ggaa"], 2))
     return leaders
 
 def ordinal_suffix(n):
