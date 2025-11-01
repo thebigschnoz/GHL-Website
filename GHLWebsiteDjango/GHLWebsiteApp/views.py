@@ -73,7 +73,10 @@ def get_seasonSetting():
 
 @csrf_exempt
 def discord_webhook(request):
-    if request.method == 'POST':
+    if request.method == "GET":
+        code = request.GET.get("code")
+        return JsonResponse({"content": f"Bot authorized. Code={code}"})
+    elif request.method == 'POST':
         signature = request.headers.get('X-Signature-Ed25519')
         timestamp = request.headers.get('X-Signature-Timestamp')
         body = request.body.decode('utf-8')
