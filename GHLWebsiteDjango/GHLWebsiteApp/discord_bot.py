@@ -327,10 +327,10 @@ async def team(interaction: discord.Interaction, teamname: str):
     await interaction.response.defer()
     try:
         logger.info("Trying exact team name match")
-        team = await sync_to_async(Team.objects.filter)(Q(name__iexact=teamname) | Q(abbreviation__iexact=teamname))
+        team = await sync_to_async(Team.objects.filter)(Q(club_full_name__iexact=teamname) | Q(club_abbr__iexact=teamname))
         if not await sync_to_async(team.exists)():
             logger.info("Trying partial team name match")
-            team = await sync_to_async(Team.objects.filter)(Q(name__icontains=teamname) | Q(abbreviation__icontains=teamname))
+            team = await sync_to_async(Team.objects.filter)(Q(club_full_name__icontains=teamname) | Q(club_abbr__icontains=teamname))
         if not await sync_to_async(team.exists)():
             await interaction.followup.send(f"⚠️ Team '{teamname}' not found.")
             logger.warning("Team not found.")
