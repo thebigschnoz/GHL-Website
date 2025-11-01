@@ -39,7 +39,7 @@ async def on_ready():
 
 def get_team_ranking(team):
     ordered_teams = list(
-        Standing.objects.select_related("team")
+        Standing.objects.select_related("team").filter(season=get_seasonSetting())
         .order_by('-points', '-wins', '-goalsfor', 'goalsagainst', 'team__club_full_name')
         .values_list("team__ea_club_num", flat=True)
     )
