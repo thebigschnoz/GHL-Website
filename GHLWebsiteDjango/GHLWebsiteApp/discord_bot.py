@@ -369,7 +369,7 @@ async def team(interaction: discord.Interaction, teamname: str):
             return
         position, total = await sync_to_async(get_team_ranking)(team)
         if position:
-            standing_line = f"📈 Current Standing: {position}{ordinal_suffix(position)} out of {total}\n"
+            standing_line = f"📈 Current Standing: **{position}{ordinal_suffix(position)}** out of {total}\n"
         else:
             standing_line = "📈 Standing not available yet.\n"
         logger.info("Sending response.")
