@@ -37,6 +37,95 @@ async def on_ready():
     except Exception as e:
         print(f"❌ Sync failed: {e}")
 
+@sync_to_async
+def get_team_ranking(team):
+    ordered_teams = list(
+        Standing.objects.select_related("team")
+        .order_by('-points', '-wins', '-goalsfor', 'goalsagainst', 'team__club_full_name')
+        .values_list("team_id", flat=True)
+    )
+    try:
+        position = ordered_teams.index(team.id) + 1
+        total = len(ordered_teams)
+        return position, total
+    except ValueError:
+        return None, len(ordered_teams)
+
+def get_team_leaders(team):
+    season = Season.objects.filter(isActive=True).first()
+    
+    leaders = {}
+
+    leader_goals = SkaterRecord.objects.filter(
+        ea_player_num__current_team=team,
+        game_num__season_num=season
+    ).values("ea_player_num__username").annotate(
+        goals=Sum("goals")
+    ).order_by("-goals").first()
+    if leader_goals:
+        leaders["Goals"] = (leader_goals["ea_player_num__username"], leader_goals["goals"])
+
+    leader_assists = SkaterRecord.objects.filter(
+        ea_player_num__current_team=team,
+        game_num__season_num=season
+    ).values("ea_player_num__username").annotate(
+        assists=Sum("assists")
+    ).order_by("-assists").first()
+    if leader_assists:
+        leaders["Assists"] = (leader_assists["ea_player_num__username"], leader_assists["assists"])
+
+    leader_shooting = SkaterRecord.objects.filter(
+        ea_player_num__current_team=team,
+        game_num__season_num=season
+    ).annotate(
+        shootperc=(Cast(Sum("goals"), FloatField()) / Cast(Sum("sog"), FloatField())) * 100
+    ).values("ea_player_num__username", "shootperc").order_by("-shootperc").first()
+    if leader_shooting:
+        leaders["Shooting %"] = (leader_shooting["ea_player_num__username"], round(leader_shooting["shootperc"], 1))
+
+    leader_hits = SkaterRecord.objects.filter(
+        ea_player_num__current_team=team,
+        game_num__season_num=season
+    ).values("ea_player_num__username").annotate(
+        avg_hits=Avg("hits")
+    ).order_by("-avg_hits").first()
+    if leader_hits:
+        leaders["Hits/GP"] = (leader_hits["ea_player_num__username"], round(leader_hits["avg_hits"], 1))
+
+    leader_blocks = SkaterRecord.objects.filter(
+        ea_player_num__current_team=team,
+        game_num__season_num=season
+    ).values("ea_player_num__username").annotate(
+        avg_blocks=Avg("blocked_shots")
+    ).order_by("-avg_blocks").first()
+    if leader_blocks:
+        leaders["Blocks/GP"] = (leader_blocks["ea_player_num__username"], round(leader_blocks["avg_blocks"], 1))
+
+    leader_goalie_svperc = GoalieRecord.objects.filter(
+        ea_player_num__current_team=team,
+        game_num__season_num=season
+    ).annotate(
+        svperc=(Cast(Sum("saves"), FloatField()) / Cast(Sum("shots_against"), FloatField())) * 100
+    ).values("ea_player_num__username", "svperc").order_by("-svperc").first()
+    if leader_goalie_svperc:
+        leaders["SV%"] = (leader_goalie_svperc["ea_player_num__username"], round(leader_goalie_svperc["svperc"], 2))
+
+    leader_goalie_gaa = GoalieRecord.objects.filter(
+        ea_player_num__current_team=team,
+        game_num__season_num=season
+    ).annotate(
+        gaa=((Cast(Sum("shots_against"), FloatField()) - Cast(Sum("saves"), FloatField())) / Cast(Sum("game_num__gamelength"), FloatField())) * 3600
+    ).values("ea_player_num__username", "gaa").order_by("gaa").first()
+    if leader_goalie_gaa:
+        leaders["GAA"] = (leader_goalie_gaa["ea_player_num__username"], round(leader_goalie_gaa["gaa"], 2))
+    return leaders
+
+def ordinal_suffix(n):
+    if 10 <= n % 100 <= 20:
+        return 'th'
+    else:
+        return {1: 'st', 2: 'nd', 3: 'rd'}.get(n % 10, 'th')
+    
 # --- SLASH COMMANDS ---
 @bot.tree.command(name="statsskater", description="Show a player's skater stats for this season")
 @app_commands.describe(username="Enter a player's username")
@@ -225,6 +314,80 @@ async def statsgoalie(interaction: discord.Interaction, username: str):
         await interaction.followup.send(response_message)
     except Exception as e:
         logger.exception(f"Error in /statsgoalie command: {e}")
+        try:
+            await interaction.followup.send(f"❌ Error: {e}")
+        except discord.InteractionResponded:
+            logger.warning("Interaction already responded to. Skipping follow-up.")
+        return
+
+@bot.tree.command(name="team", description="Show team stats for a given team")
+@app_commands.describe(teamname="Enter a team's name or abbreviation")
+async def team(interaction: discord.Interaction, teamname: str):
+    logger.info(f"Command /team triggered for teamname: {teamname}")
+    await interaction.response.defer()
+    try:
+        logger.info("Trying exact team name match")
+        team = await sync_to_async(Team.objects.filter)(Q(name__iexact=teamname) | Q(abbreviation__iexact=teamname))
+        if not await sync_to_async(team.exists)():
+            logger.info("Trying partial team name match")
+            team = await sync_to_async(Team.objects.filter)(Q(name__icontains=teamname) | Q(abbreviation__icontains=teamname))
+        if not await sync_to_async(team.exists)():
+            await interaction.followup.send(f"⚠️ Team '{teamname}' not found.")
+            logger.warning("Team not found.")
+            return
+        count = await sync_to_async(team.count)()
+        if count > 1:
+            logger.info(f"Multiple teams found: {count} total")
+            matches = await sync_to_async(lambda: ", ".join(team.values_list("name", flat=True)[:5]))()
+            await interaction.followup.send(f"⚠️ Multiple matches found: {matches}\nPlease be more specific.")
+            return
+        team = await sync_to_async(team.first)()
+        logger.info(f"Found team: {team.club_full_name}")
+
+        # Aggregate team stats
+        season = await sync_to_async(get_seasonSetting)()
+        if season is None:
+            await interaction.followup.send("⚠️ No active season found. Please try again later when Schnoz isn't breaking the website.")
+            logger.warning("No active season found.")
+            return
+
+        def get_team_stats():
+            return Standing.objects.filter(team=team, season_num=season)
+        leaders = await sync_to_async(get_team_leaders)(team)
+        leader_lines = "\n".join(
+            f"**{label}**: {username} ({value})" for label, (username, value) in leaders.items()
+        )
+        logger.info("Querying team stats...")
+        try:
+            stats = await asyncio.wait_for(sync_to_async(get_team_stats)(), timeout=10)
+        except asyncio.TimeoutError:
+            logger.error("Team stats query timed out.")
+            await interaction.followup.send("⚠️ Stats are taking too long. Try again later.")
+            return
+        if stats is None:
+            await interaction.followup.send(f"⚠️ No stats found for team '{teamname}' in the current season.")
+            logger.info("No stats found for team.")
+            return
+        position, total = await sync_to_async(get_team_ranking)(team)
+        if position:
+            standing_line = f"📈 Current Standing: {position}{ordinal_suffix(position)} out of {total}\n"
+        else:
+            standing_line = "📈 Standing not available yet.\n"
+        logger.info("Sending response.")
+        response_message = (
+            f"**{team.club_full_name}** — Team Stats\n"
+            f"{standing_line}"
+            f"Record: **{stats.wins}-{stats.losses}-{stats.otlosses}**, Streak: **{stats.streak}\n**"
+            f"GF/GA (Diff): **{stats.goals_for}/{stats.goals_against} ({stats.goals_for - stats.goals_against})**\n"
+            f"PP%: **{stats.ppperc:.2f}%**, PK%: **{stats.pkperc:.2f}%**\n\n"
+        )
+        if leader_lines:
+            response_message += (f"👑 __Team Leaders__:\n{leader_lines}")
+        else:
+            response_message += "👑 No team leader data available."
+        await interaction.followup.send(response_message)
+    except Exception as e:
+        logger.exception(f"Error in /team command: {e}")
         try:
             await interaction.followup.send(f"❌ Error: {e}")
         except discord.InteractionResponded:
