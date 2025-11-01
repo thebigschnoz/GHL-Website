@@ -92,7 +92,7 @@ async def statsskater(interaction: discord.Interaction, username: str):
                 )
             ).first()
         try:
-            stats = await asyncio.wait_for(get_skater_stats(player, season), timeout=10)
+            stats = await asyncio.wait_for(sync_to_async(get_skater_stats)(), timeout=10)
         except asyncio.TimeoutError:
             await interaction.response.send_message("⚠️ Stats are taking too long. Try again later.")
         if stats is None:
@@ -159,9 +159,10 @@ async def statsgoalie(interaction: discord.Interaction, username: str):
             ).first()
         
         try:
-            stats = await asyncio.wait_for(get_goalie_stats(player, season), timeout=10)
+            stats = await asyncio.wait_for(sync_to_async(get_goalie_stats)(), timeout=10)
         except asyncio.TimeoutError:
             await interaction.response.send_message("⚠️ Stats are taking too long. Try again later.")
+            return
         if stats is None:
             await interaction.response.send_message(f"⚠️ No stats found for player '{username}' in the current season.")
             return
