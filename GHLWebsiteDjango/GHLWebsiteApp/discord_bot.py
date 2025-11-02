@@ -483,7 +483,7 @@ async def upcoming(interaction: discord.Interaction, teamname: str):
 
             if game.expected_time:
                 est_time = game.expected_time.astimezone(ZoneInfo("America/New_York"))
-                game_time = est_time.strftime("%Y-%m-%d %I:%M %p EST")
+                game_time = est_time.strftime("%b %d %-I:%M")
             else:
                 game_time = "TBD"
             game_info_lines.append(f"- {game_time} | {location} vs {opponent.club_abbr} | **{team_code}**")
