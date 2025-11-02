@@ -449,8 +449,8 @@ async def upcoming(interaction: discord.Interaction, teamname: str):
                 location = "Away"
                 team_code = opponent.team_code
 
-            game_time = game.expected_time.strftime("%m/%d %I:%M %p") if game.expected_time else "TBD"
-            game_info_lines.append(f"📅 {game_time} | {location} vs {opponent.club_abbr} | **{team_code}**")
+            game_time = game.expected_time.strftime("%a %b %d %I:%M %p") if game.expected_time else "TBD"
+            game_info_lines.append(f"- {game_time} | {location} vs {opponent.club_abbr} | **{team_code}**")
 
         message = f"🗓️ Upcoming Games for **{team.club_abbr}**:\n" + "\n".join(game_info_lines)
         await interaction.followup.send(message)
