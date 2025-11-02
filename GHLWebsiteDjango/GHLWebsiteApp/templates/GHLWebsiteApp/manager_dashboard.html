@@ -13,6 +13,7 @@
             <div class="dashboard-column">
                 <div class="dashboard-panel">
                     <h2>Team Availability</h2>
+                    <a href="{% url 'team_scheduling' %}"><i>Click here to schedule your team for the week.</i></a>
                     {% if availability %}
                         <h3>For Week Starting {{ availability.first.week_start|date:"D, M j" }}</h3>
                         <table class="standingstable" style="width: 95%;">

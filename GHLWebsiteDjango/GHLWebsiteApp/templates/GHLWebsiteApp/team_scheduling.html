@@ -1,0 +1,70 @@
+{% extends 'GHLWebsiteApp/layout.html' %}
+{% load static %}
+{% load scheduling_tags %}
+
+{% block body %}
+<h2>Team Scheduling for the week of {{ selected_week_str }}</h2>
+
+<form method="get" class="mb-3">
+  <label for="week">Select week:</label>
+  <select name="week" onchange="this.form.submit()">
+    {% for week in week_choices %}
+    <option value="{{ week }}"
+      {% if week == selected_week_str %}selected{% endif %}>
+      {{ week }}
+    </option>
+    {% endfor %}
+  </select>
+</form>
+
+<form method="post">
+  {% csrf_token %}
+  <div class="games-container">
+    {% for game in games %}
+      <div class="game-card">
+        <h4>{{ game.expected_time|date:"D M j, g:i A" }} vs 
+          {% if game.h_team_num == request.user.player.current_team %}
+            {{ game.a_team_num.club_abbr }}
+          {% else %}
+            {{ game.h_team_num.club_abbr }}
+          {% endif %}
+        </h4>
+        <div class="positions-grid">
+          {% for pos in positions %}
+            <div class="position-box">
+              <label>{{ pos.name }}</label>
+              <select name="game_{{ game.id }}_pos_{{ pos.id }}">
+                <option value="">-- Select Player --</option>
+                {% for p in players %}
+                  {% with a=availability_map.p.id %}
+                    {% css_class_for_availability a game.expected_time.weekday as css_class %}
+                    <option value="{{ p.id }}"
+                    {% scheduled_player schedule_map game.id pos.id as assigned_id %}
+                    {% if assigned_id == p.id %}selected{% endif %}
+                      class="{{ css_class }}">
+                      {{ p.name }}
+                    </option>
+                  {% endwith %}
+                {% endfor %}
+              </select>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% empty %}
+      <p>No games scheduled this week.</p>
+    {% endfor %}
+  </div>
+  <button type="submit" class="btn btn-primary mt-3">Save Schedule</button>
+</form>
+
+<style>
+  .games-container { display: flex; flex-direction: column; gap: 2rem; }
+  .game-card { border: 1px solid #ccc; padding: 1rem; border-radius: 8px; }
+  .positions-grid { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 1rem; }
+  .position-box { flex: 1 1 150px; }
+  option.available { color: black; }
+  option.unavailable { color: red; font-style: italic; }
+  option.unknown { color: gray; font-style: italic; }
+</style>
+{% endblock %}

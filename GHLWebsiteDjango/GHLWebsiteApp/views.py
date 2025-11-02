@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from .forms import *
 import datetime
 from GHLWebsiteApp.models import *
-from django.db.models import Sum, Count, Case, When, Avg, F, Window, FloatField, Q, ExpressionWrapper, Value, OuterRef, Subquery, CharField
+from django.db.models import Sum, Count, Case, When, Avg, F, Window, FloatField, Q, ExpressionWrapper, Value, OuterRef, Subquery, IntegerField
 from django.db.models.functions import Cast, Rank, Round, Lower, Coalesce
 from django.http import JsonResponse, HttpResponse, HttpResponseForbidden
 from decimal import *
@@ -15,7 +15,6 @@ from io import BytesIO
 import csv
 import pytz
 import json
-import nacl.signing
 from django.utils import timezone as django_timezone
 from django.utils.timezone import localtime
 from django.core.paginator import Paginator
@@ -1783,6 +1782,135 @@ def player_availability_view(request):
         'day_form_fields': day_form_fields,
     })
 
+@manager_required
+def team_scheduling_view(request):
+    player = request.user.player_link
+    team = player.current_team
+    season = get_seasonSetting()
+
+    if not team:
+        messages.error(request, "You are not assigned to a team.")
+        return redirect("user_profile")
+
+    # --- Determine current/selected week ---
+    week_str = request.GET.get("week")
+    if week_str:
+        try:
+            sunday = datetime.datetime.strptime(week_str, "%B %d, %Y").date()
+        except ValueError:
+            eastern = pytz.timezone("America/New_York")
+            now_est = django_timezone.now().astimezone(eastern)
+            today = now_est.date()
+            days_since_sunday = (today.weekday() + 1) % 7
+            this_sunday = today - datetime.timedelta(days=days_since_sunday)
+            sunday = this_sunday + datetime.timedelta(days=7 if days_since_sunday >= 5 else 0)
+    else:
+        eastern = pytz.timezone("America/New_York")
+        now_est = django_timezone.now().astimezone(eastern)
+        today = now_est.date()
+        days_since_sunday = (today.weekday() + 1) % 7
+        this_sunday = today - datetime.timedelta(days=days_since_sunday)
+        sunday = this_sunday + datetime.timedelta(days=7 if days_since_sunday >= 5 else 0)
+
+    if "week" not in request.GET:
+        return redirect(f"{request.path}?week={sunday.strftime('%B %d, %Y')}")
+
+
+    # --- Get games for the week ---
+    start_dt = timezone.make_aware(datetime.datetime.combine(sunday, datetime.time.min))
+    end_dt = start_dt + datetime.timedelta(days=7)
+
+    print("Team:", team)
+    print("Season:", season)
+    print("Start:", start_dt)
+    print("End:", end_dt)
+
+    games = Game.objects.filter(
+        season_num=season,
+        expected_time__gte=start_dt,
+        expected_time__lt=end_dt,
+        played_time__isnull=True
+    ).filter(
+        Q(h_team_num=team) | Q(a_team_num=team)
+    ).order_by("expected_time")
+    print("Found games:", games.count())
+    for g in games:
+        print(g.expected_time, g.h_team_num, g.a_team_num)
+
+    # --- Availability for team this week ---
+    availability = PlayerAvailability.objects.filter(player__current_team=team, week_start=sunday)
+    availability_map = {a.player_id: a for a in availability}
+
+    # --- Current scheduling assignments ---
+    scheduling = Scheduling.objects.filter(game__in=games, team=team)
+    schedule_map = {(s.game_id, s.position_id): s.player_id for s in scheduling}
+
+    # --- Get positions + players on team ---
+    positions = list(
+        Position.objects.annotate(
+            sort_order=Case(
+                When(positionShort='C', then=Value(0)),
+                When(positionShort='LW', then=Value(1)),
+                When(positionShort='RW', then=Value(2)),
+                When(positionShort='LD', then=Value(3)),
+                When(positionShort='RD', then=Value(4)),
+                When(positionShort='G', then=Value(5)),
+                default=Value(99),
+                output_field=IntegerField()
+            )
+        ).order_by('sort_order')
+    )
+    players = team.player_set.all().order_by("username")
+
+    # --- Save handler ---
+    if request.method == "POST":
+        for game in games:
+            for pos in positions:
+                field_name = f"game_{game.id}_pos_{pos.id}"
+                player_id = request.POST.get(field_name)
+                if player_id:
+                    Scheduling.objects.update_or_create(
+                        game=game,
+                        team=team,
+                        position=pos,
+                        defaults={"player_id": player_id}
+                    )
+                else:
+                    Scheduling.objects.filter(game=game, team=team, position=pos).delete()
+        messages.success(request, "Schedule saved successfully.")
+        return redirect(f"{request.path}?week={sunday.strftime('%B %d, %Y')}")
+
+    # --- All Sundays with games for week dropdown ---
+    game_dates = (
+        Game.objects
+        .filter(season_num=season, played_time__isnull=True)
+        .filter(Q(h_team_num=team) | Q(a_team_num=team))
+        .values_list("expected_time", flat=True)
+    )
+
+    sundays = set()
+    for dt in game_dates:
+        est_date = dt.astimezone(pytz.timezone("America/New_York")).date()
+        week_sunday = est_date - datetime.timedelta(days=(est_date.weekday() + 1) % 7)
+        sundays.add(week_sunday)
+
+    if sunday not in sundays:
+        sundays.add(sunday)
+
+    week_choices = [d.strftime("%B %d, %Y") for d in sorted(sundays)]
+    selected_week_str = sunday.strftime("%B %d, %Y")
+
+    context = {
+        "games": games,
+        "positions": positions,
+        "players": players,
+        "schedule_map": schedule_map,
+        "availability_map": availability_map,
+        "sunday": sunday,
+        "week_choices": week_choices,
+        "selected_week_str": selected_week_str,
+    }
+    return render(request, "GHLWebsiteApp/team_scheduling.html", context)
 
 class PlayerAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):

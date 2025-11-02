@@ -33,4 +33,6 @@ urlpatterns = [
     path('discord/', views.discord_webhook, name='discord_webhook'),
     path('media/weekly-stats/', views.weekly_stats_view, name='weekly_stats'),
     path('manageteam/', views.manager_view, name='manager_view'),
+    path("team-scheduling/", views.team_scheduling_view, name="team_scheduling"),
+
 ]
