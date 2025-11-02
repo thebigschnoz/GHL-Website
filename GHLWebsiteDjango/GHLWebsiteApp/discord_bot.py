@@ -428,9 +428,10 @@ async def upcoming(interaction: discord.Interaction, teamname: str):
             logger.warning("No active season found.")
             return
         def get_upcoming_games():
-            return Game.objects.filter(season_num=season).filter(
+            return list(
+                Game.objects.filter(season_num=season).filter(
                 Q(h_team_num=team) | Q(a_team_num=team)
-            ).filter(played_time__isnull=True).order_by("expected_time")[:10]
+            ).filter(played_time__isnull=True).order_by("expected_time")[:10])
         upcoming_games = await asyncio.wait_for(sync_to_async(get_upcoming_games)(), timeout=10)
         if not upcoming_games:
             await interaction.followup.send(f"No upcoming games found for {team.club_abbr}.")
