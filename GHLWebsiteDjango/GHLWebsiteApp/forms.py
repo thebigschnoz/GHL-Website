@@ -1,9 +1,13 @@
 from django import forms
-from .models import AwardTitle, Player, User, Position, PlayerAvailability, TradeBlockPlayer, TeamNeed
+from .models import AwardTitle, Player, User, Position, PlayerAvailability, TradeBlockPlayer, TeamNeed, Game
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
 from captcha.fields import CaptchaField
 from dal import autocomplete
+from datetime import timedelta
+from django.utils.timezone import make_aware
+from zoneinfo import ZoneInfo
+from collections import defaultdict
 
 class UploadFileForm(forms.Form):
     file = forms.FileField()
@@ -85,9 +89,44 @@ class PlayerAvailabilityForm(forms.ModelForm):
             'thursday',
             'comment',
         ]
-        widgets = {
-            'week_start': forms.SelectDateWidget,
-        }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Get all game times (ignore nulls)
+        game_times = Game.objects.filter(expected_time__isnull=False).values_list("expected_time", flat=True)
+
+        # Build a dict: {sunday_date: game_count}
+        week_counts = defaultdict(int)
+
+        for dt in game_times:
+            # Ensure timezone-aware datetime
+            if dt.tzinfo is None:
+                dt = make_aware(dt)
+
+            # Convert to EST
+            local_dt = dt.astimezone(ZoneInfo("America/New_York"))
+            game_date = local_dt.date()
+
+            # Normalize to Sunday of that week
+            sunday = game_date - timedelta(days=game_date.weekday() + 1) if game_date.weekday() != 6 else game_date
+            week_counts[sunday] += 1
+
+        # Add 2 weeks past the last actual game-week Sunday
+        if week_counts:
+            latest = max(week_counts)
+            week_counts[latest + timedelta(weeks=1)] = 0
+            week_counts[latest + timedelta(weeks=2)] = 0
+
+        sunday_choices = sorted([
+            (sunday, f"{sunday.strftime('%B %d, %Y')} ({count} game{'s' if count != 1 else ''})")
+            for sunday, count in week_counts.items()
+        ])
+
+        self.fields['week_start'] = forms.ChoiceField(
+            choices=sunday_choices,
+            label="Week Starting (Sunday)",
+            required=True
+        )
 
 class TradeBlockForm(forms.ModelForm):
     class Meta:
