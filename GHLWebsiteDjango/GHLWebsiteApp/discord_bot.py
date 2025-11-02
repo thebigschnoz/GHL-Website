@@ -119,6 +119,30 @@ def get_team_leaders(team):
         leaders["GAA"] = (leader_goalie_gaa["ea_player_num__username"], round(leader_goalie_gaa["ggaa"], 2))
     return leaders
 
+def get_pp_ranking(team):
+    standings = (
+        Standing.objects.filter(season=get_seasonSetting())
+        .order_by('-ppperc')
+        .values_list("team__ea_club_num", flat=True)
+    )
+    try:
+        position = list(standings).index(team.ea_club_num) + 1
+        return position
+    except ValueError:
+        return None
+
+def get_pk_ranking(team):
+    standings = (
+        Standing.objects.filter(season=get_seasonSetting())
+        .order_by('-pkperc')
+        .values_list("team__ea_club_num", flat=True)
+    )
+    try:
+        position = list(standings).index(team.ea_club_num) + 1
+        return position
+    except ValueError:
+        return None
+
 def ordinal_suffix(n):
     if 10 <= n % 100 <= 20:
         return 'th'
@@ -372,17 +396,23 @@ async def team(interaction: discord.Interaction, teamname: str):
             logger.info("No stats found for team.")
             return
         position, total = await sync_to_async(get_team_ranking)(team)
+        pp_rank = await sync_to_async(get_pp_ranking)(team)
+        pk_rank = await sync_to_async(get_pk_ranking)(team)
         if position:
             standing_line = f"📈 Current Standing: **{position}{ordinal_suffix(position)}** out of {total}\n"
         else:
             standing_line = "📈 Standing not available yet.\n"
+        if pp_rank:
+            pp_rank = f"{pp_rank}{ordinal_suffix(pp_rank)})"
+        if pk_rank:
+            pk_rank = f"{pk_rank}{ordinal_suffix(pk_rank)})"
         logger.info("Sending response.")
         response_message = (
             f"**{team.club_full_name}** — Team Stats\n"
             f"{standing_line}"
             f"Record: **{stats.wins}-{stats.losses}-{stats.otlosses}**, Streak: **{stats.streak}\n**"
             f"GF/GA (Diff): **{stats.goalsfor}/{stats.goalsagainst} ({stats.goalsfor - stats.goalsagainst})**\n"
-            f"PP%: **{stats.ppperc:.2f}%**, PK%: **{stats.pkperc:.2f}%**\n\n"
+            f"PP%: **{stats.ppperc:.2f}%** ({pp_rank}), PK%: **{stats.pkperc:.2f}%** ({pk_rank})\n\n"
         )
         if leader_lines:
             response_message += (f"👑 __Team Leaders__:\n{leader_lines}")
