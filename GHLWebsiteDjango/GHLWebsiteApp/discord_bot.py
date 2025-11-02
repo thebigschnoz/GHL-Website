@@ -396,3 +396,65 @@ async def team(interaction: discord.Interaction, teamname: str):
         except discord.InteractionResponded:
             logger.warning("Interaction already responded to. Skipping follow-up.")
         return
+
+@bot.tree.command(name="upcoming", description="Show upcoming ten games for a team")
+@app_commands.describe(teamname="Enter a team's name or abbreviation")
+async def upcoming(interaction: discord.Interaction, teamname: str):
+    logger.info(f"Command /team triggered for teamname: {teamname}")
+    await interaction.response.defer()
+    try:
+        logger.info("Trying exact team name match")
+        team = await sync_to_async(Team.objects.filter)(Q(club_full_name__iexact=teamname) | Q(club_abbr__iexact=teamname))
+        if not await sync_to_async(team.exists)():
+            logger.info("Trying partial team name match")
+            team = await sync_to_async(Team.objects.filter)(Q(club_full_name__icontains=teamname) | Q(club_abbr__icontains=teamname))
+        if not await sync_to_async(team.exists)():
+            await interaction.followup.send(f"⚠️ Team '{teamname}' not found.")
+            logger.warning("Team not found.")
+            return
+        count = await sync_to_async(team.count)()
+        if count > 1:
+            logger.info(f"Multiple teams found: {count} total")
+            matches = await sync_to_async(lambda: ", ".join(team.values_list("name", flat=True)[:5]))()
+            await interaction.followup.send(f"⚠️ Multiple matches found: {matches}\nPlease be more specific.")
+            return
+        team = await sync_to_async(team.first)()
+        logger.info(f"Found team: {team.club_full_name}")
+
+        # Aggregate team stats
+        season = await sync_to_async(get_seasonSetting)()
+        if season is None:
+            await interaction.followup.send("⚠️ No active season found. Please try again later when Schnoz isn't breaking the website.")
+            logger.warning("No active season found.")
+            return
+        def get_upcoming_games():
+            return Game.objects.filter(season_num=season).filter(
+                Q(h_team_num=team) | Q(a_team_num=team)
+            ).filter(played_time__isnull=True).order_by("expected_time")[:10]
+        upcoming_games = await asyncio.wait_for(sync_to_async(get_upcoming_games)(), timeout=10)
+        if not upcoming_games:
+            await interaction.followup.send(f"No upcoming games found for {team.club_abbr}.")
+            return
+        game_info_lines = []
+        for game in upcoming_games:
+            if game.h_team_num == team:
+                opponent = game.a_team_num
+                location = "Home"
+                team_code = team.team_code
+            else:
+                opponent = game.h_team_num
+                location = "Away"
+                team_code = opponent.team_code
+
+            game_time = game.expected_time.strftime("%m/%d %I:%M %p") if game.expected_time else "TBD"
+            game_info_lines.append(f"📅 {game_time} | {location} vs {opponent.club_abbr} | **{team_code}**")
+
+        message = f"🗓️ Upcoming Games for **{team.club_abbr}**:\n" + "\n".join(game_info_lines)
+        await interaction.followup.send(message)
+    except Exception as e:
+        logger.exception(f"Error in /team command: {e}")
+        try:
+            await interaction.followup.send(f"❌ Error: {e}")
+        except discord.InteractionResponded:
+            logger.warning("Interaction already responded to. Skipping follow-up.")
+        return
