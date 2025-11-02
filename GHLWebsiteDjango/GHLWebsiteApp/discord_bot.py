@@ -76,16 +76,16 @@ def get_team_leaders(team):
     leader_shooting = SkaterRecord.objects.filter(
         ea_player_num__current_team=team,
         game_num__season_num=season
-    ).annotate(
+    ).values("ea_player_num", "ea_player_num__username").annotate(
         shootperc=(Cast(Sum("goals"), FloatField()) / Cast(Sum("sog"), FloatField())) * 100
-    ).values("ea_player_num__username", "shootperc").order_by("-shootperc").first()
+    ).order_by("-shootperc").first()
     if leader_shooting:
         leaders["Shooting %"] = (leader_shooting["ea_player_num__username"], round(leader_shooting["shootperc"], 1))
 
     leader_hits = SkaterRecord.objects.filter(
         ea_player_num__current_team=team,
         game_num__season_num=season
-    ).values("ea_player_num__username").annotate(
+    ).values("ea_player_num", "ea_player_num__username").annotate(
         avg_hits=Avg("hits")
     ).order_by("-avg_hits").first()
     if leader_hits:
@@ -94,27 +94,27 @@ def get_team_leaders(team):
     leader_blocks = SkaterRecord.objects.filter(
         ea_player_num__current_team=team,
         game_num__season_num=season
-    ).values("ea_player_num__username").annotate(
+    ).values("ea_player_num", "ea_player_num__username").annotate(
         avg_blocks=Avg("blocked_shots")
     ).order_by("-avg_blocks").first()
     if leader_blocks:
-        leaders["Blocks/GP"] = (leader_blocks["ea_player_num__username"], round(leader_blocks["avg_blocks"], 1))
+        leaders["Blocks/GP"] = (leader_blocks["ea_player_num__username"], round(leader_blocks["avg_blocks"], 2))
 
     leader_goalie_svperc = GoalieRecord.objects.filter(
         ea_player_num__current_team=team,
         game_num__season_num=season
-    ).annotate(
+    ).values("ea_player_num", "ea_player_num__username").annotate(
         svperc=(Cast(Sum("saves"), FloatField()) / Cast(Sum("shots_against"), FloatField())) * 100
-    ).values("ea_player_num__username", "svperc").order_by("-svperc").first()
+    ).order_by("-svperc").first()
     if leader_goalie_svperc:
         leaders["SV%"] = (leader_goalie_svperc["ea_player_num__username"], round(leader_goalie_svperc["svperc"], 2))
 
     leader_goalie_gaa = GoalieRecord.objects.filter(
         ea_player_num__current_team=team,
         game_num__season_num=season
-    ).annotate(
+    ).values("ea_player_num", "ea_player_num__username").annotate(
         ggaa=((Cast(Sum("shots_against"), FloatField()) - Cast(Sum("saves"), FloatField())) / Cast(Sum("game_num__gamelength"), FloatField())) * 3600
-    ).values("ea_player_num__username", "ggaa").order_by("ggaa").first()
+    ).order_by("ggaa").first()
     if leader_goalie_gaa:
         leaders["GAA"] = (leader_goalie_gaa["ea_player_num__username"], round(leader_goalie_gaa["ggaa"], 2))
     return leaders
