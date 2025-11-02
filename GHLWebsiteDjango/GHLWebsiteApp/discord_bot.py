@@ -184,6 +184,9 @@ async def statsskater(interaction: discord.Interaction, username: str):
                 sbs=Avg("blocked_shots"),
                 total_fow=Coalesce(Sum("fow"), 0),
                 total_fol=Coalesce(Sum("fol"), 0),
+                sint=Avg("interceptions"),
+                stka=Avg("takeaways"),
+                sgva=Avg("giveaways"),
             )
         logger.info("Querying skater stats...")
         try:
@@ -215,7 +218,8 @@ async def statsskater(interaction: discord.Interaction, username: str):
             f"Assists: **{stats['sassists']}**\n"
             f"S%: **{shotperc:.1f}%**\n"
             f"Pass%: **{passperc:.1f}%**\n"
-            f"Hits/GP: **{stats['shits']:.1f}**, PIMs/GP: **{stats['spims']:.1f}**, Drawn/GP: **{stats['sdrawn']:.1f}**, Blocks/GP: **{stats['sbs']:.1f}**, FO%: **{faceoffperc:.1f}%**"
+            f"Hits/GP: **{stats['shits']:.1f}**, PIMs/GP: **{stats['spims']:.1f}**, Drawn/GP: **{stats['sdrawn']:.1f}**, Blocks/GP: **{stats['sbs']:.1f}**, FO%: **{faceoffperc:.1f}%**\n"
+            f"INT/GP: **{stats['sint']:.1f}**, TK/GP: **{stats['stka']:.1f}**, GV/GP: **{stats['sgva']:.1f}**"
         )
         await interaction.followup.send(response_message)
     except Exception as e:
