@@ -405,9 +405,9 @@ async def team(interaction: discord.Interaction, teamname: str):
         else:
             standing_line = "📈 Standing not available yet.\n"
         if pp_rank:
-            pp_rank = f"{pp_rank}{ordinal_suffix(pp_rank)})"
+            pp_rank = f"{pp_rank}{ordinal_suffix(pp_rank)}"
         if pk_rank:
-            pk_rank = f"{pk_rank}{ordinal_suffix(pk_rank)})"
+            pk_rank = f"{pk_rank}{ordinal_suffix(pk_rank)}"
         logger.info("Sending response.")
         response_message = (
             f"**{team.club_full_name}** — Team Stats\n"
