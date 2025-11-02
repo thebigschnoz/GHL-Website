@@ -11,6 +11,8 @@ from GHLWebsiteApp.models import *
 from django.db.models import Sum, Count, Case, When, Avg, F, Window, FloatField, Q, ExpressionWrapper, Value, OuterRef, Subquery, CharField
 from django.db.models.functions import Cast, Rank, Round, Lower, Coalesce
 from GHLWebsiteApp.views import get_seasonSetting
+from django.utils.timezone import localtime
+from zoneinfo import ZoneInfo
 
 load_dotenv()
 
@@ -479,7 +481,11 @@ async def upcoming(interaction: discord.Interaction, teamname: str):
                 location = "Away"
                 team_code = opponent.team_code
 
-            game_time = game.expected_time.strftime("%a %b %d %I:%M %p") if game.expected_time else "TBD"
+            if game.expected_time:
+                est_time = game.expected_time.astimezone(ZoneInfo("America/New_York"))
+                game_time = est_time.strftime("%Y-%m-%d %I:%M %p EST")
+            else:
+                game_time = "TBD"
             game_info_lines.append(f"- {game_time} | {location} vs {opponent.club_abbr} | **{team_code}**")
 
         message = f"🗓️ Upcoming Games for **{team.club_abbr}**:\n" + "\n".join(game_info_lines)
