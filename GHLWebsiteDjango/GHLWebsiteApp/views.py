@@ -22,6 +22,7 @@ from dal import autocomplete
 from collections import defaultdict
 from django.views.decorators.csrf import csrf_exempt
 # from points_table_simulator import PointsTableSimulator
+est = pytz.timezone("America/New_York")
 
 def media_required(view_func):
     decorated_view_func = user_passes_test(
@@ -1825,24 +1826,28 @@ def team_scheduling_view(request):
     print("Start:", start_dt)
     print("End:", end_dt)
 
-    games = Game.objects.filter(
+    # ---- Get all games for this team & week ----
+    games_qs = Game.objects.filter(
         season_num=season,
-        expected_time__gte=start_dt,
-        expected_time__lt=end_dt,
-        played_time__isnull=True
+        expected_time__date__gte=sunday,
+        expected_time__date__lt=sunday + datetime.timedelta(days=7),
     ).filter(
         Q(h_team_num=team) | Q(a_team_num=team)
     ).order_by("expected_time")
-    print("Found games:", games.count())
-    for g in games:
-        print(g.expected_time, g.h_team_num, g.a_team_num)
+
+    # ---- Convert to EST and attach weekday ----
+    games = []
+    for g in games_qs:
+        local_dt = g.expected_time.astimezone(est)   # convert before tuple packing
+        games.append((g, local_dt.weekday()))
 
     # --- Availability for team this week ---
     availability = PlayerAvailability.objects.filter(player__current_team=team, week_start=sunday)
-    availability_map = {a.player_id: a for a in availability}
+    availability_map = {a.player.ea_player_num: a for a in availability}
 
     # --- Current scheduling assignments ---
-    scheduling = Scheduling.objects.filter(game__in=games, team=team)
+    game_objs = [g for (g, weekday) in games]   # strip weekday, keep actual Game objects
+    scheduling = Scheduling.objects.filter(game__in=game_objs, team=team)
     schedule_map = {(s.game_id, s.position_id): s.player_id for s in scheduling}
 
     # --- Get positions + players on team ---
@@ -1864,19 +1869,24 @@ def team_scheduling_view(request):
 
     # --- Save handler ---
     if request.method == "POST":
-        for game in games:
+        for game_obj, weekday in games:
             for pos in positions:
-                field_name = f"game_{game.id}_pos_{pos.id}"
+                field_name = f"game_{game_obj.game_num}_pos_{pos.positionShort}"
                 player_id = request.POST.get(field_name)
+
                 if player_id:
                     Scheduling.objects.update_or_create(
-                        game=game,
+                        game=game_obj,         # ✅ FIXED
                         team=team,
                         position=pos,
                         defaults={"player_id": player_id}
                     )
                 else:
-                    Scheduling.objects.filter(game=game, team=team, position=pos).delete()
+                    Scheduling.objects.filter(
+                        game=game_obj,        # ✅ FIXED
+                        team=team,
+                        position=pos
+                    ).delete()
         messages.success(request, "Schedule saved successfully.")
         return redirect(f"{request.path}?week={sunday.strftime('%B %d, %Y')}")
 

@@ -5,7 +5,7 @@
 {% block body %}
 <h2>Team Scheduling for the week of {{ selected_week_str }}</h2>
 
-<form method="get" class="mb-3">
+<form method="get" class="mb-3" style="padding: 1rem;">
   <label for="week">Select week:</label>
   <select name="week" onchange="this.form.submit()">
     {% for week in week_choices %}
@@ -20,7 +20,7 @@
 <form method="post">
   {% csrf_token %}
   <div class="games-container">
-    {% for game in games %}
+    {% for game, weekday in games %}
       <div class="game-card">
         <h4>{{ game.expected_time|date:"D M j, g:i A" }} vs 
           {% if game.h_team_num == request.user.player.current_team %}
@@ -32,17 +32,17 @@
         <div class="positions-grid">
           {% for pos in positions %}
             <div class="position-box">
-              <label>{{ pos.name }}</label>
-              <select name="game_{{ game.id }}_pos_{{ pos.id }}">
+              <label>{{ pos.positionShort }}</label>
+              <select name="game_{{ game.game_num }}_pos_{{ pos.positionShort }}">
                 <option value="">-- Select Player --</option>
                 {% for p in players %}
-                  {% with a=availability_map.p.id %}
-                    {% css_class_for_availability a game.expected_time.weekday as css_class %}
-                    <option value="{{ p.id }}"
-                    {% scheduled_player schedule_map game.id pos.id as assigned_id %}
-                    {% if assigned_id == p.id %}selected{% endif %}
+                  {% with a=availability_map|dict_get:p.ea_player_num %}
+                    {% css_class_for_availability a weekday as css_class %}
+                    <option value="{{ p.ea_player_num }}"
+                    {% scheduled_player schedule_map game.game_num pos.ea_pos as assigned_id %}
+                    {% if assigned_id == p.ea_player_num %}selected{% endif %}
                       class="{{ css_class }}">
-                      {{ p.name }}
+                      {{ p.username }}
                     </option>
                   {% endwith %}
                 {% endfor %}
@@ -55,15 +55,26 @@
       <p>No games scheduled this week.</p>
     {% endfor %}
   </div>
-  <button type="submit" class="btn btn-primary mt-3">Save Schedule</button>
+  <button type="submit" class="btn btn-submit mt-3" style="margin: 1rem;">Save Schedule</button>
 </form>
 
 <style>
-  .games-container { display: flex; flex-direction: column; gap: 2rem; }
-  .game-card { border: 1px solid #ccc; padding: 1rem; border-radius: 8px; }
-  .positions-grid { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 1rem; }
-  .position-box { flex: 1 1 150px; }
-  option.available { color: black; }
+    select {
+    background-color: #303030;
+    color: #e9eaec;
+    border: 1px solid #e4b61a;
+  }
+  option {
+    background-color: #303030;
+    color: #e9eaec;
+  }
+  .games-container { display: flex; flex-wrap: wrap; gap: 2rem; }
+  .game-card { border: 1px solid #e4b61a; padding: 1rem; border-radius: 8px; display: inline-block; width: max-content; white-space: nowrap; background-color: black;}
+  .positions-grid { display: grid; column-gap: 1rem; row-gap: 0.5rem; margin-top: 1rem; grid-template-columns: auto auto;}
+  .position-box { display: contents; }
+  .positions-grid label { text-align: right; padding-right: .25rem;}
+  h2 { background-color: black; border: 1px solid #e4b61a; padding: 0.5rem; border-radius: 8px; width: max-content;}
+  option.available { color: limegreen; }
   option.unavailable { color: red; font-style: italic; }
   option.unknown { color: gray; font-style: italic; }
 </style>
