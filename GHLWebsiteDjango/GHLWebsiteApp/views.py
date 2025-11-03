@@ -1876,14 +1876,14 @@ def team_scheduling_view(request):
 
                 if player_id:
                     Scheduling.objects.update_or_create(
-                        game=game_obj,         # ✅ FIXED
+                        game=game_obj,
                         team=team,
                         position=pos,
                         defaults={"player_id": player_id}
                     )
                 else:
                     Scheduling.objects.filter(
-                        game=game_obj,        # ✅ FIXED
+                        game=game_obj,
                         team=team,
                         position=pos
                     ).delete()
