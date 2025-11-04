@@ -562,7 +562,7 @@ async def lineups(interaction: discord.Interaction, teamname: str):
         # --- Fetch scheduling rows for all those games ---
         def fetch_schedules():
             return list(
-                Scheduling.objects.filter(game__in=games)
+                Scheduling.objects.filter(game__in=games, team=team)
                 .select_related("player", "position", "game")
             )
 
