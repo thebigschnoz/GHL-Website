@@ -601,7 +601,7 @@ async def lineups(interaction: discord.Interaction, teamname: str):
             # Header line for game
             lines.append(
                 f"__{local_time:%a %-I:%M %p} {homeaway} {opponent.club_abbr} ({record})__\n"
-                f"(**{code_to_display}**)"
+                f"(*{code_to_display}*)"
             )
 
             # Position assignments
