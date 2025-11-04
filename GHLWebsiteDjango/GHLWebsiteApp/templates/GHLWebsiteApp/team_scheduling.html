@@ -73,9 +73,47 @@
   .positions-grid { display: grid; column-gap: 1rem; row-gap: 0.5rem; margin-top: 1rem; grid-template-columns: auto auto;}
   .position-box { display: contents; }
   .positions-grid label { text-align: right; padding-right: .25rem;}
-  h2 { background-color: black; border: 1px solid #e4b61a; padding: 0.5rem; border-radius: 8px; width: max-content;}
+  h2 { background-color: black; border: 1px solid #e4b61a; padding: 1rem; border-radius: 8px; width: max-content; justify-self: center;}
+  h4 { margin-top: 0.5rem; }
   option.available { color: limegreen; }
   option.unavailable { color: red; font-style: italic; }
   option.unknown { color: gray; font-style: italic; }
 </style>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".game-card").forEach(function(card) {
+        const selects = card.querySelectorAll("select");
+
+        function updateDropdowns() {
+            // Get all selected player IDs (ignoring blanks)
+            const selectedValues = Array.from(selects)
+                .map(sel => sel.value)
+                .filter(v => v !== "");
+
+            selects.forEach(sel => {
+                const currentValue = sel.value;
+                const options = Array.from(sel.querySelectorAll("option"));
+
+                // Reset all options first (show everything)
+                options.forEach(opt => opt.hidden = false);
+
+                options.forEach(opt => {
+                    if (opt.value !== "" && opt.value !== currentValue && selectedValues.includes(opt.value)) {
+                        opt.hidden = true;  // hide players already selected elsewhere
+                    }
+                });
+            });
+        }
+
+        // Attach listener to each <select>
+        selects.forEach(sel => {
+            sel.addEventListener("change", updateDropdowns);
+        });
+
+        // Run once on load (pre-selects from DB get honored)
+        updateDropdowns();
+    });
+});
+</script>
+
 {% endblock %}
