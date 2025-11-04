@@ -13,7 +13,6 @@ from django.db.models import Sum, Count, Case, When, Avg, F, Window, FloatField,
 from django.db.models.functions import Cast, Rank, Round, Lower, Coalesce
 from GHLWebsiteApp.views import get_seasonSetting
 from zoneinfo import ZoneInfo
-from GHLWebsiteApp.views import get_default_week_start
 
 
 load_dotenv()
@@ -504,6 +503,24 @@ async def upcoming(interaction: discord.Interaction, teamname: str):
 @app_commands.describe(teamname="Enter a team's name or abbreviation")
 async def lineups(interaction: discord.Interaction, teamname: str):
     await interaction.response.defer()
+
+    def get_current_ghl_week_start():
+        eastern = ZoneInfo("America/New_York")
+        now = datetime.datetime.now(eastern).date()
+        weekday = now.weekday()  # Monday = 0 ... Sunday = 6
+
+        # GHL Week = Friday (4) → Thursday (10)
+        # If today is Fri (4) or Sat (5), we jump ahead to NEXT Friday
+        if weekday in (4, 5):  # Friday or Saturday
+            days_until_next_friday = (4 - weekday) % 7
+            week_start = now + datetime.timedelta(days=days_until_next_friday)
+        else:
+            # Otherwise, find the most recent Friday
+            days_since_friday = (weekday - 4) % 7
+            week_start = now - datetime.timedelta(days=days_since_friday)
+
+        return week_start
+
     try:
         # --- Resolve Team ---
         def resolve_team():
@@ -522,7 +539,7 @@ async def lineups(interaction: discord.Interaction, teamname: str):
             return
 
         # --- Determine EST Friday-Thursday week range ---
-        week_start = await sync_to_async(get_default_week_start)()
+        week_start = await sync_to_async(get_current_ghl_week_start)()
         week_end = week_start + datetime.timedelta(days=6)
 
         # --- Get team games for this week ---
@@ -583,8 +600,8 @@ async def lineups(interaction: discord.Interaction, teamname: str):
 
             # Header line for game
             lines.append(
-                f"__{local_time:%a %-I:%M %p} {homeaway} {opponent.club_abbr} ({record})__ "
-                f"(-# {code_to_display})"
+                f"__{local_time:%a %-I:%M %p} {homeaway} {opponent.club_abbr} ({record})__\n"
+                f"(**{code_to_display}**)"
             )
 
             # Position assignments
