@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+import datetime
 import discord
 from discord import app_commands
 from discord.ext import commands
@@ -11,8 +12,9 @@ from GHLWebsiteApp.models import *
 from django.db.models import Sum, Count, Case, When, Avg, F, Window, FloatField, Q, ExpressionWrapper, Value, OuterRef, Subquery, CharField
 from django.db.models.functions import Cast, Rank, Round, Lower, Coalesce
 from GHLWebsiteApp.views import get_seasonSetting
-from django.utils.timezone import localtime
 from zoneinfo import ZoneInfo
+from GHLWebsiteApp.views import get_default_week_start
+
 
 load_dotenv()
 
@@ -497,3 +499,102 @@ async def upcoming(interaction: discord.Interaction, teamname: str):
         except discord.InteractionResponded:
             logger.warning("Interaction already responded to. Skipping follow-up.")
         return
+
+@bot.tree.command(name="lineups", description="Show scheduled lineups for the current GHL week")
+@app_commands.describe(teamname="Enter a team's name or abbreviation")
+async def lineups(interaction: discord.Interaction, teamname: str):
+    await interaction.response.defer()
+    try:
+        # --- Resolve Team ---
+        def resolve_team():
+            qs = Team.objects.filter(
+                Q(club_full_name__iexact=teamname) | Q(club_abbr__iexact=teamname)
+            )
+            if not qs.exists():
+                qs = Team.objects.filter(
+                    Q(club_full_name__icontains=teamname) | Q(club_abbr__icontains=teamname)
+                )
+            return qs.first() if qs.exists() else None
+
+        team = await sync_to_async(resolve_team)()
+        if not team:
+            await interaction.followup.send(f"⚠️ Team '{teamname}' not found.")
+            return
+
+        # --- Determine EST Friday-Thursday week range ---
+        week_start = await sync_to_async(get_default_week_start)()
+        week_end = week_start + datetime.timedelta(days=6)
+
+        # --- Get team games for this week ---
+        def fetch_games():
+            return list(
+                Game.objects.filter(
+                    expected_time__date__gte=week_start,
+                    expected_time__date__lte=week_end,
+                ).filter(
+                    Q(h_team_num=team) | Q(a_team_num=team)
+                ).select_related("h_team_num", "a_team_num")
+                .order_by("expected_time")
+            )
+
+        games = await sync_to_async(fetch_games)()
+        if not games:
+            await interaction.followup.send(f"No games scheduled for {team.club_abbr} this week.")
+            return
+
+        # --- Fetch scheduling rows for all those games ---
+        def fetch_schedules():
+            return list(
+                Scheduling.objects.filter(game__in=games)
+                .select_related("player", "position", "game")
+            )
+
+        schedules = await sync_to_async(fetch_schedules)()
+
+        # Build mapping: {game_id: {posShort: username}}
+        schedule_map = {}
+        for s in schedules:
+            schedule_map.setdefault(s.game.game_num, {})[s.position.positionShort] = s.player.username
+
+        # --- Build output text ---
+        lines = [
+            f"📝 **Lineups for {team.club_abbr}** "
+            f"({week_start:%b %d}–{week_end:%b %d})\n"
+        ]
+
+        est = ZoneInfo("America/New_York")
+        positions = ["C", "LW", "RW", "LD", "RD", "G"]
+
+        for g in games:
+            local_time = g.expected_time.astimezone(est)
+            opponent = g.a_team_num if g.h_team_num == team else g.h_team_num
+            homeaway = "vs" if g.h_team_num == team else "@"
+            code_to_display = team.team_code if homeaway == "vs" else opponent.team_code
+
+            # --- Get opponent record ---
+            def get_record():
+                try:
+                    s = Standing.objects.get(team=opponent)
+                    return f"{s.wins}-{s.losses}-{s.otlosses}"
+                except Standing.DoesNotExist:
+                    return "0-0-0"
+
+            record = await sync_to_async(get_record)()
+
+            # Header line for game
+            lines.append(
+                f"__{local_time:%a %-I:%M %p} {homeaway} {opponent.club_abbr} ({record})__ "
+                f"(-# {code_to_display})"
+            )
+
+            # Position assignments
+            assigned = schedule_map.get(g.game_num, {})
+            for pos in positions:
+                lines.append(f"{pos}: {assigned.get(pos, '—')}")
+            lines.append("")  # spacer line
+
+        await interaction.followup.send("\n".join(lines))
+
+    except Exception as e:
+        logger.exception(f"Error in /lineups command: {e}")
+        await interaction.followup.send(f"❌ Error: {e}")
