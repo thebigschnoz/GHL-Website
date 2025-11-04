@@ -32,4 +32,17 @@
         <button type="submit" class="btn-submit">Save Availability</button>
     </form>
 </div>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const weekSelect = document.querySelector("select[name='week_start']");
+    if (!weekSelect) return;
+
+    weekSelect.addEventListener("change", function () {
+        const selected = this.value;
+        const url = new URL(window.location.href);
+        url.searchParams.set("week_start", selected);
+        window.location.href = url.toString();
+    });
+});
+</script>
 {% endblock %}

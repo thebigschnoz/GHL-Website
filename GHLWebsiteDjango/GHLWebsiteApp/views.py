@@ -1750,38 +1750,51 @@ def player_availability_view(request):
     player = request.user.player_link
     default_week_start = get_default_week_start()
 
-    existing = PlayerAvailability.objects.filter(
-        player=player,
-        week_start=default_week_start
-    ).first()
-    if request.method == 'POST':
-        form = PlayerAvailabilityForm(request.POST, instance=existing)
-        if form.is_valid():
-            avail = form.save(commit=False)
-            avail.player = player
-            avail.week_start = default_week_start
-            avail.save()
-            messages.success(request, "Your availability has been saved successfully!")
-            return redirect('team', team=player.current_team.ea_club_num)
-    else:
-        if existing:
-            form = PlayerAvailabilityForm(instance=existing)
-        else:
-            form = PlayerAvailabilityForm(initial={'week_start': default_week_start})
-    
-    day_fields = [
-        'sunday',
-        'monday',
-        'tuesday',
-        'wednesday',
-        'thursday',
-    ]
-    day_form_fields = [(day.capitalize(), form[day]) for day in day_fields]
+    week_param = request.GET.get("week_start")
 
-    return render(request, 'GHLWebsiteApp/player_availability.html', {
-        'form': form,
-        'day_form_fields': day_form_fields,
-    })
+    if week_param:
+        try:
+            week_start = datetime.date.fromisoformat(week_param)
+        except ValueError:
+            week_start = get_default_week_start()
+    else:
+        week_start = get_default_week_start()
+
+    # --- Get or create existing availability record for that week ---
+    availability_obj, created = PlayerAvailability.objects.get_or_create(
+        player=player,
+        week_start=week_start
+    )
+
+    # --- Bind form (POST updates existing row; GET only shows form) ---
+    if request.method == "POST":
+        form = PlayerAvailabilityForm(request.POST, instance=availability_obj)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Availability saved successfully.")
+            return redirect(f"{request.path}?week_start={week_start.isoformat()}")
+    else:
+        # Bind with initial so dropdown shows correct week
+        form = PlayerAvailabilityForm(
+            instance=availability_obj,
+            initial={"week_start": week_start}
+        )
+
+    # --- For template: supply day/checkbox fields in a friendly structure ---
+    day_form_fields = [
+        ("Sunday", form["sunday"]),
+        ("Monday", form["monday"]),
+        ("Tuesday", form["tuesday"]),
+        ("Wednesday", form["wednesday"]),
+        ("Thursday", form["thursday"]),
+    ]
+
+    context = {
+        "form": form,
+        "day_form_fields": day_form_fields,
+    }
+
+    return render(request, "GHLWebsiteApp/player_availability.html", context)
 
 @manager_required
 def team_scheduling_view(request):
