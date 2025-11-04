@@ -2,6 +2,7 @@ from django import forms
 from .models import AwardTitle, Player, User, Position, PlayerAvailability, TradeBlockPlayer, TeamNeed, Game
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 from captcha.fields import CaptchaField
 from dal import autocomplete
 from datetime import timedelta
@@ -89,11 +90,14 @@ class PlayerAvailabilityForm(forms.ModelForm):
             'thursday',
             'comment',
         ]
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, player=None, **kwargs):
         super().__init__(*args, **kwargs)
-
+        if player is None:
+            return
+        team = player.current_team
+        
         # Get all game times (ignore nulls)
-        game_times = Game.objects.filter(expected_time__isnull=False).values_list("expected_time", flat=True)
+        game_times = Game.objects.filter(expected_time__isnull=False).filter(Q(h_team_num=team) | Q(a_team_num=team)).values_list("expected_time", flat=True)
 
         # Build a dict: {sunday_date: game_count}
         week_counts = defaultdict(int)

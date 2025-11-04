@@ -1748,7 +1748,6 @@ def manager_view(request):
 @login_required
 def player_availability_view(request):
     player = request.user.player_link
-    default_week_start = get_default_week_start()
 
     week_param = request.GET.get("week_start")
 
@@ -1768,7 +1767,7 @@ def player_availability_view(request):
 
     # --- Bind form (POST updates existing row; GET only shows form) ---
     if request.method == "POST":
-        form = PlayerAvailabilityForm(request.POST, instance=availability_obj)
+        form = PlayerAvailabilityForm(request.POST, instance=availability_obj, player=player)
         if form.is_valid():
             form.save()
             messages.success(request, "Availability saved successfully.")
@@ -1777,7 +1776,8 @@ def player_availability_view(request):
         # Bind with initial so dropdown shows correct week
         form = PlayerAvailabilityForm(
             instance=availability_obj,
-            initial={"week_start": week_start}
+            initial={"week_start": week_start},
+            player=player
         )
 
     # --- For template: supply day/checkbox fields in a friendly structure ---
