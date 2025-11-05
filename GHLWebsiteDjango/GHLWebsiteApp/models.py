@@ -1,8 +1,9 @@
 from django.db import models
 from django.utils import timezone
+from django.db.models import Q
 from django.db.models.functions import Lower
 from decimal import *
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, User, Group
 
 class Season(models.Model):
     SEASON_CHOICES = [
@@ -47,6 +48,35 @@ class Team(models.Model):
     
     class Meta:
         ordering = [Lower('club_full_name')]
+
+    def save(self, *args, **kwargs):
+        # Store previous values so we can detect changes
+        if self.pk:
+            old = Team.objects.filter(pk=self.pk).first()
+            old_manager = old.manager if old else None
+            old_ass_manager = old.ass_manager if old else None
+        else:
+            old_manager = None
+            old_ass_manager = None
+
+        super().save(*args, **kwargs)
+
+        # Group we assign/remove
+        group, _ = Group.objects.get_or_create(name="Team Managers")
+
+        # ✅ 1. ADD group to new manager(s)
+        for user in [self.manager, self.ass_manager]:
+            if user:
+                user.groups.add(group)
+
+        # ✅ 2. REMOVE group from OLD manager if they no longer manage ANY team
+        for old_user in [old_manager, old_ass_manager]:
+            if old_user and old_user not in [self.manager, self.ass_manager]:
+                still_manager = Team.objects.filter(
+                    Q(manager=old_user) | Q(ass_manager=old_user)
+                ).exists()
+                if not still_manager:
+                    old_user.groups.remove(group)
 
 class Game(models.Model):
     game_num = models.AutoField(primary_key=True)
