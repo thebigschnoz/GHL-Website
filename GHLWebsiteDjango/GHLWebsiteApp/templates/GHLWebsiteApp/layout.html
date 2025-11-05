@@ -115,6 +115,7 @@
 									{% endif %}
 									{% if user|has_group:"Team Managers" %}
 									<li><a href="{% url 'manager_view' %}">Manage Team</a></li>
+									<li><a href="https://discord.com/oauth2/authorize?client_id=1324949615883325450&permissions=2147568704&integration_type=0&scope=applications.commands+bot">Get Discord Bot</a></li>
 									{% endif %}
 									{% if user|has_group:"Media" %}
 									<li><a href="{% url 'weekly_stats' %}">Media Page</a></li>
