@@ -554,3 +554,11 @@ class Scheduling(models.Model):
     
     class Meta:
         unique_together = ['game', 'team', 'position']
+
+class Salary(models.Model):
+    player = models.ForeignKey(Player, on_delete=models.CASCADE)
+    season = models.ForeignKey(Season, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+
+    class Meta:
+        unique_together = ['player', 'season']
