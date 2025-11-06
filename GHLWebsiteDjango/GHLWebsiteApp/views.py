@@ -37,7 +37,10 @@ def manager_required(view_func):
     return decorated_view_func
 
 def get_user_team(user):
-    return Team.objects.get(manager=user)
+    try:
+        return Team.objects.get(Q(manager=user) | Q(ass_manager=user))
+    except Team.DoesNotExist:
+        return None
 
 @manager_required
 def add_trade_block_player(request):
@@ -1716,6 +1719,9 @@ def manager_view(request):
                 "SV%": leader_svp[0] if leader_svp else None,
                 "GAA": leader_gaa[0] if leader_gaa else None,
             }
+        else:
+            messages.error(request, "You are currently not linked to a team. Either adjust your linked player, or contact the league manager.")
+            return redirect('user_profile')
         now = timezone.now()
         upcoming_games = (
             Game.objects
