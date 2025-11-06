@@ -22,7 +22,7 @@ class Command(BaseCommand):
             raise CommandError("One or both of the specified games do not exist.")
         if survivor_game.a_team_num == merge_game.h_team_num and survivor_game.h_team_num == merge_game.a_team_num:
             self.stdout.write(self.style.WARNING("Home and away teams are reversed in merge_game. Swapping..."))
-            call_command('swaphomeaway', game_num=merge_game_num)
+            call_command('swaphomeaway', merge_game_num)
         if survivor_game.expected_time == None:
             survivor_game.expected_time = merge_game.expected_time
         if survivor_game.played_time == None:
