@@ -2230,3 +2230,17 @@ div.three-stars-section ol li {
   justify-content: space-evenly;
   align-items: flex-start;
 }
+
+nav.primary-navigation ul li.open > ul {
+  visibility: visible !important;
+  opacity: 1 !important;
+  display: block !important;
+}
+
+@media (hover: none) {
+  nav.primary-navigation ul li:hover > ul {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+  }
+}
