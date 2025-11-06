@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from .forms import *
 import datetime
 from GHLWebsiteApp.models import *
-from django.db.models import Sum, Count, Case, When, Avg, F, Window, FloatField, Q, ExpressionWrapper, Value, OuterRef, Subquery, IntegerField
+from django.db.models import Sum, Count, Case, When, Avg, F, Window, FloatField, Q, ExpressionWrapper, Value, OuterRef, Subquery, IntegerField, DecimalField
 from django.db.models.functions import Cast, Rank, Round, Lower, Coalesce
 from django.http import JsonResponse, HttpResponse, HttpResponseForbidden
 from decimal import *
@@ -794,7 +794,13 @@ def team(request, team, season=None):
         .values('amount')[:1]
     )
 
-    roster = roster.annotate(salary=Coalesce(latest_salary, 0))
+    roster = roster.annotate(
+        latest_salary=Coalesce(
+            Cast(latest_salary, output_field=DecimalField(max_digits=10, decimal_places=0)),
+            0,
+            output_field=DecimalField(max_digits=10, decimal_places=0)
+        )
+    )
     seasons = Season.objects.filter(
         models.Q(game__a_team_num=team) | models.Q(game__h_team_num=team)
     ).exclude(
