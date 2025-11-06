@@ -562,3 +562,6 @@ class Salary(models.Model):
 
     class Meta:
         unique_together = ['player', 'season']
+
+    def __str__(self):
+        return f"{self.player.username} - {self.season.season_text} - ${self.amount:,.0f}"

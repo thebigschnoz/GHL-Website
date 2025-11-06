@@ -217,6 +217,11 @@ class GameSkaterRatingAdmin(admin.ModelAdmin):
     list_display = ("skater_record__ea_player_num", "skater_record__game_num__game_num", "skater_record__game_num__season_num__season_text", "overall_rating", "offense_rating", "defense_rating", "teamplay_rating", "game_result_bonus")
     list_filter = ("skater_record__game_num__season_num__season_text",)
 
+class SalaryAdmin(admin.ModelAdmin):
+    list_display = ("player", "season", "amount")
+    list_filter = ("season__season_text",)
+    search_fields = ("player__username",)
+
 custom_admin_site.register(Season, SeasonsAdmin)
 custom_admin_site.register(Game, GameAdmin)
 custom_admin_site.register(AwardTitle)
@@ -245,3 +250,4 @@ custom_admin_site.register(GoalieRating)
 custom_admin_site.register(GameGoalieRating)
 custom_admin_site.register(TradeBlockPlayer)
 custom_admin_site.register(TeamNeed)
+custom_admin_site.register(Salary)
