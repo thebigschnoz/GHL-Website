@@ -1397,6 +1397,16 @@ td.hoverlink:hover a {
   gap: 20px;
 }
 
+@media (max-width: 900px) {
+  .dashboard-grid {
+    flex-wrap: wrap;
+  }
+
+  .dashboard-column {
+    flex: 1 1 100%;   /* each column becomes full-width */
+  }
+}
+
 .dashboard-panel {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid #e4b61a;
@@ -1404,6 +1414,12 @@ td.hoverlink:hover a {
   padding: 15px;
   min-height: 150px;
   justify-items: center;
+}
+
+@media (max-width: 900px) {
+  .dashboard-panel {
+    min-width: 100%;
+  }
 }
 
 .dashboard-panel h2 {
