@@ -9,23 +9,23 @@ def times(number):
 @register.filter
 def money_full(value):
     if not value:
-        return "—"
+        return "$---,---"
     try:
         value = int(value)
     except (TypeError, ValueError):
-        return "—"
+        return "$---,---"
     return "${:,.0f}".format(value)
 
 @register.filter
 def money_abbr(value):
     """Formats 950000 -> $950K, 1150000 -> $1.15M"""
     if not value:   # None, empty, zero
-        return "—"
+        return "$---"
 
     try:
         value = int(value)
     except (TypeError, ValueError):
-        return "—"
+        return "$---"
 
     if value >= 1_000_000:
         return f"${value/1_000_000:.2f}M".rstrip("0").rstrip(".")
