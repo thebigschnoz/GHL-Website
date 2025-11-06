@@ -1,5 +1,6 @@
 {% extends "GHLWebsiteApp/layout.html" %}
 {% load static %}
+{% load my_filters %}
 {% block body %}
 <center>
     <div class="section section_lg"><center>
@@ -71,15 +72,15 @@
                                             </div>
                                             <div class="contract-container">
                                                 <div class="contract">
-                                                    <span class="contract-abbr">$$$$K</span>
-                                                    <span class="contract-full">$$$$,$$$</span>
+                                                    <span class="contract-abbr">{{ player.salary|money_abbr }}</span>
+                                                    <span class="contract-full">{{ player.salary|money_full }}</span>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="bottom-contract">
-                                    <span class="contract-tiny">$$$$K</span>
+                                    <span class="contract-tiny">{{ player.salary|money_abbr }}</span>
                                 </div>
                             </a>
                         </div>

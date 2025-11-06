@@ -787,6 +787,14 @@ def team(request, team, season=None):
         key=lambda game: (game.expected_time is None, game.expected_time or game.game_num),
     )
     roster = Player.objects.filter(current_team=teamnum).exclude(banneduser__isnull=False).order_by(Lower("username"))
+    latest_salary = Subquery(
+    Salary.objects
+        .filter(player=OuterRef('pk'))
+        .order_by('-season__start_date')
+        .values('amount')[:1]
+    )
+
+    roster = roster.annotate(salary=Coalesce(latest_salary, 0))
     seasons = Season.objects.filter(
         models.Q(game__a_team_num=team) | models.Q(game__h_team_num=team)
     ).exclude(
@@ -1213,6 +1221,13 @@ def playerlist(request):
         goalie_seasons = set(player.goalierecord_set.filter(game_num__season_num__season_type='regular')
                             .values_list('game_num__season_num', flat=True))
         combined_seasons = skater_seasons.union(goalie_seasons)
+        latest_salary = (
+            Salary.objects
+            .filter(player=player)
+            .order_by('-season__start_date')
+            .values_list('amount', flat=True)
+            .first()
+        )
 
         total_games = (
             player.skaterrecord_set.filter(game_num__season_num__season_type='regular').exclude(position=0).values('game_num').distinct().count()
@@ -1224,6 +1239,7 @@ def playerlist(request):
             "total_seasons": len(combined_seasons),
             "total_games": total_games,
             "number": player.jersey_num if player.jersey_num else "00",
+            "salary": latest_salary if latest_salary is not None else "—",
         })
     return render(request, "GHLWebsiteApp/playerlist.html", {"all_players": player_data,})
 
