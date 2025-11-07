@@ -533,7 +533,7 @@ async def lineups(interaction: discord.Interaction, teamname: str):
         team = binding.team
     else:
         # This is the main server (or a server intentionally set as unrestricted)
-        pass
+        team = None  # unrestricted server (main league server)
 
     def get_current_ghl_week_start():
         eastern = ZoneInfo("America/New_York")
@@ -645,7 +645,7 @@ async def lineups(interaction: discord.Interaction, teamname: str):
 
     except Exception as e:
         logger.exception(f"Error in /lineups command: {e}")
-        await interaction.followup.send(f"❌ Error: {e}")
+        await interaction.followup.send(f"❌ Error: {e}", ephemeral=True)
 
 @bot.tree.command(name="request", description="Request to bind this server to a team. Admins only.")
 @app_commands.checks.has_permissions(administrator=True)
