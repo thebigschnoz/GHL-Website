@@ -448,7 +448,7 @@ async def team(interaction: discord.Interaction, teamname: str):
 @bot.tree.command(name="upcoming", description="Show upcoming ten games for a team")
 @app_commands.describe(teamname="Enter a team's name or abbreviation")
 async def upcoming(interaction: discord.Interaction, teamname: str):
-    logger.info(f"Command /team triggered for teamname: {teamname}")
+    logger.info(f"Command /upcoming triggered for teamname: {teamname}")
     await interaction.response.defer()
     try:
         logger.info("Trying exact team name match")
@@ -517,6 +517,7 @@ async def upcoming(interaction: discord.Interaction, teamname: str):
 @bot.tree.command(name="lineups", description="Show scheduled lineups for the current GHL week")
 @app_commands.describe(teamname="Enter a team's name or abbreviation")
 async def lineups(interaction: discord.Interaction, teamname: str):
+    logger.info(f"Command /lineups triggered for teamname: {teamname}")
     await interaction.response.defer()
 
     binding = await sync_to_async(
@@ -650,6 +651,7 @@ async def lineups(interaction: discord.Interaction, teamname: str):
 @bot.tree.command(name="request", description="Request to bind this server to a team. Admins only.")
 @app_commands.checks.has_permissions(administrator=True)
 async def request(interaction: discord.Interaction, club_abbr: str):
+    logger.info(f"Command /request triggered for team: {club_abbr}")
     team = await sync_to_async(Team.objects.filter(club_abbr__iexact=club_abbr).first)()
     if not team:
         return await interaction.followup.send(f"❌ Team `{club_abbr}` not found.", ephemeral=True)
@@ -681,6 +683,7 @@ async def request(interaction: discord.Interaction, club_abbr: str):
 @bot.tree.command(name="clearteam", description="Unbind THIS server from any team. Admins only.")
 @app_commands.checks.has_permissions(administrator=True)
 async def clearteam(interaction: discord.Interaction):
+    logger.info(f"Command /clearteam triggered")
     deleted, _ = await sync_to_async(TeamServerBinding.objects.filter(guild_id=interaction.guild_id).delete)()
     if deleted:
         msg = "✅ Server unbound. `/lineups` is now blocked until bound again."
@@ -690,7 +693,9 @@ async def clearteam(interaction: discord.Interaction):
     await interaction.response.send_message(msg, ephemeral=True)
 
 @bot.tree.command(name="approve", description="Approve a pending team server binding. League admins only.")
+@app_commands.checks.has_permissions(administrator=True)
 async def approve(interaction: discord.Interaction, guild_id: str):
+    logger.info(f"Command /approve triggered for guild: {guild_id}")
     if not is_league_admin(interaction):
         return await interaction.followup.send("⛔ You do not have permission.", ephemeral=True)
 
@@ -717,7 +722,9 @@ async def approve(interaction: discord.Interaction, guild_id: str):
     await bot_log(f"✅ Approved: `{guild_id}` → **{pending.requested_team.club_abbr}** by `{interaction.user}`")
 
 @bot.tree.command(name="viewbindings", description="View all registered and pending server bindings. League admins only.")
+@app_commands.checks.has_permissions(administrator=True)
 async def viewbindings(interaction: discord.Interaction):
+    logger.info(f"Command /viewbindings triggered")
     if not is_league_admin(interaction):
         return await interaction.followup.send("⛔ You do not have permission.", ephemeral=True)
 
@@ -744,12 +751,10 @@ async def viewbindings(interaction: discord.Interaction):
 
     await interaction.response.send_message(msg, ephemeral=True)
 
-@bot.tree.command(
-    name="deny",
-    description="Deny a pending server binding request. League admins only."
-)
+@bot.tree.command(name="deny", description="Deny a pending server binding request. League admins only.")
+@app_commands.checks.has_permissions(administrator=True)
 async def deny(interaction: discord.Interaction, guild_id: str):
-    # Must be run inside the main league Discord, and must have the required role
+    logger.info(f"Command /deny triggered for guild: {guild_id}")
     if interaction.guild_id != LEAGUE_GUILD_ID:
         return await interaction.followup.send(
             "⛔ This command can only be used inside the main league server.",
