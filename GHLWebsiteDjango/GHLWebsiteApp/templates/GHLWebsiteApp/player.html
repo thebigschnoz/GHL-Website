@@ -6,8 +6,38 @@
         <div class="subsection-container-vert">
             <div class="player-header">
                 <div class="player-photo">
-                    <img src="{% static 'GHLWebsiteApp/stock-user-photo.jpg' %}" width="200" height="200" />
+                    <img src="https://avatar-ssl.xboxlive.com/avatar/{{ playernum.username }}/avatar-body.png" class="ghl-avatar" alt="Xbox Avatar" data-fallback="{% static 'GHLWebsiteApp/stock-user-photo.jpg' %}">
                 </div>
+                <script>
+                        document.addEventListener("DOMContentLoaded", () => {
+                        document.querySelectorAll("img.ghl-avatar").forEach(img => {
+                            const fallback = img.dataset.fallback;
+
+                            img.onload = () => {
+                            // Create canvas to inspect pixel data
+                            const canvas = document.createElement("canvas");
+                            canvas.width = img.naturalWidth;
+                            canvas.height = img.naturalHeight;
+                            const ctx = canvas.getContext("2d");
+                            ctx.drawImage(img, 0, 0);
+
+                            // Read a pixel — if fully transparent, replace image
+                            const pixel = ctx.getImageData(0, 0, 1, 1).data;
+                            const isTransparent = pixel[3] === 0;
+
+                            if (isTransparent) {
+                                img.src = fallback;
+                                img.classList.add("fallback-avatar");
+                            }
+                            };
+
+                            img.onerror = () => {
+                            img.src = fallback;
+                            img.classList.add("fallback-avatar");
+                            };
+                        });
+                        });
+                        </script>
                 <div class="player-name">
                     {{ playernum.username }}
                 </div>
