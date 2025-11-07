@@ -696,11 +696,11 @@ async def clearteam(interaction: discord.Interaction):
 @app_commands.checks.has_permissions(administrator=True)
 async def approve(interaction: discord.Interaction, guild_id: str):
     logger.info(f"Command /approve triggered for guild: {guild_id}")
-    if not is_league_admin(interaction):
+    if not await is_league_admin(interaction):
         return await interaction.followup.send("⛔ You do not have permission.", ephemeral=True)
 
     pending = await sync_to_async(PendingServerBinding.objects.filter(guild_id=guild_id).select_related("requested_team").first)()
-    if not pending:
+    if not await pending:
         return await interaction.followup.send("❌ No pending request found for that guild.", ephemeral=True)
 
     # Apply binding
@@ -725,7 +725,7 @@ async def approve(interaction: discord.Interaction, guild_id: str):
 @app_commands.checks.has_permissions(administrator=True)
 async def viewbindings(interaction: discord.Interaction):
     logger.info(f"Command /viewbindings triggered")
-    if not is_league_admin(interaction):
+    if not await is_league_admin(interaction):
         return await interaction.followup.send("⛔ You do not have permission.", ephemeral=True)
 
     approved = await sync_to_async(list)(
