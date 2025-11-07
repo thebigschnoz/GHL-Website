@@ -523,7 +523,7 @@ async def lineups(interaction: discord.Interaction, teamname: str):
         TeamServerBinding.objects.filter(guild_id=interaction.guild_id).select_related("team").first)()
 
     if not binding:
-        return await interaction.response.send_message(
+        return await interaction.followup.send(
             "⛔ This server is not registered. A server admin must run `/set_team_server TEAMCODE` first.",
             ephemeral=True
         )
@@ -652,7 +652,7 @@ async def lineups(interaction: discord.Interaction, teamname: str):
 async def request(interaction: discord.Interaction, club_abbr: str):
     team = await sync_to_async(Team.objects.filter(club_abbr__iexact=club_abbr).first)()
     if not team:
-        return await interaction.response.send_message(f"❌ Team `{club_abbr}` not found.", ephemeral=True)
+        return await interaction.followup.send(f"❌ Team `{club_abbr}` not found.", ephemeral=True)
 
     # Store request
     await sync_to_async(PendingServerBinding.objects.update_or_create)(
@@ -692,11 +692,11 @@ async def clearteam(interaction: discord.Interaction):
 @bot.tree.command(name="approve", description="Approve a pending team server binding. League admins only.")
 async def approve(interaction: discord.Interaction, guild_id: str):
     if not is_league_admin(interaction):
-        return await interaction.response.send_message("⛔ You do not have permission.", ephemeral=True)
+        return await interaction.followup.send("⛔ You do not have permission.", ephemeral=True)
 
     pending = await sync_to_async(PendingServerBinding.objects.filter(guild_id=guild_id).select_related("requested_team").first)()
     if not pending:
-        return await interaction.response.send_message("❌ No pending request found for that guild.", ephemeral=True)
+        return await interaction.followup.send("❌ No pending request found for that guild.", ephemeral=True)
 
     # Apply binding
     await sync_to_async(TeamServerBinding.objects.update_or_create)(
@@ -719,7 +719,7 @@ async def approve(interaction: discord.Interaction, guild_id: str):
 @bot.tree.command(name="viewbindings", description="View all registered and pending server bindings. League admins only.")
 async def viewbindings(interaction: discord.Interaction):
     if not is_league_admin(interaction):
-        return await interaction.response.send_message("⛔ You do not have permission.", ephemeral=True)
+        return await interaction.followup.send("⛔ You do not have permission.", ephemeral=True)
 
     approved = await sync_to_async(list)(
         TeamServerBinding.objects.select_related("team").all()
@@ -751,13 +751,13 @@ async def viewbindings(interaction: discord.Interaction):
 async def deny(interaction: discord.Interaction, guild_id: str):
     # Must be run inside the main league Discord, and must have the required role
     if interaction.guild_id != LEAGUE_GUILD_ID:
-        return await interaction.response.send_message(
+        return await interaction.followup.send(
             "⛔ This command can only be used inside the main league server.",
             ephemeral=True
         )
 
     if not any(r.name == LEAGUE_ADMIN_ROLE for r in interaction.user.roles):
-        return await interaction.response.send_message(
+        return await interaction.followup.send(
             "⛔ You do not have permission to perform this action.",
             ephemeral=True
         )
@@ -767,7 +767,7 @@ async def deny(interaction: discord.Interaction, guild_id: str):
     )()
 
     if not pending:
-        return await interaction.response.send_message(
+        return await interaction.followup.send(
             "❌ No pending request found for that guild.",
             ephemeral=True
         )
