@@ -690,21 +690,6 @@ async def clearteam(interaction: discord.Interaction):
     await interaction.response.send_message(msg, ephemeral=True)
 
 @bot.tree.command(name="approve", description="Approve a pending team server binding. League admins only.")
-@app_commands.checks.has_permissions(administrator=True)  
-async def approve(interaction: discord.Interaction, guild_id: str):
-    pending = await sync_to_async(PendingServerBinding.objects.filter(guild_id=guild_id).first)()
-    if not pending:
-        return await interaction.response.send_message("❌ No pending request found.", ephemeral=True)
-
-    await sync_to_async(TeamServerBinding.objects.update_or_create)(
-        guild_id=guild_id,
-        defaults={"team": pending.requested_team}
-    )
-    await sync_to_async(pending.delete)()
-    await interaction.response.send_message("✅ Approved and applied.", ephemeral=True)
-    await bot_log(f"✅ Approved: `{guild_id}` → {pending.requested_team.club_abbr}")
-
-@bot.tree.command(name="approve", description="Approve a pending team server binding. League admins only.")
 async def approve(interaction: discord.Interaction, guild_id: str):
     if not is_league_admin(interaction):
         return await interaction.response.send_message("⛔ You do not have permission.", ephemeral=True)
