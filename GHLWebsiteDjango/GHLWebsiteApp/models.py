@@ -565,3 +565,16 @@ class Salary(models.Model):
 
     def __str__(self):
         return f"{self.player.username} - {self.season.season_text} - ${self.amount:,.0f}"
+    
+class TeamServerBinding(models.Model):
+    guild_id = models.BigIntegerField(unique=True, verbose_name="Discord Guild ID", help_text="The Discord server (guild) ID")
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.guild_id} → {self.team.team_code if self.team else 'UNBOUND'}"
+    
+class PendingServerBinding(models.Model):
+    guild_id = models.BigIntegerField(unique=True)
+    requested_team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    requested_by = models.BigIntegerField()  # discord user ID
+    requested_at = models.DateTimeField(auto_now_add=True)

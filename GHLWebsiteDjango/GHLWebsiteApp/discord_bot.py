@@ -14,10 +14,12 @@ from django.db.models.functions import Cast, Rank, Round, Lower, Coalesce
 from GHLWebsiteApp.views import get_seasonSetting
 from zoneinfo import ZoneInfo
 
-
 load_dotenv()
 
+LOG_CHANNEL_ID = 1435172225060962374
 TOKEN = os.getenv("DISCORD_TOKEN")
+LEAGUE_ADMIN_ROLE = "All Admins"
+LEAGUE_GUILD_ID = 1021563211759230976
 
 if not TOKEN:
     raise ValueError("❌ DISCORD_TOKEN not found. Make sure it's in your .env file.")
@@ -30,6 +32,11 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+async def bot_log(message: str):
+    channel = bot.get_channel(LOG_CHANNEL_ID)
+    if channel:
+        await channel.send(message)
 
 @bot.event
 async def on_ready():
@@ -151,6 +158,14 @@ def ordinal_suffix(n):
         return 'th'
     else:
         return {1: 'st', 2: 'nd', 3: 'rd'}.get(n % 10, 'th')
+
+async def is_league_admin(interaction):
+    # Must be executed inside the LEAGUE_GUILD
+    if interaction.guild_id != LEAGUE_GUILD_ID:
+        return False
+    
+    # Must have the required role inside the league server
+    return any(r.name == LEAGUE_ADMIN_ROLE for r in interaction.user.roles)
     
 # --- SLASH COMMANDS ---
 @bot.tree.command(name="statsskater", description="Show a player's skater stats for this season")
@@ -504,6 +519,22 @@ async def upcoming(interaction: discord.Interaction, teamname: str):
 async def lineups(interaction: discord.Interaction, teamname: str):
     await interaction.response.defer()
 
+    binding = await sync_to_async(
+        TeamServerBinding.objects.filter(guild_id=interaction.guild_id).select_related("team").first)()
+
+    if not binding:
+        return await interaction.response.send_message(
+            "⛔ This server is not registered. A server admin must run `/set_team_server TEAMCODE` first.",
+            ephemeral=True
+        )
+
+    if binding.team:
+        # Server is restricted to one team — override user input
+        team = binding.team
+    else:
+        # This is the main server (or a server intentionally set as unrestricted)
+        pass
+
     def get_current_ghl_week_start():
         eastern = ZoneInfo("America/New_York")
         now = datetime.datetime.now(eastern).date()
@@ -615,3 +646,166 @@ async def lineups(interaction: discord.Interaction, teamname: str):
     except Exception as e:
         logger.exception(f"Error in /lineups command: {e}")
         await interaction.followup.send(f"❌ Error: {e}")
+
+@bot.tree.command(name="request", description="Request to bind this server to a team. Admins only.")
+@app_commands.checks.has_permissions(administrator=True)
+async def request(interaction: discord.Interaction, club_abbr: str):
+    team = await sync_to_async(Team.objects.filter(club_abbr__iexact=club_abbr).first)()
+    if not team:
+        return await interaction.response.send_message(f"❌ Team `{club_abbr}` not found.", ephemeral=True)
+
+    # Store request
+    await sync_to_async(PendingServerBinding.objects.update_or_create)(
+        guild_id=interaction.guild_id,
+        defaults={"requested_team": team, "requested_by": interaction.user.id},
+    )
+
+    # DM the requester
+    try:
+        await interaction.user.send(f"✅ Your server binding request for **{team.club_abbr}** has been submitted and awaits approval.")
+    except:
+        pass  # user has DMs disabled
+
+    # Notify them in server
+    await interaction.response.send_message(
+        "✅ Request submitted. A league admin must approve it before `/lineups` will work.",
+        ephemeral=True
+    )
+
+    # Log to league server
+    await bot_log(
+        f"📩 Binding request: `{interaction.guild.name}` ({interaction.guild_id}) → **{team.club_abbr}** (requested by `{interaction.user}`)"
+    )
+
+
+@bot.tree.command(name="clearteam", description="Unbind THIS server from any team. Admins only.")
+@app_commands.checks.has_permissions(administrator=True)
+async def clearteam(interaction: discord.Interaction):
+    deleted, _ = await sync_to_async(TeamServerBinding.objects.filter(guild_id=interaction.guild_id).delete)()
+    if deleted:
+        msg = "✅ Server unbound. `/lineups` is now blocked until bound again."
+        await bot_log(f"🗑️ `{interaction.user}` unbound guild `{interaction.guild.name}` ({interaction.guild_id})")
+    else:
+        msg = "ℹ️ This server wasn’t bound."
+    await interaction.response.send_message(msg, ephemeral=True)
+
+@bot.tree.command(name="approve", description="Approve a pending team server binding. League admins only.")
+@app_commands.checks.has_permissions(administrator=True)  
+async def approve(interaction: discord.Interaction, guild_id: str):
+    pending = await sync_to_async(PendingServerBinding.objects.filter(guild_id=guild_id).first)()
+    if not pending:
+        return await interaction.response.send_message("❌ No pending request found.", ephemeral=True)
+
+    await sync_to_async(TeamServerBinding.objects.update_or_create)(
+        guild_id=guild_id,
+        defaults={"team": pending.requested_team}
+    )
+    await sync_to_async(pending.delete)()
+    await interaction.response.send_message("✅ Approved and applied.", ephemeral=True)
+    await bot_log(f"✅ Approved: `{guild_id}` → {pending.requested_team.club_abbr}")
+
+@bot.tree.command(name="approve", description="Approve a pending team server binding. League admins only.")
+async def approve(interaction: discord.Interaction, guild_id: str):
+    if not is_league_admin(interaction):
+        return await interaction.response.send_message("⛔ You do not have permission.", ephemeral=True)
+
+    pending = await sync_to_async(PendingServerBinding.objects.filter(guild_id=guild_id).select_related("requested_team").first)()
+    if not pending:
+        return await interaction.response.send_message("❌ No pending request found for that guild.", ephemeral=True)
+
+    # Apply binding
+    await sync_to_async(TeamServerBinding.objects.update_or_create)(
+        guild_id=guild_id,
+        defaults={"team": pending.requested_team},
+    )
+
+    # Notify requester if possible
+    user = await bot.fetch_user(pending.requested_by)
+    try:
+        await user.send(f"✅ Your server binding request has been approved! **{pending.requested_team.club_abbr}** is now active.")
+    except:
+        pass
+
+    await sync_to_async(pending.delete)()
+
+    await interaction.response.send_message("✅ Approved and applied.", ephemeral=True)
+    await bot_log(f"✅ Approved: `{guild_id}` → **{pending.requested_team.club_abbr}** by `{interaction.user}`")
+
+@bot.tree.command(name="viewbindings", description="View all registered and pending server bindings. League admins only.")
+async def viewbindings(interaction: discord.Interaction):
+    if not is_league_admin(interaction):
+        return await interaction.response.send_message("⛔ You do not have permission.", ephemeral=True)
+
+    approved = await sync_to_async(list)(
+        TeamServerBinding.objects.select_related("team").all()
+    )
+    pending = await sync_to_async(list)(
+        PendingServerBinding.objects.select_related("requested_team").all()
+    )
+
+    msg = "**✅ Approved Bindings:**\n"
+    if approved:
+        for b in approved:
+            msg += f"• `{b.guild_id}` → **{b.team.club_abbr if b.team else 'UNBOUND'}**\n"
+    else:
+        msg += "• *(none)*\n"
+
+    msg += "\n**⏳ Pending Requests:**\n"
+    if pending:
+        for p in pending:
+            msg += f"• `{p.guild_id}` → **{p.requested_team.club_abbr}** (by <@{p.requested_by}>)\n"
+    else:
+        msg += "• *(none)*"
+
+    await interaction.response.send_message(msg, ephemeral=True)
+
+@bot.tree.command(
+    name="deny",
+    description="Deny a pending server binding request. League admins only."
+)
+async def deny(interaction: discord.Interaction, guild_id: str):
+    # Must be run inside the main league Discord, and must have the required role
+    if interaction.guild_id != LEAGUE_GUILD_ID:
+        return await interaction.response.send_message(
+            "⛔ This command can only be used inside the main league server.",
+            ephemeral=True
+        )
+
+    if not any(r.name == LEAGUE_ADMIN_ROLE for r in interaction.user.roles):
+        return await interaction.response.send_message(
+            "⛔ You do not have permission to perform this action.",
+            ephemeral=True
+        )
+
+    pending = await sync_to_async(
+        PendingServerBinding.objects.filter(guild_id=guild_id).select_related("requested_team").first
+    )()
+
+    if not pending:
+        return await interaction.response.send_message(
+            "❌ No pending request found for that guild.",
+            ephemeral=True
+        )
+
+    # Try to DM requester
+    try:
+        user = await bot.fetch_user(pending.requested_by)
+        await user.send(
+            f"❌ Your server binding request for **{pending.requested_team.club_abbr}** was denied."
+        )
+    except:
+        pass  # DMs blocked or invalid user
+
+    # Delete request
+    await sync_to_async(pending.delete)()
+
+    # Acknowledge in admin server
+    await interaction.response.send_message(
+        f"✅ Denied request from guild `{guild_id}` for team **{pending.requested_team.club_abbr}**.",
+        ephemeral=True
+    )
+
+    # Log to league log channel
+    await bot_log(
+        f"❌ DENIED by `{interaction.user}` — `{guild_id}` → **{pending.requested_team.club_abbr}**"
+    )

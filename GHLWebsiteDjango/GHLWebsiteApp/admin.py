@@ -222,6 +222,14 @@ class SalaryAdmin(admin.ModelAdmin):
     list_filter = ("season__season_text",)
     search_fields = ("player__username",)
 
+class TeamServerBindingAdmin(admin.ModelAdmin):
+    list_display = ("guild_id", "team")
+    search_fields = ("guild_id", "team__club_abbr", "team__club_full_name")
+
+class PSBAdmin(admin.ModelAdmin):
+    list_display = ("guild_id", "requested_team", "requested_by", "requested_at")
+    search_fields = ("guild_id", "requested_team__club_abbr")
+
 custom_admin_site.register(Season, SeasonsAdmin)
 custom_admin_site.register(Game, GameAdmin)
 custom_admin_site.register(AwardTitle)
@@ -250,4 +258,6 @@ custom_admin_site.register(GoalieRating)
 custom_admin_site.register(GameGoalieRating)
 custom_admin_site.register(TradeBlockPlayer)
 custom_admin_site.register(TeamNeed)
-custom_admin_site.register(Salary)
+custom_admin_site.register(Salary, SalaryAdmin)
+custom_admin_site.register(TeamServerBinding, TeamServerBindingAdmin)
+custom_admin_site.register(PendingServerBinding, PSBAdmin)
