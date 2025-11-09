@@ -542,12 +542,12 @@ async def lineups(interaction: discord.Interaction, teamname: str):
         weekday = now.weekday()  # Monday = 0 ... Sunday = 6
 
         # GHL Week = Friday (4) → Thursday (10)
-        # If today is Fri (4) or Sat (5), we jump ahead to NEXT Friday
-        if weekday in (4, 5):  # Friday or Saturday
-            days_until_next_friday = (4 - weekday) % 7
-            week_start = now + datetime.timedelta(days=days_until_next_friday)
+        # If today is Fri (4) or Sat (5), we stay in the current week
+        if weekday >= 4:  # Fri (4), Sat (5), Sun (6)
+            days_since_friday = weekday - 4
+            week_start = now - datetime.timedelta(days=days_since_friday)
         else:
-            # Otherwise, find the most recent Friday
+            # Mon–Thu → go backwards to the previous Friday
             days_since_friday = (weekday - 4) % 7
             week_start = now - datetime.timedelta(days=days_since_friday)
 
