@@ -49,6 +49,7 @@ INSTALLED_APPS = [
 
 CRONJOBS = [
     ('*/5 21-23 * * 0-4', 'GHLWebsiteApp.cron.run_poll_api', '>> pollapi.log 2>&1'),
+    ('*/30 22-23 * * 0-4', 'GHLWebsiteApp.cron.run_update_clinch', '>> updateclinch.log 2>&1'),
 ]
 
 MIDDLEWARE = [
