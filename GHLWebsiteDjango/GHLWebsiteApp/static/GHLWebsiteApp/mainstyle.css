@@ -257,9 +257,8 @@ th {
 
 .clinched {
   border: 1px solid white;
-  width: 100px;
+  min-width: 100px;
   padding: 3px;
-  width: 50px;
   border-radius: 5px;
   background-color: #b89217;
 }
