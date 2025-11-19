@@ -397,6 +397,25 @@ class PlayoffSeries(models.Model):
             self.series_winner = None
         self.save()
 
+class PlayoffConfig(models.Model):
+    season = models.OneToOneField(
+        Season,
+        on_delete=models.CASCADE,
+        related_name="playoff_config",
+    )
+    playoff_teams = models.PositiveSmallIntegerField(
+        default=8,
+        help_text="Total number of teams that qualify for playoffs from this season."
+    )
+    # TODO: add conference/division logic if needed
+    # use_conferences = models.BooleanField(default=False)
+    # teams_per_conference = models.PositiveSmallIntegerField(default=0)
+    # etc.
+
+    def __str__(self):
+        return f"{self.season.season_text} playoff config"
+
+
 class AwardVote(models.Model):
     ea_player_num = models.ForeignKey(Player, on_delete=models.CASCADE, verbose_name="Player")
     team = models.ForeignKey(Team, on_delete=models.CASCADE, verbose_name="Team", null=True)
