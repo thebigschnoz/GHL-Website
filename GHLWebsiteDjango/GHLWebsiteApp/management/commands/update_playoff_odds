@@ -1,5 +1,4 @@
 from django.core.management.base import BaseCommand
-from GHLWebsiteApp.models import Season
 from GHLWebsiteApp.playoff_sim import get_active_season, update_playoff_flags_from_odds
 
 class Command(BaseCommand):
