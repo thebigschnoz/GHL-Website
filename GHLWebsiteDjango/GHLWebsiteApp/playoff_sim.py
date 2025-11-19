@@ -132,44 +132,74 @@ def compute_playoff_odds(season: Season, iterations: int = 5000):
     remaining_games = get_remaining_games(season)
 
     if not remaining_games:
-        # season effectively done, just mark top N
+        # Season done: we know exact final order.
         sorted_teams = [s.team_id for s in standings]
-        return {
+
+        playoff_odds = {
             s.team_id: 1.0 if i < cfg.playoff_teams else 0.0
             for i, s in enumerate(standings)
         }
 
+        presidents_odds = {
+            s.team_id: 1.0 if i == 0 else 0.0
+            for i, s in enumerate(standings)
+        }
+
+        return playoff_odds, presidents_odds
+
     base_points = build_base_points_table(standings)
 
     qualify_counts = {s.team_id: 0 for s in standings}
+    presidents_counts = {s.team_id: 0 for s in standings}
 
     for _ in range(iterations):
         final_order = simulate_season_once(season, base_points, remaining_games)
+
+        # Teams that make the playoffs in this run
         qualifiers = set(final_order[:cfg.playoff_teams])
         for team_id in qualifiers:
             if team_id in qualify_counts:
                 qualify_counts[team_id] += 1
 
-    odds = {
+        # Team that wins the President's Trophy (1st overall) in this run
+        top_team_id = final_order[0]
+        if top_team_id in presidents_counts:
+            presidents_counts[top_team_id] += 1
+
+    playoff_odds = {
         team_id: qualify_counts[team_id] / iterations
         for team_id in qualify_counts
     }
-    return odds
+    presidents_odds = {
+        team_id: presidents_counts[team_id] / iterations
+        for team_id in presidents_counts
+    }
+
+    return playoff_odds, presidents_odds
 
 def update_playoff_flags_from_odds(season: Season, iterations: int = 5000):
-    odds = compute_playoff_odds(season, iterations=iterations)
+    playoff_odds, presidents_odds = compute_playoff_odds(
+        season, iterations=iterations
+    )
     standings = Standing.objects.filter(season=season).select_related("team")
 
     for s in standings:
-        p = odds.get(s.team_id, 0.0)
-        old_code = s.playoffs
+        playoff_p = playoff_odds.get(s.team_id, 0.0) # Odds of making the playoffs
+        pres_p = presidents_odds.get(s.team_id, 0.0) # Odds of winning President's Trophy (most points)
+
+        old_code = s.playoffs or ""
         new_code = old_code
 
-        if p >= 0.999 and old_code == "":
-            new_code = "x"  # clinched playoff spot
-        # Optional: add elimination code if you add it to choices
-        # elif p <= 0.001 and old_code == "":
-        #     new_code = "e"
+        # 1) President's Trophy clinched: override with 'p'
+        #    (using same 0.999 threshold as your playoff clinch)
+        if pres_p >= 0.999:
+            new_code = "p"
+
+        # 2) Otherwise, mark basic playoff clinch if they have no flag yet
+        elif playoff_p >= 0.999 and old_code == "":
+            new_code = "x"
+
+        # TODO: division/conference clinches
 
         if new_code != old_code:
             s.playoffs = new_code
