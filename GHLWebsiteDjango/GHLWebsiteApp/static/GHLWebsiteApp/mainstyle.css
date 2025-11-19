@@ -858,6 +858,7 @@ nav.primary-navigation li:hover {
 nav.primary-navigation ul li ul {
   z-index: 10;
   visibility: hidden;
+  transition: max-height .25s ease, opacity .25s ease;
   opacity: 0;
   position: absolute;
   padding-left: 0;
@@ -866,17 +867,7 @@ nav.primary-navigation ul li ul {
   box-shadow: none;
   background: #e4b61a;
 }
-/* nav.primary-navigation ul li:hover > ul,
-nav.primary-navigation ul li ul:hover,
-nav.primary-navigation ul li.open > ul {
-  visibility: visible;
-  opacity: 1;
-  display: block;
-  min-width: 150px;
-  text-align: left;
-  padding-top: 10px;
-  box-shadow: 0px 3px 5px -1px #ccc;
-} */
+
 nav.primary-navigation ul li.open > ul {
   visibility: visible !important;
   opacity: 1 !important;
@@ -889,12 +880,6 @@ nav.primary-navigation ul li.open > ul {
   visibility: hidden;
   display: none;
 }
-
-/*.dropdown-parent:hover .dropdown,
-.dropdown-parent.open .dropdown {
-  visibility: visible;
-  display: block;
-}*/
 
 nav.primary-navigation ul li ul li {
   /* Stroke?
@@ -917,6 +902,24 @@ nav.primary-navigation ul li ul li a:hover {
   border-left: 2px solid #e4b61a;
   transition: all 0.3s ease;
 }
+
+nav.primary-navigation .dropdown-toggle {
+    background: none;
+    border: none;
+    color: inherit;
+    font: inherit;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    display: block;
+    width: 100%;
+    text-align: left;
+}
+
+nav.primary-navigation .dropdown-toggle:focus {
+    outline: none;
+}
+
 
 ul li a {
   text-decoration: none;

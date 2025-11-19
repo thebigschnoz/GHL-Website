@@ -90,7 +90,8 @@
 				<ul>
 					<li><a href="{% url 'index' %}">Home</a></li>
 					<li><a href="{% url 'standings' %}">Standings</a></li>
-					<li style="font-weight: 600;" class="dropdown-parent">Statistics &dtrif;
+					<li style="font-weight: 600;" class="dropdown-parent">
+						<button class="dropdown-toggle">Statistics &dtrif;</button>
 						<ul class="dropdown">
 							<li><a href="{% url 'leaders' %}">League Leaders</a></li>
 							<li><a href="{% url 'skaters' %}">Skater Stats</a></li>
@@ -108,7 +109,8 @@
 				<span style="display: inline-block; margin-right: 5px; background-color: black;">{% if user.is_authenticated %}User: {{ user.get_username }}{% endif %}</span><nav role="navigation" class="primary-navigation" style="display: inline-block; vertical-align: middle;">
 					{% if user.is_authenticated %}
 						<ul>
-							<li class="dropdown-parent">Actions &dtrif;
+							<li class="dropdown-parent">
+								<button class="dropdown-toggle">Actions &dtrif;</button>
 								<ul class="dropdown">
 									{% if user.is_superuser or user|has_group:"Admins" %}
 									<li><a href="{% url 'admin:index' %}">Admin</a></li>
@@ -138,24 +140,27 @@
 			</div>
 		</div>
 		<script>
-			document.querySelectorAll('nav.primary-navigation ul li').forEach(menu => {
-			  menu.addEventListener('click', function (e) {
-				e.stopPropagation();
-				// Toggle 'open' class
-				this.classList.toggle('open');
-		  
-				// Close other open menus
-				document.querySelectorAll('nav.primary-navigation ul li').forEach(el => {
-				  if (el !== this) el.classList.remove('open');
+			document.querySelectorAll('.dropdown-toggle').forEach(btn => {
+				btn.addEventListener('click', function (e) {
+					e.preventDefault();
+					e.stopPropagation();
+
+					const parent = this.parentElement;
+					const isOpen = parent.classList.contains('open');
+
+					document.querySelectorAll('.dropdown-parent').forEach(el => {
+						el.classList.remove('open');
+					});
+
+					if (!isOpen) parent.classList.add('open');
 				});
-			  });
 			});
-		  
-			// Close dropdowns if clicking outside
+
+			// close menus when tapping outside
 			document.addEventListener('click', () => {
-			  document.querySelectorAll('nav.primary-navigation ul li').forEach(menu => {
-				menu.classList.remove('open');
-			  });
+				document.querySelectorAll('.dropdown-parent').forEach(el =>
+					el.classList.remove('open')
+				);
 			});
 		</script>
 		<div id="divider"></div>
