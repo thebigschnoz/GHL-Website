@@ -2272,11 +2272,3 @@ nav.primary-navigation ul li.open > ul {
   opacity: 1 !important;
   display: block !important;
 }
-
-@media (hover: none) {
-  nav.primary-navigation ul li:hover > ul {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-  }
-}
