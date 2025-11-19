@@ -256,10 +256,11 @@ th {
 }
 
 .clinched {
-  outline: 2px;
-  text-shadow: 1px 1px 3px black;
+  border: 1px solid white;
+  padding: 3px;
+  width: 50px;
+  border-radius: 5px;
   background-color: #b89217;
-  outline-style: outset;
 }
 
 .standingstable {
