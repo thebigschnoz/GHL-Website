@@ -46,7 +46,7 @@
           {% for standing in standings %}
           <tr>
             <td>{{ forloop.counter }}</td>
-            <td>&nbsp;</td>
+            <td>{{ standing.playoffs }}</td>
             {% if standing.team.team_logo_link %}
             <td><img src="{{ standing.team.team_logo_link }}" height=24 width=24></img></td>
             {% else %}

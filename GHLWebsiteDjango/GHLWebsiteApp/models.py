@@ -415,7 +415,6 @@ class PlayoffConfig(models.Model):
     def __str__(self):
         return f"{self.season.season_text} playoff config"
 
-
 class AwardVote(models.Model):
     ea_player_num = models.ForeignKey(Player, on_delete=models.CASCADE, verbose_name="Player")
     team = models.ForeignKey(Team, on_delete=models.CASCADE, verbose_name="Team", null=True)
