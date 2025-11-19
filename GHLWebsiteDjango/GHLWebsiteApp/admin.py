@@ -230,6 +230,10 @@ class PSBAdmin(admin.ModelAdmin):
     list_display = ("guild_id", "requested_team", "requested_by", "requested_at")
     search_fields = ("guild_id", "requested_team__club_abbr")
 
+class StandingAdmin(admin.ModelAdmin):
+    list_display = ("team", "season", "points", "playoffs")
+    list_filter = ("season__season_text",)
+
 custom_admin_site.register(Season, SeasonsAdmin)
 custom_admin_site.register(Game, GameAdmin)
 custom_admin_site.register(AwardTitle)
@@ -241,7 +245,7 @@ custom_admin_site.register(AwardAssign, AwardAssignAdmin)
 custom_admin_site.register(SkaterRecord, SkaterRecordAdmin)
 custom_admin_site.register(GoalieRecord, GoalieRecordAdmin)
 custom_admin_site.register(TeamRecord, TeamRecordAdmin)
-custom_admin_site.register(Standing)
+custom_admin_site.register(Standing, StandingAdmin)
 custom_admin_site.register(Leader)
 custom_admin_site.register(AwardVote)
 custom_admin_site.register(User, CustomUserAdmin)
