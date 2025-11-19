@@ -1,15 +1,35 @@
 import random
+from django.core.exceptions import ObjectDoesNotExist
 from collections import defaultdict
 
 
 from .models import Season, Game, Standing, PlayoffConfig, Team
 
 def get_active_season():
-    return Season.objects.get(isActive=True)
+    try:
+        season = Season.objects.get(isActive=True)
+    except ObjectDoesNotExist:
+        raise ValueError("No active season found. Cannot run playoff simulation.")
+
+    if season.season_type != "regular":
+        # Defensive: stop immediately if someone accidentally activates playoffs/preseason
+        raise ValueError(
+            f"Active season '{season.season_text}' is type "
+            f"'{season.season_type}', but playoff_sim only runs for regular seasons."
+        )
+
+    return season
 
 
 def get_playoff_config(season: Season) -> PlayoffConfig:
-    return PlayoffConfig.objects.get(season=season)
+    try:
+        cfg = PlayoffConfig.objects.get(season=season)
+    except PlayoffConfig.DoesNotExist:
+        raise ValueError(
+            f"No PlayoffConfig found for season '{season.season_text}'. "
+            "Create one in the admin with the correct number of playoff teams."
+        )
+    return cfg
 
 
 def get_current_standings(season: Season):
@@ -28,10 +48,12 @@ def get_remaining_games(season: Season):
     """
     Unplayed games = no played_time set (you can tweak this if needed).
     """
-    return list(
+    games = list(
         Game.objects.filter(season_num=season, played_time__isnull=True)
         .select_related("a_team_num", "h_team_num")
     )
+    print(f"[playoff_sim] Remaining unplayed games for '{season.season_text}': {len(games)}")
+    return games
 
 def build_base_points_table(standings):
     """
