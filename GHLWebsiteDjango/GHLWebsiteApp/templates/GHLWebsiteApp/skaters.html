@@ -39,6 +39,7 @@
       </form>
     </div>
     <div><a href="{% url 'skatersAdvanced' %}"><i>(Go to Advanced Stats)</i></a></div>
+    <div class="standings-scroll">
       <table id="fullstandings" class="sortable">
         <col style="width: 60px;">
         <col style="width: 240px;">
@@ -92,7 +93,7 @@
           <td colspan=14>No games recorded.</td>
         </tr>
         {% endfor %}
-      </table>
+      </table></div>
       </center>
     </div>
   </center>

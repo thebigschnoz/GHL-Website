@@ -2267,8 +2267,41 @@ div.three-stars-section ol li {
   align-items: flex-start;
 }
 
-nav.primary-navigation ul li.open > ul {
-  visibility: visible !important;
-  opacity: 1 !important;
-  display: block !important;
+@media (max-width: 768px) {
+  .game-details {
+    flex-direction: column;      /* stack table then stars */
+    align-items: center;         /* or 'stretch' if you want full width */
+    gap: 16px;
+  }
+
+  .game-details .stats-table {
+    width: 100%;
+  }
+
+  .game-details .three-stars-section {
+    width: 100%;
+    max-width: 320px;            /* optional: cap width */
+    margin: 0 auto;              /* center it */
+  }
+}
+
+.standings-scroll {
+  width: 100%;
+  overflow-x: auto;          /* horizontal scroll */
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  text-align: left;          /* kill inherited centering */
+}
+
+/* prevent the table from re-centering itself/margins */
+.standings-scroll #fullstandings {
+  margin: 0;                 /* no auto-centering */
+  align-self: flex-start;
+  justify-self: flex-start;
+}
+
+@media (max-width: 768px) {
+  .standings-scroll {
+    overflow-x: auto;
+  }
 }
