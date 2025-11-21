@@ -2290,7 +2290,6 @@ div.three-stars-section ol li {
   overflow-x: auto;          /* horizontal scroll */
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
-  text-align: left;          /* kill inherited centering */
 }
 
 /* prevent the table from re-centering itself/margins */
@@ -2302,6 +2301,14 @@ div.three-stars-section ol li {
 
 @media (max-width: 768px) {
   .standings-scroll {
+    text-align: left;
     overflow-x: auto;
+  }
+}
+
+@media (max-width: 640px) {
+  /* hide all game links except the first one */
+  .scoreboard__container > a:not(:first-child) {
+    display: none;
   }
 }

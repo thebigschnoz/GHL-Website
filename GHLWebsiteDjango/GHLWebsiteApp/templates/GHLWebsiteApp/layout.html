@@ -32,7 +32,7 @@
 			<a href="{% url 'game' game.game_num %}">
 				<div class="game__container" data-index="{{ forloop.counter }}">
 					<div class="game__top-bar">
-						<span class="game__time">{% if game.expected_time %}{{ game.expected_time|date:"D M j" }}, {{ game.expected_time|time:"g:i" }}{% else %}No Time Schduled{% endif %}</span>
+						<span class="game__time"{% if not game.expected_time %} style="color: lightgray; font-style: italic;"{% endif %}>{% if game.expected_time %}{{ game.expected_time|date:"D M j" }}, {{ game.expected_time|time:"g:i" }}{% else %}No Time Schduled{% endif %}</span>
 					</div>
 					<div class="info-split">
 						<div class="team__container">
@@ -66,25 +66,6 @@
 			No games played yet this season.
 		</div>
 		{% endfor %}
-		<script>
-			function adjustGameDisplay() {
-			  const games = document.querySelectorAll('.game__container');
-			  const maxGames = 1;
-			  const screenWidth = window.innerWidth;
-		  
-			  games.forEach((game, index) => {
-				if (screenWidth < 640 && index >= maxGames) {
-				  game.classList.add('hide');
-				} else {
-				  game.classList.remove('hide');
-				}
-			  });
-			}
-		  
-			// Run on page load and on window resize
-			window.addEventListener('load', adjustGameDisplay);
-			window.addEventListener('resize', adjustGameDisplay);
-		</script>
 		</center>
 		<div id="menu-container">
 			<nav role="navigation" class="primary-navigation" id="menu" style="text-align: -webkit-center; place-self: center;">
