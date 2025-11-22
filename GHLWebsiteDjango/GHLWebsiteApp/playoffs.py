@@ -1,4 +1,5 @@
 from django.db import transaction
+from datetime import datetime, time, timedelta
 from django.utils import timezone
 from django.shortcuts import redirect
 from django.contrib.admin.views.decorators import staff_member_required
@@ -6,6 +7,96 @@ from django.contrib import messages
 from .views import get_seasonSetting
 
 from .models import Season, Standing, PlayoffConfig, PlayoffRound, PlayoffSeries
+
+def get_upcoming_sunday_9pm():
+    """
+    Return the next Sunday at 21:00 in the current timezone.
+    'Week' flips at Sunday 9pm: if we're already past this week's
+    Sunday 9pm, move to next Sunday.
+    """
+    now = timezone.localtime(timezone.now())
+    tz = timezone.get_current_timezone()
+
+    # Monday=0 ... Sunday=6
+    days_until_sunday = (6 - now.weekday()) % 7
+    sunday_date = (now + timedelta(days=days_until_sunday)).date()
+
+    first_slot = timezone.make_aware(
+        datetime.combine(sunday_date, time(21, 0)),
+        tz
+    )
+
+    if first_slot <= now:
+        # We’re already at/after this Sunday's 9pm; use next week.
+        sunday_date = sunday_date + timedelta(days=7)
+        first_slot = timezone.make_aware(
+            datetime.combine(sunday_date, time(21, 0)),
+            tz
+        )
+
+    return first_slot
+
+
+def get_playoff_game_slots():
+    """
+    Seven slots for a series:
+    Sun 9:00, Sun 9:45, Mon 9:00, Mon 9:45, Tue 9:00, Wed 9:00, Thu 9:00.
+    """
+    first = get_upcoming_sunday_9pm()
+    return [
+        first,                              # G1 Sun 9:00
+        first + timedelta(minutes=45),      # G2 Sun 9:45
+        first + timedelta(days=1),          # G3 Mon 9:00
+        first + timedelta(days=1, minutes=45),  # G4 Mon 9:45
+        first + timedelta(days=2),          # G5 Tue 9:00
+        first + timedelta(days=3),          # G6 Wed 9:00
+        first + timedelta(days=4),          # G7 Thu 9:00
+    ]
+
+
+def create_games_for_series(series, slots=None):
+    """
+    Create 7 Game rows for a given PlayoffSeries.
+
+    Better (high) seed home pattern: H, H, A, A, H, A, H.
+    """
+    from .models import Game  # avoid circular imports just in case
+
+    if slots is None:
+        slots = get_playoff_game_slots()
+
+    home_pattern = ["high", "high", "low", "low", "high", "low", "high"]
+
+    for when, home_side in zip(slots, home_pattern):
+        if home_side == "high":
+            home = series.high_seed
+            away = series.low_seed
+        else:
+            home = series.low_seed
+            away = series.high_seed
+
+        Game.objects.create(
+            season_num=series.season,
+            expected_time=when,
+            gamelength=3600,
+            dnf=False,
+            a_team_num=away,
+            h_team_num=home,
+        )
+
+
+def create_games_for_round(round_obj):
+    """
+    Create games for every series in a PlayoffRound.
+    All series share the same weekly time grid.
+    """
+    slots = get_playoff_game_slots()
+    for series in PlayoffSeries.objects.filter(
+        season=round_obj.season,
+        round_num=round_obj
+    ):
+        create_games_for_series(series, slots)
+
 
 def get_playoff_seeds(season: Season):
     """
@@ -94,16 +185,13 @@ def start_playoffs(request):
             round_num=round1,
             high_seed=high_team,
             low_seed=low_team,
-            high_seed_num=num_teams - high_seed + 1,  # e.g. seed 1 => 8, 2 => 7, ...
-            low_seed_num=low_seed,                     # 1 = lowest, 2 = second-lowest, etc.
+            # 1 = best → N ; N = worst → 1
+            high_seed_num=num_teams - high_seed + 1,
+            low_seed_num=num_teams - low_seed + 1,
             high_seed_wins=0,
             low_seed_wins=0,
         )
-
-    # Flip season to playoffs
-    season.season_type = "playoffs"
-    season.save()
-
+    create_games_for_round(round1)
     messages.success(
         request,
         f"Created {len(pairs)} playoff series for {season.season_text} and switched to playoffs."
@@ -220,12 +308,15 @@ def advance_round(request):
             high_seed_num=(
                 total_playoff_teams - high_seed + 1
                 if high_seed is not None else 0
-            ),  # 8 = highest, 7 = next, etc. :contentReference[oaicite:3]{index=3}
-            low_seed_num=low_seed or 0,       # 1 = lowest, 2 = second lowest, etc.
+            ),
+            low_seed_num=(
+                total_playoff_teams - low_seed + 1
+                if low_seed is not None else 0
+            ),
             high_seed_wins=0,
             low_seed_wins=0,
         )
-
+    create_games_for_round(next_round)
     messages.success(
         request,
         f"Advanced to Round {next_round_num} ({next_round.round_name}) with {len(pairs)} series created."
