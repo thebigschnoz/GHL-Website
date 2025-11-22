@@ -227,7 +227,7 @@ def advance_round(request):
     if incomplete.exists():
         messages.error(
             request,
-            f"Cannot advance: Round {current_round_num} still has unfinished series."
+            f"Cannot advance: Round {current_round_num} still has at least one unfinished series."
         )
         return redirect("tools")
 
