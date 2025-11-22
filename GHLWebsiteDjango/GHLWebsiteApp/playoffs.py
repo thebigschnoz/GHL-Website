@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.utils import timezone
 from django.shortcuts import redirect
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
@@ -33,9 +34,26 @@ def start_playoffs(request):
     if season.season_type != "regular":
         messages.error(request, "Season must be in 'regular' state to start playoffs.")
         return redirect("standings")
-
+    
     seeds = get_playoff_seeds(season)  # [(seed, Standing), ...]
     num_teams = len(seeds)
+
+    playoff_season_text = f"{season.season_text} Playoffs"
+
+    # Remove isActive from the previous season
+    season.isActive = False
+    season.save()
+
+    # Create the new Season object for playoffs
+    new_season = Season.objects.create(
+        season_text=playoff_season_text,
+        season_type="playoffs",
+        start_date=timezone.now(),
+        isActive=True
+    )
+
+    # This new season becomes the working season for the rest of this function
+    season = new_season
 
     if num_teams == 0 or (num_teams & (num_teams - 1)) != 0:
         # Require a power-of-two for now (4, 8, 16...)
