@@ -596,3 +596,15 @@ class PendingServerBinding(models.Model):
     requested_team = models.ForeignKey(Team, on_delete=models.CASCADE)
     requested_by = models.BigIntegerField()  # discord user ID
     requested_at = models.DateTimeField(auto_now_add=True)
+
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+@receiver(post_save, sender=Season)
+def ensure_playoff_config(sender, instance: Season, created, **kwargs):
+    """
+    Ensure every regular-season Season has a PlayoffConfig.
+    Runs on create and on update.
+    """
+    if created and instance.season_type == "regular":
+        PlayoffConfig.objects.get_or_create(season=instance)

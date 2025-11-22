@@ -2313,3 +2313,7 @@ div.three-stars-section ol li {
     display: none;
   }
 }
+
+hr {
+  margin: 15px 0;
+}

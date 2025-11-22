@@ -96,6 +96,7 @@
 								<ul class="dropdown">
 									{% if user.is_superuser or user|has_group:"Admins" %}
 									<li><a href="{% url 'admin:index' %}">Admin</a></li>
+									<li><a href="{% url 'tools' %}">Commissioner Tools</a></li>
 									{% endif %}
 									{% if user|has_group:"Team Managers" %}
 									<li><a href="{% url 'manager_view' %}">Manage Team</a></li>

@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.admin.views.decorators import staff_member_required
 from .forms import *
 import datetime
 from GHLWebsiteApp.models import *
@@ -211,46 +212,6 @@ def calculate_standings():
                             break
                 streak = f"{streak_type}{streak_count}"
             standing, created = Standing.objects.update_or_create(team=team, season=Season.objects.get(season_num=season), defaults={'wins': wins, 'losses': losses, 'otlosses': otlosses, 'points': points, 'goalsfor': goalsfor, 'goalsagainst': goalsagainst, "gp": gp, "winperc": winperc, "ppperc": ppperc, "pkperc": pkperc, "lastten": lastten, "streak": streak})
-
-    # Compile schedule for PointsTableSimulator
-    '''games = Game.objects.filter(season_num=season).values(
-        "game_num", 
-        "h_team_num__club_full_name", 
-        "a_team_num__club_full_name", 
-        "played_time", 
-        "h_team_gf", 
-        "a_team_gf"
-    )
-
-    # Prepare CSV data
-    csv_data = [["match_number", "home", "away", "winner"]]
-    for game in games:
-        if game["played_time"]:
-            if game["h_team_gf"] > game["a_team_gf"]:
-                winner = game["h_team_num__club_full_name"]
-            elif game["h_team_gf"] < game["a_team_gf"]:
-                winner = game["a_team_num__club_full_name"]
-            else:
-                winner = "draw"
-        else:
-            winner = "no result"
-        csv_data.append([game["game_num"], game["h_team_num__club_full_name"], game["a_team_num__club_full_name"], winner])
-
-    # Run the simulator
-    simulator = PointsTableSimulator(
-        tournament_schedule=csv_data,
-        points_for_a_win=2,
-        points_for_a_loss=0,
-    )
-    standings_table = simulator.current_points_table
-
-    # Update playoff status in Standing objects
-    for standing in Standing.objects.filter(season=season):
-        if standing.team.club_full_name in playoff_locks:
-            standing.playoffs = "x"  # Clinched Playoff Spot
-        if standing.team.club_full_name == presidents_trophy_winner:
-            standing.playoffs = "p"  # President's Trophy
-        standing.save()'''
 
 def get_scoreboard():
     season = get_seasonSetting()
@@ -1962,6 +1923,14 @@ def team_scheduling_view(request):
         "selected_week_str": selected_week_str,
     }
     return render(request, "GHLWebsiteApp/team_scheduling.html", context)
+
+@staff_member_required
+def tools(request):
+    try:
+        season = Season.objects.get(season_num=get_seasonSetting())
+    except Season.DoesNotExist:
+        season = None
+    return render(request, "GHLWebsiteApp/tools.html", {"season": season})
 
 class PlayerAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):

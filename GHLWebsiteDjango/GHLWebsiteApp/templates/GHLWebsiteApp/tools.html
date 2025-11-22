@@ -1,0 +1,77 @@
+{% extends 'GHLWebsiteApp/layout.html' %}
+{% load static %}
+{% block title %} - Commissioner Tools{% endblock %}
+
+{% block body %}
+<center><div class="section section_lg">
+  <h1>League Operations</h1>
+
+  {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+        <li class="{{ message.tags }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  <p>
+    Current season:
+    <strong>{{ season.season_text }}</strong>
+    <i>({{ season.get_season_type_display }})</i>
+  </p>
+
+  <hr>
+
+  <h2>Playoffs</h2>
+
+    {% if season.season_type == "regular" %}
+    <p>
+      <i>
+          Generate the playoff bracket from the current regular-season standings
+          and switch the season to <strong>Playoffs</strong>.
+      </i>
+    </p>
+    <form method="post" action="{% url 'start_playoffs' %}">
+      {% csrf_token %}
+      <button type="submit"
+              onclick="return confirm('This will generate the playoff bracket and switch the season to Playoffs. This cannot be undone easily. Continue?');"
+              class="btn-submit">
+        Start Playoffs / Generate Bracket
+      </button>
+    </form>
+
+    {% elif season.season_type == "playoffs" %}
+    <p>
+        <i>
+        Advance to the next playoff round once all series in the current round
+        have a recorded winner.
+        </i>
+    </p>
+    <form method="post" action="{% url 'advance_round' %}">
+        {% csrf_token %}
+        <button type="submit"
+                onclick="return confirm('This will create the next playoff round from the current round winners. Make sure all series have a winner recorded. Continue?');"
+                class="btn-submit">
+        Advance to Next Playoff Round
+        </button>
+    </form>
+
+    {% else %}
+    <p>
+      Playoff generation is only available when the season is in
+      <strong>Regular Season</strong> state. Current state:
+      <strong>{{ season.get_season_type_display }}</strong>.
+    </p>
+    {% endif %}
+
+  <hr>
+
+  <h2>Other Tools (coming soon)</h2>
+  <ul>
+    <li>Advance playoff rounds</li>
+    <li>Move to next season</li>
+    <li>Open/close signups</li>
+    <li>Draft tools</li>
+  </ul>
+</div></center>
+{% endblock %}
