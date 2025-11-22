@@ -4,6 +4,7 @@ from django.db.models import Q
 from django.db.models.functions import Lower
 from decimal import *
 from django.contrib.auth.models import AbstractUser, User, Group
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Season(models.Model):
     SEASON_CHOICES = [
@@ -16,6 +17,11 @@ class Season(models.Model):
     season_type = models.CharField(max_length=20, choices=SEASON_CHOICES, default='preseason', verbose_name="Season Type", help_text="Preseason, Regular Season, or Playoffs")
     isActive = models.BooleanField(default=False, verbose_name="Is Active Season", help_text="Only one season can be active at a time")
     start_date = models.DateField(verbose_name="Start Date", blank=True, null=True)
+    signups_open = models.BooleanField(
+        default=False,
+        verbose_name="Signups Open",
+        help_text="If true, players can submit signups for this season."
+    )
 
     class Meta:
         constraints = [
@@ -596,6 +602,91 @@ class PendingServerBinding(models.Model):
     requested_team = models.ForeignKey(Team, on_delete=models.CASCADE)
     requested_by = models.BigIntegerField()  # discord user ID
     requested_at = models.DateTimeField(auto_now_add=True)
+
+class Signup(models.Model):
+    """Season signup from a user/player."""
+
+    season = models.ForeignKey(
+        Season,
+        on_delete=models.CASCADE,
+        verbose_name="Season",
+        help_text="Season this signup applies to.",
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name="Website User",
+        help_text="Account used to submit the signup.",
+    )
+    player = models.ForeignKey(
+        Player,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        verbose_name="Linked Player (optional)",
+        help_text="If linked, ties signup directly to a Player record.",
+    )
+    primary_position = models.ForeignKey(
+        Position,
+        on_delete=models.CASCADE,
+        related_name="signup_primary",
+        verbose_name="Primary Position",
+    )
+    secondary_positions = models.ManyToManyField(
+        Position,
+        blank=True,
+        related_name="signup_secondary",
+        verbose_name="Secondary Positions",
+        help_text="Should include the primary position as well.",
+    )
+    days_per_week = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(2), MaxValueValidator(5)],
+        verbose_name="Nights per Week",
+        help_text="How many nights per week the player can commit (2–5).",
+    )
+    scheduling_issues = models.TextField(
+        blank=True,
+        verbose_name="Scheduling Issues",
+        help_text="Holidays, work constraints, etc.",
+    )
+    invited_by_name = models.CharField(
+        max_length=50,
+        blank=True,
+        verbose_name="Invited By",
+        help_text="Who invited them to the league (username or friend).",
+    )
+    committed_to_league = models.BooleanField(
+        default=True,
+        verbose_name="Committed to GHL",
+        help_text="True if they intend to prioritize this league.",
+    )
+    other_league_obligations = models.TextField(
+        blank=True,
+        verbose_name="Other League Obligations",
+        help_text="Any existing leagues/teams they also play with.",
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ("season", "user")  # one signup per user per season
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.user.username} signup for {self.season.season_text}"
+
+    def ensure_primary_in_secondaries(self):
+        """Ensure primary position is always in the M2M secondaries."""
+        if self.primary_position and self.pk:
+            if not self.secondary_positions.filter(pk=self.primary_position.pk).exists():
+                self.secondary_positions.add(self.primary_position)
+    
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # After we have a PK, enforce the primary ∈ secondaries rule.
+        self.ensure_primary_in_secondaries()
+
 
 from django.db.models.signals import post_save
 from django.dispatch import receiver

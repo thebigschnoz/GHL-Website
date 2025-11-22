@@ -1930,7 +1930,142 @@ def tools(request):
         season = Season.objects.get(season_num=get_seasonSetting())
     except Season.DoesNotExist:
         season = None
-    return render(request, "GHLWebsiteApp/tools.html", {"season": season})
+    if request.method == "POST" and "signup_action" in request.POST:
+        action = request.POST["signup_action"]
+        if action == "open":
+            season.signups_open = True
+        elif action == "close":
+            season.signups_open = False
+        season.save()
+
+    # Signup stats
+    signups_qs = Signup.objects.filter(season=season)
+
+    total_signups = signups_qs.count()
+
+    primary_breakdown = (
+        signups_qs
+        .values("primary_position__positionShort", "primary_position__position")
+        .annotate(count=Count("id"))
+        .order_by("primary_position__positionShort")
+    )
+
+    secondary_breakdown = (
+        signups_qs
+        .values("secondary_positions__positionShort", "secondary_positions__position")
+        .annotate(count=Count("id"))
+        .order_by("secondary_positions__positionShort")
+    )
+
+    context = {
+        "season": season,
+        "total_signups": total_signups,
+        "primary_breakdown": primary_breakdown,
+        "secondary_breakdown": secondary_breakdown,
+    }
+    return render(request, "GHLWebsiteApp/tools.html", context)
+
+@login_required
+def season_signup(request):
+    # Active season
+    season = Season.objects.get(season_num=get_seasonSetting())
+
+    # Guard: signups must be open
+    if not getattr(season, "signups_open", False):
+        return HttpResponseForbidden("Signups are currently closed for this season.")
+
+    # Single signup per user per season
+    try:
+        instance = Signup.objects.get(season=season, user=request.user)
+    except Signup.DoesNotExist:
+        instance = None
+
+    if request.method == "POST":
+        form = SignupForm(request.POST, instance=instance)
+        if form.is_valid():
+            signup = form.save(commit=False)
+            signup.user = request.user
+
+            # Link to Player if available
+            player = getattr(request.user, "player_link", None)
+            if player:
+                signup.player = player
+
+            signup.season = season
+            signup.save()
+            messages.success(request, "Your signup has been submitted.")
+            return redirect("season_signup")
+    else:
+        form = SignupForm(instance=instance)
+
+    return render(
+        request,
+        "GHLWebsiteApp/signup_form.html",
+        {
+            "form": form,
+            "season": season,
+            "signups_open": season.signups_open,
+        },
+    )
+
+@manager_required
+def signup_list(request):
+    season = Season.objects.get(season_num=get_seasonSetting())
+    signups = (
+        Signup.objects
+        .filter(season=season)
+        .select_related("user", "player", "primary_position")
+        .prefetch_related("secondary_positions")
+        .order_by("user__username")
+    )
+
+    # CSV download if requested
+    if request.GET.get("download") == "csv":
+        response = HttpResponse(content_type="text/csv")
+        response["Content-Disposition"] = f'attachment; filename="signups_{season.season_text}.csv"'
+
+        writer = csv.writer(response)
+        writer.writerow([
+            "Username",
+            "Player Name",
+            "Primary Position",
+            "Secondary Positions",
+            "Nights per Week",
+            "Scheduling Issues",
+            "Invited By",
+            "Committed to League",
+            "Other League Obligations",
+            "Created At",
+        ])
+
+        for s in signups:
+            secondaries = ", ".join(
+                s.secondary_positions.order_by("positionShort").values_list("positionShort", flat=True)
+            )
+            writer.writerow([
+                s.user.username,
+                s.player.username if s.player else "",
+                s.primary_position.positionShort if s.primary_position else "",
+                secondaries,
+                s.days_per_week,
+                (s.scheduling_issues or "").replace("\n", " "),
+                s.invited_by_name or "",
+                "Yes" if s.committed_to_league else "No",
+                (s.other_league_obligations or "").replace("\n", " "),
+                localtime(s.created_at).strftime("%Y-%m-%d %H:%M"),
+            ])
+
+        return response
+
+    return render(
+        request,
+        "GHLWebsiteApp/signup_list.html",
+        {
+            "season": season,
+            "signups": signups,
+        },
+    )
+
 
 class PlayerAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):

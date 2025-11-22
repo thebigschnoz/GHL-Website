@@ -61,6 +61,20 @@
 
             <!-- RIGHT COLUMN -->
             <div class="dashboard-column">
+                <div class="dashboard-panel">
+                <h2>League Signups</h2>
+                    <p>
+                        <a href="{% url 'signup_list' %}">
+                            <i>View all player signups</i>
+                        </a>
+                        {% if active_season and active_season.signups_open %}
+                            <br>
+                            <span style="color:#4CAF50; font-weight:bold;">
+                                Signups are open ({{ active_season.season_text }})
+                            </span>
+                        {% endif %}
+                    </p>
+                </div>
 
                 <div class="dashboard-panel">
                     <h2>Next Ten Games</h2>

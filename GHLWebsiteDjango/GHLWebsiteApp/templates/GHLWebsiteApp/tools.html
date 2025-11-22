@@ -64,13 +64,81 @@
     </p>
     {% endif %}
 
+<hr>
+
+<h2>Signups</h2>
+
+<p>
+  Current season: <strong>{{ season.season_text }}</strong><br>
+  Signups are currently:
+  {% if season.signups_open %}
+    <span style="color: #4CAF50; font-weight: bold;">OPEN</span>
+  {% else %}
+    <span style="color: #f44336; font-weight: bold;">CLOSED</span>
+  {% endif %}
+</p>
+
+<form method="post" style="margin-bottom: 1rem;">
+  {% csrf_token %}
+  {% if season.signups_open %}
+    <button type="submit" name="signup_action" value="close" class="btn-submit">
+      Close Signups
+    </button>
+  {% else %}
+    <button type="submit" name="signup_action" value="open" class="btn-submit">
+      Open Signups
+    </button>
+  {% endif %}
+</form>
+
+<form action="{% url 'signup_list' %}" method="get">
+    <button type="submit" class="btn-submit">View Signup List</button>
+</form>
+
+<h3>Signup Summary</h3>
+
+<p>Total signups: <strong>{{ total_signups }}</strong></p>
+
+<div style="display:flex; gap:40px; flex-wrap:wrap; justify-content:center;">
+  <div>
+    <h4>Primary</h4>
+    <table class="standingstable">
+      <tr><th>Pos</th><th>Count</th></tr>
+      {% for row in primary_breakdown %}
+        <tr>
+          <td>{{ row.primary_position__positionShort }}</td>
+          <td>{{ row.count }}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="3">No signups yet.</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  <div>
+    <h4>Secondary</h4>
+    <table class="standingstable">
+      <tr><th>Pos</th><th>Count</th></tr>
+      {% for row in secondary_breakdown %}
+        {% if row.secondary_positions__positionShort %}
+          <tr>
+            <td>{{ row.secondary_positions__positionShort }}</td>
+            <td>{{ row.count }}</td>
+          </tr>
+        {% endif %}
+      {% empty %}
+        <tr><td colspan="3">No signups yet.</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+</div>
+  
   <hr>
 
   <h2>Other Tools (coming soon)</h2>
   <ul>
     <li>Move to off season</li>
     <li>Start a new regular season</li>
-    <li>Open/close signups</li>
     <li>Draft tools</li>
     <li>Season Schedule Generation</li>
   </ul>

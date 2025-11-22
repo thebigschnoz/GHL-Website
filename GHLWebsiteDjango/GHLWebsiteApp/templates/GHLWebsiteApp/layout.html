@@ -98,6 +98,9 @@
 									<li><a href="{% url 'admin:index' %}">Admin</a></li>
 									<li><a href="{% url 'tools' %}">Commissioner Tools</a></li>
 									{% endif %}
+									{% if active_season and active_season.signups_open %}
+									<li><a href="{% url 'season_signup' %}">Season Signup</a></li>
+									{% endif %}
 									{% if user|has_group:"Team Managers" %}
 									<li><a href="{% url 'manager_view' %}">Manage Team</a></li>
 									<li><a href="https://discord.com/oauth2/authorize?client_id=1324949615883325450&permissions=2147568704&integration_type=0&scope=applications.commands+bot">Get Discord Bot</a></li>

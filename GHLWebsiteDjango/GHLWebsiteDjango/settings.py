@@ -82,6 +82,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'GHLWebsiteApp.context_processors.scoreboard_context',
+                'GHLWebsiteApp.context_processors.active_season',
             ],
         },
     },

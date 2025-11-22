@@ -1,0 +1,70 @@
+{% extends 'GHLWebsiteApp/layout.html' %}
+{% load static %}
+
+{% block title %} - Signups{% endblock %}
+
+{% block body %}
+<div class="section section_lg">
+  <h1>Season Signups</h1>
+
+  <p>
+    Season: <strong>{{ season.season_text }}</strong>
+    {% if season.signups_open %}
+      <span style="color:#4CAF50; font-weight:bold; margin-left:10px;">(Signups Open)</span>
+    {% else %}
+      <span style="color:#f44336; font-weight:bold; margin-left:10px;">(Signups Closed)</span>
+    {% endif %}
+  </p>
+
+  <p>
+    Total signups: <strong>{{ signups|length }}</strong>
+    &nbsp;|&nbsp;
+    <a href="?download=csv">Download CSV</a>
+  </p>
+
+  <div class="standings-scroll">
+    <table class="standingstable sortable">
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Player</th>
+          <th>Primary</th>
+          <th>Secondaries</th>
+          <th>Nights/Wk</th>
+          <th>Scheduling Issues</th>
+          <th>Invited By</th>
+          <th>Committed</th>
+          <th>Other League Obligations</th>
+          <th>Created</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in signups %}
+          <tr>
+            <td>{{ s.user.username }}</td>
+            <td>{% if s.player %}{{ s.player.username }}{% else %}-{% endif %}</td>
+            <td>{{ s.primary_position.positionShort }}</td>
+            <td>
+              {% for pos in s.secondary_positions.all %}
+                {{ pos.positionShort }}{% if not forloop.last %}, {% endif %}
+              {% empty %}
+                -
+              {% endfor %}
+            </td>
+            <td>{{ s.days_per_week }}</td>
+            <td>{{ s.scheduling_issues|default:"-" }}</td>
+            <td>{{ s.invited_by_name|default:"-" }}</td>
+            <td>{{ "Yes" if s.committed_to_league else "No" }}</td>
+            <td>{{ s.other_league_obligations|default:"-" }}</td>
+            <td>{{ s.created_at|date:"Y-m-d H:i" }}</td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="10">No signups yet.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

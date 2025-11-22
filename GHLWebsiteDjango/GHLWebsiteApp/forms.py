@@ -9,6 +9,7 @@ from datetime import timedelta
 from django.utils.timezone import make_aware
 from zoneinfo import ZoneInfo
 from collections import defaultdict
+from .models import Signup, Position
 
 class UploadFileForm(forms.Form):
     file = forms.FileField()
@@ -155,3 +156,66 @@ class TeamNeedForm(forms.ModelForm):
         widgets = {
             'note': forms.TextInput(attrs={'placeholder': 'e.g. Top 6 winger, shutdown RD...'}),
         }
+
+class SignupForm(forms.ModelForm):
+    primary_position = forms.ModelChoiceField(
+        queryset=Position.objects.all().order_by('-ea_pos'),
+        label="Primary Position",
+    )
+    secondary_positions = forms.ModelMultipleChoiceField(
+        queryset=Position.objects.all().order_by('-ea_pos'),
+        label="Secondary Positions",
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+        help_text="Select all positions you are comfortable playing (including your primary).",
+    )
+
+    class Meta:
+        model = Signup
+        fields = [
+            "primary_position",
+            "secondary_positions",
+            "days_per_week",
+            "scheduling_issues",
+            "invited_by_name",
+            "committed_to_league",
+            "other_league_obligations",
+        ]
+        widgets = {
+            "days_per_week": forms.NumberInput(attrs={"min": 2, "max": 5}),
+            "scheduling_issues": forms.Textarea(attrs={"rows": 3}),
+            "other_league_obligations": forms.Textarea(attrs={"rows": 3}),
+        }
+        labels = {
+            "days_per_week": "Nights per Week (2–5)",
+            "scheduling_issues": "Known Scheduling Issues",
+            "invited_by_name": "Who Invited You?",
+            "committed_to_league": "Are You Committed to This League?",
+            "other_league_obligations": "Other League Obligations",
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Use positionShort for display labels
+        self.fields["primary_position"].label_from_instance = lambda obj: obj.positionShort
+        self.fields["secondary_positions"].label_from_instance = lambda obj: obj.positionShort
+
+    def clean(self):
+        cleaned = super().clean()
+        primary = cleaned.get("primary_position")
+        secondaries = cleaned.get("secondary_positions")
+
+        # enforce 2–5 constraint even if someone bypasses HTML
+        days = cleaned.get("days_per_week")
+        if days is not None and not (2 <= days <= 5):
+            self.add_error("days_per_week", "Nights per week must be between 2 and 5.")
+
+        if primary:
+            if not secondaries:
+                # auto-include primary as the only secondary
+                cleaned["secondary_positions"] = [primary]
+            elif primary not in secondaries:
+                # enforce invariant: primary ∈ secondaries
+                cleaned["secondary_positions"] = list(secondaries) + [primary]
+
+        return cleaned

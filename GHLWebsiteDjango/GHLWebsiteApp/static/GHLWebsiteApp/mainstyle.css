@@ -959,6 +959,10 @@ ul li ul li a {
   align-items: center;
 }
 
+.auth-form-table ul li label {
+    white-space: nowrap;
+}
+
 .auth-form input,
 .auth-form select {
   width: 100%;

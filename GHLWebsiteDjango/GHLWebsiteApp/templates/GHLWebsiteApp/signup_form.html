@@ -1,0 +1,44 @@
+{% extends 'GHLWebsiteApp/layout.html' %}
+{% load static %}
+
+{% block title %} - Season Signup{% endblock %}
+
+{% block body %}
+<div class="section section_lg auth-form">
+  <h1>Season Signup</h1>
+
+  <p>
+    You are signing up for:
+    <strong>{{ season.season_text }}</strong>
+    {% if signups_open %}
+      <span style="color:#4CAF50; font-weight:bold; margin-left:10px;">(Signups Open)</span>
+    {% else %}
+      <span style="color:#f44336; font-weight:bold; margin-left:10px;">(Signups Closed)</span>
+    {% endif %}
+  </p>
+
+  <p>
+    Logged in as: <strong>{{ request.user.username }}</strong>
+  </p>
+
+  {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+        <li class="{{ message.tags }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% if not signups_open %}
+    <p>Signups for this season are currently closed.</p>
+  {% else %}
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <table class="auth-form-table">
+        {{ form.as_table }}
+      </table>
+      <button type="submit" class="btn-submit">Submit Signup</button>
+    </form>
+  {% endif %}
+</div>
+{% endblock %}
