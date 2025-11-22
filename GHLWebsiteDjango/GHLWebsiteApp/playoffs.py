@@ -193,7 +193,7 @@ def advance_round(request):
     # Sort winners by ORIGINAL seed (1 = best)
     winners_sorted = sorted(
         winners,
-        key=lambda t: seed_by_team_id.get(t.id, 9999)
+        key=lambda t: seed_by_team_id.get(t.pk, 9999)
     )
 
     # Pair best vs worst, next best vs next worst, etc.
@@ -203,8 +203,8 @@ def advance_round(request):
     while left < right:
         high_team = winners_sorted[left]   # better seed (numerically lower)
         low_team = winners_sorted[right]   # worse seed
-        high_seed = seed_by_team_id.get(high_team.id)
-        low_seed = seed_by_team_id.get(low_team.id)
+        high_seed = seed_by_team_id.get(high_team.pk)
+        low_seed = seed_by_team_id.get(low_team.pk)
         pairs.append((high_team, high_seed, low_team, low_seed))
         left += 1
         right -= 1

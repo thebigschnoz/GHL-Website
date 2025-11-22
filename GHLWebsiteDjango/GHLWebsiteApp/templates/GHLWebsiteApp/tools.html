@@ -16,7 +16,7 @@
 
   <p>
     Current season:
-    <strong>{{ season.season_text }}</strong>
+    <strong><font style="color: #e4b61a; text-decoration-line: underline; text-decoration-style: dotted;">{{ season.season_text }}</font></strong>
     <i>({{ season.get_season_type_display }})</i>
   </p>
 
@@ -28,7 +28,7 @@
     <p>
       <i>
           Generate the playoff bracket from the current regular-season standings
-          and switch the season to <strong>Playoffs</strong>.
+          and switch the season to <strong><font style="color: #e4b61a;">Playoffs</font></strong>.
       </i>
     </p>
     <form method="post" action="{% url 'start_playoffs' %}">
