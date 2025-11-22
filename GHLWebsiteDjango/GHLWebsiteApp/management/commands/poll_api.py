@@ -4,6 +4,7 @@ import httpx
 from GHLWebsiteApp.models import *
 from datetime import datetime, time, date
 import pytz
+from django.db.models import Q
 from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
 
@@ -14,6 +15,70 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--force', action='store_true', help='Force the script to run even if no games are scheduled')
+
+        def update_playoff_series(self, season_instance, a_team, h_team, a_gf, h_gf):
+            """
+            For a playoff season, increment the appropriate team's win count
+            in the matching PlayoffSeries. If a team reaches 4 wins, set
+            series_winner.
+            """
+            if season_instance.season_type != "playoffs":
+                return
+
+            # Find the active series between these two teams in this season
+            series_qs = PlayoffSeries.objects.filter(
+                season=season_instance,
+                series_winner__isnull=True
+            ).filter(
+                Q(high_seed=a_team, low_seed=h_team) |
+                Q(high_seed=h_team, low_seed=a_team)
+            )
+
+            series = series_qs.first()
+            if not series:
+                self.stdout.write(
+                    f"No active playoff series found for {a_team} vs {h_team} in season {season_instance.season_text}."
+                )
+                return
+
+            # Determine winner and loser
+            if a_gf == h_gf:
+                self.stdout.write(
+                    f"Playoff game between {a_team} and {h_team} ended tied in data - not updating series."
+                )
+                return
+
+            winner = a_team if a_gf > h_gf else h_team
+            loser = h_team if winner is a_team else a_team
+
+            if winner == series.high_seed:
+                series.high_seed_wins += 1
+                self.stdout.write(
+                    f"Incremented high_seed_wins for series {series.id}: "
+                    f"{series.high_seed} now has {series.high_seed_wins} wins."
+                )
+            elif winner == series.low_seed:
+                series.low_seed_wins += 1
+                self.stdout.write(
+                    f"Incremented low_seed_wins for series {series.id}: "
+                    f"{series.low_seed} now has {series.low_seed_wins} wins."
+                )
+            else:
+                # Should not happen if the query found the correct series
+                self.stdout.write(
+                    f"Winner {winner} not found as high/low seed in series {series.id}."
+                )
+                return
+
+            # Check for series win (best of 7 -> first to 4)
+            if series.high_seed_wins >= 4 or series.low_seed_wins >= 4:
+                series.series_winner = winner
+                self.stdout.write(
+                    f"Series {series.id} won by {winner.club_full_name} "
+                    f"({series.high_seed_wins}-{series.low_seed_wins})."
+                )
+
+            series.save()
 
 
     def fetch_and_process_games(self, team_id):
@@ -184,6 +249,15 @@ class Command(BaseCommand):
                     matching_games_flipped.first().delete()
                 game_obj.save()
                 self.stdout.write(f"Created new game {game_num}")
+                # If this is a playoff season, update the playoff series wins
+                if season_instance.season_type == "playoffs":
+                    self.update_playoff_series(
+                        season_instance,
+                        a_team_instance,
+                        h_team_instance,
+                        int(a_team_gf),
+                        int(h_team_gf),
+                    )
                 
                 # Parse team stats
                 for club_id, club_data in game["clubs"].items():
