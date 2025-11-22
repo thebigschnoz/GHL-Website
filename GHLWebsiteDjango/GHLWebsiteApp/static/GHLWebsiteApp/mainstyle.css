@@ -2317,3 +2317,8 @@ div.three-stars-section ol li {
 hr {
   margin: 15px 0;
 }
+
+body ul li {
+    list-style: disc;
+    list-style-position: inside;
+}
