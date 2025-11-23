@@ -4,7 +4,11 @@
 {% block title %} - Manager's Scheduling Page{% endblock %}
 
 {% block body %}
-<h2>Team Scheduling for the week of {{ selected_week_str }}</h2>
+<h2 class="scheduling-title">Team Scheduling for the week of {{ selected_week_str }}</h2>
+
+<div id="usage-summary" style="margin: 1rem 0; padding: 0.75rem; border: 1px solid #e4b61a; border-radius: 6px; background-color: #000; max-width: 350px;">
+  
+</div>
 
 <form method="get" class="mb-3" style="padding: 1rem;">
   <label for="week">Select week:</label>
@@ -18,7 +22,7 @@
   </select>
 </form>
 
-<form method="post">
+<form method="post" id="schedule-form">
   {% csrf_token %}
   <div class="games-container">
     {% for game, weekday in games %}
@@ -69,16 +73,70 @@
     background-color: #303030;
     color: #e9eaec;
   }
-  .games-container { display: flex; flex-wrap: wrap; gap: 2rem; }
-  .game-card { border: 1px solid #e4b61a; padding: 1rem; border-radius: 8px; display: inline-block; width: max-content; white-space: nowrap; background-color: black;}
   .positions-grid { display: grid; column-gap: 1rem; row-gap: 0.5rem; margin-top: 1rem; grid-template-columns: auto auto;}
   .position-box { display: contents; }
   .positions-grid label { text-align: right; padding-right: .25rem;}
-  h2 { background-color: black; border: 1px solid #e4b61a; padding: 1rem; border-radius: 8px; width: max-content; justify-self: center;}
+  .scheduling-title {
+  background-color: black;
+  border: 1px solid #e4b61a;
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 0 auto 1rem auto;
+  text-align: center;
+}
+
+/* desktop / default layout */
+.games-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: center;  /* center game cards horizontally */
+}
+
+.game-card {
+  border: 1px solid #e4b61a;
+  padding: 1rem;
+  border-radius: 8px;
+  display: inline-block;
+  width: max-content;
+  white-space: nowrap;
+  background-color: black;
+}
+
   h4 { margin-top: 0.5rem; }
   option.available { color: limegreen; }
   option.unavailable { color: red; font-style: italic; }
   option.unknown { color: gray; font-style: italic; }
+  @media (max-width: 768px) {
+    .scheduling-title {
+      width: 100%;
+      box-sizing: border-box;
+      white-space: normal;      /* allow heading text to wrap */
+    }
+
+    #usage-summary {
+      margin-left: auto;
+      margin-right: auto;       /* center the usage box */
+      justify-self: center;
+    }
+
+    .games-container {
+      justify-content: center;  /* keep cards centered */
+    }
+
+    .game-card {
+      white-space: normal;      /* allow card headings/text to wrap */
+      width: 100%;
+      max-width: 350px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .btn-submit {
+      justify-self: center;
+      margin-left: auto;
+      margin-right: auto;
+    }
+}
 </style>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
@@ -116,5 +174,110 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 </script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+      // --- Caps from backend (regular-season signups) ---
+      const PLAYER_CAPS = {{ player_caps_json|default:"{}"|safe }};
+
+      // All scheduling selects in the POST form
+      const scheduleForm = document.getElementById("schedule-form");
+      const selects = scheduleForm ? scheduleForm.querySelectorAll("select[name^='game_']") : [];
+
+      function computeUsage() {
+          const usage = {};
+          selects.forEach(sel => {
+              const val = sel.value;
+              if (val) {
+                  const key = String(val);              // normalize to string
+                  usage[key] = (usage[key] || 0) + 1;
+              }
+          });
+          return usage;
+      }
+
+      function renderUsage() {
+          const usage = computeUsage();
+          const container = document.getElementById("usage-summary");
+          if (!container || Object.keys(PLAYER_CAPS).length === 0) {
+              return;
+          }
+
+          let html = '<h3 style="margin-top:0;">Weekly Load (Games per Player)</h3>';
+          html += '<table style="border-collapse: collapse; width: 100%;">';
+          html += '<tr><th style="text-align:left; padding:2px 4px;">Player</th>' +
+                  '<th style="text-align:right; padding:2px 4px;">Games</th>' +
+                  '<th style="text-align:right; padding:2px 4px;">Max (from signups)</th></tr>';
+
+          Object.keys(PLAYER_CAPS).sort((a,b) => {
+              const na = PLAYER_CAPS[a].name.toLowerCase();
+              const nb = PLAYER_CAPS[b].name.toLowerCase();
+              return na < nb ? -1 : na > nb ? 1 : 0;
+          }).forEach(pid => {
+              const cap = PLAYER_CAPS[pid];
+              const count = usage[String(pid)] || 0;
+              const over = cap.max_games && count > cap.max_games;
+
+              html += '<tr>';
+
+              let nameStyle = "padding:2px 4px;";
+              if (over) {
+                  nameStyle += " color:#f44336; font-weight:bold; text-decoration: underline dotted #f44336;";
+              }
+
+              html += `<td style="${nameStyle}">${cap.name}</td>`;
+
+              let gamesStyle = "padding:2px 4px; text-align:right;";
+              if (over) {
+                  gamesStyle += " color:#f44336; font-weight:bold;";
+              }
+
+              html += `<td style="${gamesStyle}">${count}</td>`;
+
+              html += `<td style="padding:2px 4px; text-align:right;">${cap.max_games} (${cap.nights} nights)</td>`;
+
+              html += '</tr>';
+          });
+
+          html += '</table>';
+          container.innerHTML = html;
+      }
+
+      selects.forEach(sel => {
+          sel.addEventListener("change", renderUsage);
+      });
+
+      renderUsage();
+
+      if (scheduleForm && Object.keys(PLAYER_CAPS).length > 0) {
+          scheduleForm.addEventListener("submit", function (e) {
+              const usage = computeUsage();
+              const overPlayers = [];
+
+              Object.keys(PLAYER_CAPS).forEach(pid => {
+                  const cap = PLAYER_CAPS[pid];
+                  const count = usage[String(pid)] || 0;
+                  if (cap.max_games && count > cap.max_games) {
+                      overPlayers.push(
+                          `${cap.name}: ${count} games (max ${cap.max_games} games / ${cap.nights} nights)`
+                      );
+                  }
+              });
+
+              if (overPlayers.length > 0) {
+                  const msg =
+                      "The following players are scheduled for more games than their signup allows:\n\n" +
+                      overPlayers.join("\n") +
+                      "\n\nSubmit anyway?";
+
+                  if (!confirm(msg)) {
+                      e.preventDefault();
+                  }
+              }
+          });
+      }
+  });
+
+</script>
+
 
 {% endblock %}

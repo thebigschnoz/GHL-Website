@@ -162,50 +162,52 @@
                 <div class="dashboard-panel">
                     <h2>League Standings</h2>
                     {% if not season.season_type == "playoffs" %}
-                    <table class="standingstable">
-                        <colgroup>
-                            <col style="width: 60px">
-                            <col style="width: 35px">
-                            <col style="width: 35px">
-                            <col style="width: 35px">
-                            <col style="width: 35px">
-                            <col style="width: 35px">
-                            <col style="width: 35px">
-                            <col style="width: 35px">
-                            <col style="width: 35px">
-                            <col style="width: 35px">
-                        </colgroup>
-                        <thead>
-                            <tr>
-                                <th>Team</th>
-                                <th>GP</th>
-                                <th>W</th>
-                                <th>L</th>
-                                <th>OTL</th>
-                                <th>PP%</th>
-                                <th>PK%</th>
-                                <th>L10</th>
-                                <th>Str</th>
-                                <th>PTS</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for standing in standings %}
-                            <tr{% if standing.team == team %} style="background-color: #78620a;"{% endif %}>
-                                <td class="hoverlink"><a href="{% url 'team' standing.team.ea_club_num %}">{{ standing.team.club_abbr }}</a></td>
-                                <td>{{ standing.gp }}</td>
-                                <td>{{ standing.wins }}</td>
-                                <td>{{ standing.losses }}</td>
-                                <td>{{ standing.otlosses }}</td>
-                                <td>{{ standing.ppperc|floatformat:2 }}%</td>
-                                <td>{{ standing.pkperc|floatformat:2 }}%</td>
-                                <td>{{ standing.lastten }}</td>
-                                <td>{{ standing.streak }}</td>
-                                <td class="points">{{ standing.points }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                    <div class="standings-scroll">
+                        <table class="standingstable">
+                            <colgroup>
+                                <col style="width: 60px">
+                                <col style="width: 35px">
+                                <col style="width: 35px">
+                                <col style="width: 35px">
+                                <col style="width: 35px">
+                                <col style="width: 35px">
+                                <col style="width: 35px">
+                                <col style="width: 35px">
+                                <col style="width: 35px">
+                                <col style="width: 35px">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th>Team</th>
+                                    <th>GP</th>
+                                    <th>W</th>
+                                    <th>L</th>
+                                    <th>OTL</th>
+                                    <th>PP%</th>
+                                    <th>PK%</th>
+                                    <th>L10</th>
+                                    <th>Str</th>
+                                    <th>PTS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for standing in standings %}
+                                <tr{% if standing.team == team %} style="background-color: #78620a;"{% endif %}>
+                                    <td class="hoverlink"><a href="{% url 'team' standing.team.ea_club_num %}">{{ standing.team.club_abbr }}</a></td>
+                                    <td>{{ standing.gp }}</td>
+                                    <td>{{ standing.wins }}</td>
+                                    <td>{{ standing.losses }}</td>
+                                    <td>{{ standing.otlosses }}</td>
+                                    <td>{{ standing.ppperc|floatformat:1 }}%</td>
+                                    <td>{{ standing.pkperc|floatformat:1 }}%</td>
+                                    <td style="white-space: nowrap;">{{ standing.lastten }}</td>
+                                    <td>{{ standing.streak }}</td>
+                                    <td class="points">{{ standing.points }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                     {% else %}
                     <a href="{% url 'standings' %}" style="text-decoration: none;">Click here for playoff tree</a>
                     {% endif %}

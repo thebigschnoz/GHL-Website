@@ -75,6 +75,32 @@ def get_seasonSetting():
         seasonSetting = 1
     return seasonSetting # Returns an integer
 
+def get_signup_season():
+    """
+    Season whose Signup records should be used for scheduling.
+
+    - If the active season is regular: use that.
+    - If the active season is playoffs: use the most recent regular season
+      (by start_date, falling back to season_num).
+    """
+    active = Season.objects.filter(isActive=True).first()
+    if not active:
+        return None
+
+    if active.season_type == "regular":
+        return active
+
+    qs = Season.objects.filter(season_type="regular")
+
+    # Prefer regular seasons that started on/before the active season
+    if active.start_date:
+        qs = qs.filter(start_date__lte=active.start_date)
+
+    # Latest regular season by date, then by PK as tiebreaker
+    qs = qs.order_by("-start_date", "-season_num")
+
+    return qs.first()
+
 @csrf_exempt
 def discord_webhook(request):
     if request.method == "GET":
@@ -1868,6 +1894,19 @@ def team_scheduling_view(request):
         ).order_by('sort_order')
     )
     players = team.player_set.all().order_by("username")
+    signup_season = get_signup_season()
+    player_caps = {}
+    if signup_season:
+        signups = Signup.objects.filter(season=signup_season, player__in=players)
+        for s in signups:
+            if not s.player_id:
+                continue
+            max_games = s.days_per_week * 2  # 2 games per night
+            player_caps[s.player_id] = {
+                "name": s.player.username,
+                "max_games": max_games,
+                "nights": s.days_per_week,
+            }
 
     # --- Save handler ---
     if request.method == "POST":
@@ -1921,6 +1960,7 @@ def team_scheduling_view(request):
         "sunday": sunday,
         "week_choices": week_choices,
         "selected_week_str": selected_week_str,
+        "player_caps_json": json.dumps(player_caps),
     }
     return render(request, "GHLWebsiteApp/team_scheduling.html", context)
 

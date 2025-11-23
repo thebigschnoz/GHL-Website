@@ -2326,3 +2326,19 @@ body ul li {
     list-style: disc;
     list-style-position: inside;
 }
+/* Allow dashboard columns to shrink inside the flex container */
+.dashboard-column {
+  min-width: 0;
+}
+
+/* In the manager dashboard, don't force tables to be wider than the screen */
+.dashboard-panel .standingstable {
+  white-space: normal;   /* allow wrapping */
+  width: 100%;           /* fill the panel instead of growing past it */
+}
+
+@media (max-width: 900px) {
+  .dashboard-panel .standingstable {
+    min-width: 0;        /* override the global min-width: 85% */
+  }
+}
