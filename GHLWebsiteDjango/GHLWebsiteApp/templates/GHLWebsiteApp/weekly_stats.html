@@ -2,6 +2,7 @@
 {% block title %} - Weekly Stats{% endblock %}
 
 {% block body %}
+<center>
 <div class="section section_lg" style="justify-items: center;">
     <div class="header">Weekly Stats</div>
 
@@ -18,7 +19,7 @@
     
     {% if skater_stats %}
       <h3>Skater Stats</h3>
-      <table class="fullstandings sortable">
+      <div class="standings-scroll"><table class="fullstandings sortable">
         <tr>
             <th>Player</th>
             <th>GP</th>
@@ -51,10 +52,10 @@
             <td style="width: 40px;">{{ s.bspergame|floatformat:2 }}</td>
         </tr>
         {% endfor %}
-    </table>
+    </table></div>
     
     <h3>Goalie Stats</h3>
-    <table class="fullstandings sortable">
+    <div class="standings-scroll"><table class="fullstandings sortable">
         <tr>
             <th>Player</th>
             <th>GP</th>
@@ -75,9 +76,9 @@
             <td style="width: 40px;">{{ g.shutouts }}</td>
         </tr>
         {% endfor %}
-    </table>
+    </table></div>
     {% else %}
         <p>No stats for this week.</p>
     {% endif %}    
-</div>
+</div></center>
 {% endblock %}
