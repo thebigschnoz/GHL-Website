@@ -1333,7 +1333,7 @@ ul li ul li a {
   flex-wrap: nowrap;
 }
 
-#id_secondarypos {
+#id_secondarypos, #id_secondary_positions {
   display: flex;
   flex-wrap: wrap;
   max-width: 400px;
@@ -1341,7 +1341,7 @@ ul li ul li a {
   justify-content: center;
 }
 
-#id_secondarypos > div {
+#id_secondarypos > div, #id_secondary_positions > div {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2296,6 +2296,10 @@ div.three-stars-section ol li {
   -webkit-overflow-scrolling: touch;
   display: flex;              /* allow centering */
   justify-content: center;    /* desktop/tablet: center the table */
+}
+
+.standings-scroll table {
+  margin: 0;
 }
 
 /* prevent the table from re-centering itself/margins */

@@ -4,6 +4,7 @@
 {% block title %} - Signups{% endblock %}
 
 {% block body %}
+<center>
 <div class="section section_lg">
   <h1>Season Signups</h1>
 
@@ -26,12 +27,12 @@
     <table class="standingstable sortable">
       <thead>
         <tr>
+          <th>Site</th>
           <th>Username</th>
-          <th>Player</th>
-          <th>Primary</th>
-          <th>Secondaries</th>
+          <th>PRI</th>
+          <th>SEC</th>
           <th>Nights/Wk</th>
-          <th>Scheduling Issues</th>
+          <th>Issues</th>
           <th>Invited By</th>
           <th>Committed</th>
           <th>Other League Obligations</th>
@@ -54,7 +55,13 @@
             <td>{{ s.days_per_week }}</td>
             <td>{{ s.scheduling_issues|default:"-" }}</td>
             <td>{{ s.invited_by_name|default:"-" }}</td>
-            <td>{{ "Yes" if s.committed_to_league else "No" }}</td>
+            <td>
+              {% if s.committed_to_league %}
+                Yes
+              {% else %}
+                No
+              {% endif %}
+            </td>
             <td>{{ s.other_league_obligations|default:"-" }}</td>
             <td>{{ s.created_at|date:"Y-m-d H:i" }}</td>
           </tr>
@@ -66,5 +73,5 @@
       </tbody>
     </table>
   </div>
-</div>
+</div></center>
 {% endblock %}

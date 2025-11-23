@@ -2066,15 +2066,15 @@ def signup_list(request):
 
         writer = csv.writer(response)
         writer.writerow([
+            "Site Name",
             "Username",
-            "Player Name",
-            "Primary Position",
-            "Secondary Positions",
-            "Nights per Week",
+            "Primary Pos",
+            "Secondary Pos",
+            "Nights",
             "Scheduling Issues",
             "Invited By",
-            "Committed to League",
-            "Other League Obligations",
+            "Committed?",
+            "Other Leagues",
             "Created At",
         ])
 
