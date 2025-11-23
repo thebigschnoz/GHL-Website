@@ -1,4 +1,5 @@
 from datetime import *
+from collections import defaultdict
 from random import shuffle
 from django.core.management.base import BaseCommand, CommandError
 from GHLWebsiteApp.models import Game, Schedule, Team
@@ -167,13 +168,25 @@ class ScheduleGenerator:
         shuffle(matchups)
         return matchups
     
-    def generate_and_save_games(self) -> list[Game]:
+    def generate_and_save_games(self, max_attempts: int = 10) -> list[Game]:
         # Generates and saves games based on the schedule and teams.
         if not self.teams:
             raise ValueError("No active teams available to generate games.")
+        attempt = 1
+        while attempt <= max_attempts:
+            try:
+                return self._single_attempt_generate()
+            except RuntimeError as e:
+                if self.stdout:
+                    self.stdout.write(f"Attempt {attempt} failed: {e}")
+                attempt += 1
 
+        raise RuntimeError(f"Could not generate a valid schedule after {max_attempts} attempts.")
+    
+    def _single_attempt_generate(self) -> list[Game]:
         matchups = self.create_all_matchups(self.teams)
         games = []
+        pair_counts = defaultdict(int)
         current_date = datetime.combine(self.schedule.start_date, self.allowed_times[0]) # Sets the starting date and time for the schedule
         time_counter = 0
         # bump start forward until it’s an allowed day
@@ -189,6 +202,7 @@ class ScheduleGenerator:
         while matchups:
             remaining_teams = set(self.teams)
             daily_matchups = []
+            daily_pairs = set()
             stack = []  # Each entry: (daily_matchups, matchups, remaining_teams, tried_pairs)
             day = current_date.date()
             if day.weekday() in (4, 5) or day.weekday() in self.skip_weekdays or day in self.skip_dates:
@@ -205,8 +219,14 @@ class ScheduleGenerator:
                 # Generate matchups for current team that are still valid
                 possible_games = [
                     m for m in matchups
-                    if current_team in m and m[0] in remaining_teams and m[1] in remaining_teams
+                    if current_team in m
+                    and m[0] in remaining_teams
+                    and m[1] in remaining_teams
+                    and frozenset((m[0].id, m[1].id)) not in daily_pairs
                 ]
+                possible_games.sort(
+                    key=lambda g: pair_counts[frozenset((g[0].id, g[1].id))]
+                )
 
                 # Try each possible game, tracking which were attempted
                 tried = set()
@@ -222,13 +242,16 @@ class ScheduleGenerator:
                         daily_matchups.copy(),
                         matchups.copy(),
                         remaining_teams.copy(),
-                        tried | {game}
+                        tried | {game},
+                        pair_counts.copy(),
                     ))
 
                     daily_matchups.append(game)
                     matchups.remove(game)
                     remaining_teams.remove(game[0])
                     remaining_teams.remove(game[1])
+                    pair_counts[frozenset((game[0].id, game[1].id))] += 1
+                    daily_pairs.add(frozenset((game[0].id, game[1].id)))
                     self.stdout.write(f"Chosen matchup: {game[0].club_abbr} vs {game[1].club_abbr}")
                     made_progress = True
                     break
@@ -236,8 +259,9 @@ class ScheduleGenerator:
                 if not made_progress:
                     self.stdout.write("No valid matchup found. Backtracking...")
                     if not stack:
-                        raise RuntimeError("Backtracking failed. Cannot complete schedule.")
-                    daily_matchups, matchups, remaining_teams, _ = stack.pop()
+                        # we have tried everything for this day in this attempt → give up this attempt
+                        raise RuntimeError("Backtracking failed at day level; restarting schedule.")
+                    daily_matchups, matchups, remaining_teams, _, pair_counts = stack.pop()
 
             # Save the day’s games
             self.stdout.write(f"Creating games for date: {current_date.strftime('%Y-%m-%d %H:%M')}")
