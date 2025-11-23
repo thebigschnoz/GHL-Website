@@ -638,8 +638,12 @@ async def lineups(interaction: discord.Interaction, teamname: str):
 
             # Position assignments
             assigned = schedule_map.get(g.game_num, {})
-            for pos in positions:
-                lines.append(f"{pos}: {assigned.get(pos, '—')}")
+            # If no one is assigned to any of the six positions, show a simple message
+            if not any(assigned.get(pos) for pos in positions):
+                lines.append("*No lineup set yet.*")
+            else:
+                for pos in positions:
+                    lines.append(f"{pos}: {assigned.get(pos, '—')}")
             lines.append("")  # spacer line
 
         await interaction.followup.send("\n".join(lines))
