@@ -2346,3 +2346,76 @@ body ul li {
     min-width: 0;        /* override the global min-width: 85% */
   }
 }
+
+/* Compare players tables */
+.compare-table th,
+.compare-table td {
+  text-align: center;
+  max-width: 90px;      /* shrink the width */
+  width: 90px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.compare-table th:first-child,
+.compare-table td:first-child {
+  text-align: right;
+  width: 90px;
+  max-width: 90px;
+  white-space: normal;  /* allow wrapping */
+}
+
+/* Highlight best stat per row */
+.stat-best {
+  font-weight: bold;
+  color: black; /* matches your signup banner / success color */
+  text-decoration: underline;
+  background-color: #fbe134;
+}
+
+.stat-best:before {
+    content: "▲ ";  /* filled up arrow */
+    color: #000000;
+}
+
+.compare-form-container {
+  display: flex;
+  justify-content: center;
+  margin: 1.5rem auto;
+  width: 100%;
+}
+
+.compare-form-box {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  border: 2px solid #e4b61a;
+  background-color: rgba(255,255,255,0.05);
+  padding: 20px 25px;
+  border-radius: 6px;
+  max-width: 600px;
+  width: 100%;
+}
+
+.compare-form-table td,
+.compare-form-table th {
+  padding: 8px 6px;
+}
+
+/* Make dropdowns fill their column uniformly */
+.compare-form-table select {
+  width: 100%;
+}
+
+@media (max-width: 600px) {
+    .compare-form-box {
+        padding: 15px;
+        border-width: 1px;
+    }
+
+    .compare-form-table td,
+    .compare-form-table th {
+        padding: 6px 4px;
+    }
+}

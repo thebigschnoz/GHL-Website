@@ -1,15 +1,15 @@
 from django import forms
-from .models import AwardTitle, Player, User, Position, PlayerAvailability, TradeBlockPlayer, TeamNeed, Game
+from .models import AwardTitle, Player, User, Position, PlayerAvailability, TradeBlockPlayer, TeamNeed, Game, Signup, Position
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
 from django.db.models import Q
+from django.db.models.functions import Lower
 from captcha.fields import CaptchaField
 from dal import autocomplete
 from datetime import timedelta
 from django.utils.timezone import make_aware
 from zoneinfo import ZoneInfo
 from collections import defaultdict
-from .models import Signup, Position
 
 class UploadFileForm(forms.Form):
     file = forms.FileField()
@@ -219,3 +219,30 @@ class SignupForm(forms.ModelForm):
                 cleaned["secondary_positions"] = list(secondaries) + [primary]
 
         return cleaned
+
+class ComparePlayersForm(forms.Form):
+    player1 = forms.ModelChoiceField(
+        queryset=Player.objects.all().exclude(banneduser__isnull=False).order_by(Lower("username")),
+        required=False,
+        label="Player 1",
+    )
+    player2 = forms.ModelChoiceField(
+        queryset=Player.objects.all().exclude(banneduser__isnull=False).order_by(Lower("username")),
+        required=False,
+        label="Player 2",
+    )
+    player3 = forms.ModelChoiceField(
+        queryset=Player.objects.all().exclude(banneduser__isnull=False).order_by(Lower("username")),
+        required=False,
+        label="Player 3",
+    )
+    player4 = forms.ModelChoiceField(
+        queryset=Player.objects.all().exclude(banneduser__isnull=False).order_by(Lower("username")),
+        required=False,
+        label="Player 4",
+    )
+    player5 = forms.ModelChoiceField(
+        queryset=Player.objects.all().exclude(banneduser__isnull=False).order_by(Lower("username")),
+        required=False,
+        label="Player 5",
+    )

@@ -1,0 +1,160 @@
+{% extends "GHLWebsiteApp/layout.html" %}
+{% load static %}
+
+{% block title %} - Compare Players{% endblock %}
+
+{% block body %}
+<center>
+<div class="section section_lg">
+  <h1 style="text-align:center;">Compare Players</h1>
+
+  <p style="text-align:center;">
+    Select up to five players to compare their stats.
+  </p>
+
+  <form method="get" class="compare-form-container">
+    <div class="compare-form-box">
+        <table class="auth-form-table compare-form-table">
+          {{ form.as_table }}
+        </table>
+
+        <div style="text-align:center; margin-top:0.5rem;">
+          <button type="submit" class="btn-submit">Compare</button>
+        </div>
+    </div>
+  </form>
+
+  {% if players %}
+    <h2 style="text-align:center; margin-top:2rem;">Selected Players</h2>
+    <p style="text-align:center; margin-bottom:1rem;">
+      {% for p in players %}
+        {{ p.username }}{% if not forloop.last %} // {% endif %}
+      {% endfor %}
+    </p>
+
+    {% if season_has_games %}
+      <h2 style="text-align:center;">Current Season ({{ season.season_text }})</h2>
+      <div class="standings-scroll">
+        <table class="standingstable compare-table" style="width: auto; text-align: center;">
+          <thead>
+            <tr>
+              <th>Stat</th>
+              {% for p in players %}
+                <th>{{ p.username }}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in season_rows %}
+              <tr>
+                <td>{{ row.label }}</td>
+                {% for cell in row.values %}
+                  <td class="{% if cell.is_best %}stat-best{% endif %}">
+                    {% if cell.value is not None %}
+                      {{ cell.value }}
+                    {% else %}
+                      -
+                    {% endif %}
+                  </td>
+                {% endfor %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p style="text-align:center; margin-top:1.5rem;">
+        No games have been played this season for these players yet. Showing career stats only.
+      </p>
+    {% endif %}
+
+    <h2 style="text-align:center; margin-top:2rem;">Career Totals</h2>
+    <div class="standings-scroll">
+      <table class="standingstable compare-table">
+        <thead>
+          <tr>
+            <th>Stat</th>
+            {% for p in players %}
+              <th>{{ p.username }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in career_rows %}
+            <tr>
+              <td>{{ row.label }}</td>
+              {% for cell in row.values %}
+                <td class="{% if cell.is_best %}stat-best{% endif %}">
+                  {% if cell.value is not None %}
+                    {{ cell.value }}
+                  {% else %}
+                    -
+                  {% endif %}
+                </td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% if goalie_season_rows %}
+        <h2>Season Goalie Stats</h2>
+        <div class="standings-scroll">
+            <table class="standingstable compare-table">
+                <thead>
+                    <tr>
+                        <th>Stat</th>
+                        {% for p in players %}
+                            <th>{{ p.username }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in goalie_season_rows %}
+                        <tr>
+                            <td>{{ row.label }}</td>
+                            {% for cell in row.values %}
+                                <td class="{% if cell.is_best %}stat-best{% endif %}">
+                                    {{ cell.value|default:"-" }}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+    {% if goalie_career_rows %}
+        <h2>Career Goalie Stats</h2>
+        <div class="standings-scroll">
+            <table class="standingstable compare-table">
+                <thead>
+                    <tr>
+                        <th>Stat</th>
+                        {% for p in players %}
+                            <th>{{ p.username }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in goalie_career_rows %}
+                        <tr>
+                            <td>{{ row.label }}</td>
+                            {% for cell in row.values %}
+                                <td class="{% if cell.is_best %}stat-best{% endif %}">
+                                    {{ cell.value|default:"-" }}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+  {% else %}
+    <p style="text-align:center; margin-top:2rem;">
+      Select one or more players above and click <strong>Compare</strong> to see stats.
+    </p>
+  {% endif %}
+</div></center>
+{% endblock %}

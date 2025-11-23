@@ -39,4 +39,5 @@ urlpatterns = [
     path('tools/advance-round/', playoffs.advance_round, name='advance_round'),
     path("signup/", views.season_signup, name="season_signup"),
     path("signups/manage/", views.signup_list, name="signup_list"),
+    path("compare-players/", views.compare_players, name="compare_players"),
 ]

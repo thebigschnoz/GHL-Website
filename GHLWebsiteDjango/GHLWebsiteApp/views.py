@@ -262,6 +262,297 @@ def get_default_week_start():
 
     return week_start
 
+def aggregate_skater_stats(player, season_filter=None, exclude_test=True):
+    """
+    Aggregate basic skater stats for a player.
+    If season_filter is None -> career (optionally excluding 'Test Season').
+    Returns a dict with keys matching STAT_FIELDS below, or {} if no games.
+    """
+    qs = SkaterRecord.objects.filter(ea_player_num=player).exclude(position=0)
+
+    if exclude_test:
+        qs = qs.exclude(game_num__season_num__season_text="Test Season")
+
+    if season_filter is not None:
+        qs = qs.filter(game_num__season_num=season_filter)
+
+    agg = qs.aggregate(
+        gp=Count("game_num", distinct=True),
+        g=Coalesce(Sum("goals"), 0),
+        a=Coalesce(Sum("assists"), 0),
+        p=Coalesce(Sum("points"), 0),
+        plus_minus=Coalesce(Sum("plus_minus"), 0),
+        pims=Coalesce(Sum("pims"), 0),
+        sog=Coalesce(Sum("sog"), 0),
+        hits=Coalesce(Sum("hits"), 0),
+        shot_att=Coalesce(Sum("shot_attempts"), 0),
+        deflections=Coalesce(Sum("deflections"), 0),
+        pass_att=Coalesce(Sum("pass_att"), 0),
+        pass_comp=Coalesce(Sum("pass_comp"), 0),
+    )
+
+    if agg["gp"] == 0:
+        return {}
+
+    # Derived stats
+    gp = float(agg["gp"])
+    g = float(agg["g"])
+    a = float(agg["a"])
+    p = float(agg["p"])
+    plus_minus = float(agg["plus_minus"])
+    pims = float(agg["pims"])
+    sog = float(agg["sog"])
+    hits = float(agg["hits"])
+    shot_att = float(agg["shot_att"])
+    defl = float(agg["deflections"])
+    pass_att = float(agg["pass_att"])
+    pass_comp = float(agg["pass_comp"])
+
+    def per_game(val):
+        return round(val / gp, 2) if gp > 0 else None
+
+    if sog > 0:
+        shot_perc = round((g / sog) * 100.0, 1)
+    else:
+        shot_perc = None
+
+    if (shot_att + defl) > 0:
+        shot_eff = round((sog / (shot_att + defl)) * 100.0, 1)
+    else:
+        shot_eff = None
+
+    if pass_att > 0:
+        pass_perc = round((pass_comp / pass_att) * 100.0, 1)
+    else:
+        pass_perc = None
+
+    return {
+        "gp": int(gp),
+        "g_per": per_game(g),
+        "a_per": per_game(a),
+        "p_per": per_game(p),
+        "plus_minus_per": per_game(plus_minus),
+        "pims_per": per_game(pims),
+        "hits_per": per_game(hits),
+        "sog_per": per_game(sog),
+        "shot_perc": shot_perc,
+        "shot_eff": shot_eff,
+        "pass_perc": pass_perc,
+    }
+
+def aggregate_goalie_stats(player, season_filter=None, exclude_test=True):
+    qs = GoalieRecord.objects.filter(ea_player_num=player)
+
+    if exclude_test:
+        qs = qs.exclude(game_num__season_num__season_text="Test Season")
+
+    if season_filter is not None:
+        qs = qs.filter(game_num__season_num=season_filter)
+
+    agg = qs.aggregate(
+        gp=Count("game_num", distinct=True),
+        shots=Coalesce(Sum("shots_against"), 0),
+        saves=Coalesce(Sum("saves"), 0),
+        shutouts=Sum(
+            Case(
+                When(shutout=True, then=1),
+                default=0,
+                output_field=models.IntegerField(),
+            )
+        ),
+        wins=Sum(
+            Case(
+                When(win=True, then=1),
+                default=0,
+                output_field=models.IntegerField(),
+            )
+        ),
+        losses=Sum(
+            Case(
+                When(loss=True, then=1),
+                default=0,
+                output_field=models.IntegerField(),
+            )
+        ),
+        otlosses=Sum(
+            Case(
+                When(otloss=True, then=1),
+                default=0,
+                output_field=models.IntegerField(),
+            )
+        ),
+        seconds_played=Coalesce(Sum("game_num__gamelength"), 0),
+    )
+
+    if agg["gp"] == 0:
+        return {}
+
+    gp = float(agg["gp"])
+    shots = float(agg["shots"])
+    saves = float(agg["saves"])
+    goals_against = shots - saves
+    seconds_played = float(agg["seconds_played"]) or 0.0
+
+    sh_per_gp = round(shots / gp, 1) if gp > 0 else None
+
+    if shots > 0:
+        sv_perc = round((saves / shots) * 100.0, 1)
+    else:
+        sv_perc = None
+
+    if seconds_played > 0:
+        gaa = round(goals_against * 3600.0 / seconds_played, 2)
+    else:
+        gaa = None
+
+    wins = int(agg["wins"])
+    losses = int(agg["losses"])
+    otlosses = int(agg["otlosses"])
+    shutouts = int(agg["shutouts"])
+
+    record = f"{wins}-{losses}-{otlosses}"
+
+    return {
+        "gp_goalie": int(gp),
+        "shots_per_gp": sh_per_gp,   # SH/GP
+        "sv_perc": sv_perc,          # SV%
+        "gaa": gaa,                  # GAA
+        "record": record,            # unsorted string
+        "so": shutouts,              # shutouts
+    }
+
+
+def compare_players(request):
+    season_id = get_seasonSetting()
+    season = Season.objects.get(season_num=season_id)
+
+    from .forms import ComparePlayersForm  # or rely on the wildcard import at top
+
+    form = ComparePlayersForm(request.GET or None)
+
+    players = []
+    if form.is_valid():
+        seen = set()
+        for field in ["player1", "player2", "player3", "player4", "player5"]:
+            p = form.cleaned_data.get(field)
+            if p and p.pk not in seen:
+                players.append(p)
+                seen.add(p.pk)
+
+    # Nothing selected yet -> mostly blank page with just the form
+    if not players:
+        context = {
+            "form": form,
+            "season": season,
+            "players": [],
+            "season_rows": [],
+            "career_rows": [],
+            "goalie_season_rows": [],
+            "goalie_career_rows": [],
+            "season_has_games": False,
+        }
+        return render(request, "GHLWebsiteApp/compare_players.html", context)
+
+    # Define which stats we compare and whether higher is better
+    SKATER_STAT_FIELDS = [
+        {"key": "gp", "label": "GP", "higher": True},
+        {"key": "g_per", "label": "G/GP", "higher": True},
+        {"key": "a_per", "label": "A/GP", "higher": True},
+        {"key": "p_per", "label": "Pts/GP", "higher": True},
+        {"key": "plus_minus_per", "label": "+/-/GP", "higher": True},
+        {"key": "pims_per", "label": "PIM/GP", "higher": False},  # lower better
+        {"key": "hits_per", "label": "Hits/GP", "higher": True},
+        {"key": "sog_per", "label": "SOG/GP", "higher": True},
+        {"key": "shot_perc", "label": "SH%", "higher": True},
+        {"key": "shot_eff", "label": "Shot Eff%", "higher": True},
+        {"key": "pass_perc", "label": "Pass%", "higher": True},
+    ]
+
+    GOALIE_STAT_FIELDS = [
+        {"key": "gp_goalie", "label": "GP (G)", "higher": True},
+        {"key": "shots_per_gp", "label": "SH/GP", "higher": None},   # no "best"
+        {"key": "sv_perc", "label": "SV%", "higher": True},
+        {"key": "gaa", "label": "GAA", "higher": False},             # lower better
+        {"key": "record", "label": "Record", "higher": None},        # unsorted
+        {"key": "so", "label": "SO", "higher": True},
+    ]
+
+    players_data = []
+    for p in players:
+        sk_season = aggregate_skater_stats(p, season_filter=season_id)
+        sk_career = aggregate_skater_stats(p, season_filter=None, exclude_test=True)
+
+        g_season = aggregate_goalie_stats(p, season_filter=season_id)
+        g_career = aggregate_goalie_stats(p, season_filter=None, exclude_test=True)
+
+        players_data.append(
+            {
+                "player": p,
+                "season_sk": sk_season,
+                "career_sk": sk_career,
+                "season_g": g_season,
+                "career_g": g_career,
+            }
+        )
+
+    season_has_games = any(d["season_sk"].get("gp", 0) > 0 for d in players_data)
+
+    def build_rows(scope_key, stat_fields):
+        rows = []
+        for stat in stat_fields:
+            key = stat["key"]
+            label = stat["label"]
+            higher = stat["higher"]
+
+            values = []
+            numeric_values = []
+
+            for d in players_data:
+                stats_dict = d.get(scope_key, {}) or {}
+                v = stats_dict.get(key)
+                values.append(v)
+                if isinstance(v, (int, float, Decimal)):
+                    numeric_values.append(v)
+
+            # Skip if everyone is missing this stat
+            if not any(v is not None for v in values):
+                continue
+
+            best_indices = set()
+            if numeric_values and higher is not None:
+                best_val = max(numeric_values) if higher else min(numeric_values)
+                for idx, v in enumerate(values):
+                    if v == best_val:
+                        best_indices.add(idx)
+
+            row = {"label": label, "key": key, "values": []}
+            for idx, v in enumerate(values):
+                row["values"].append(
+                    {
+                        "value": v,
+                        "is_best": idx in best_indices and v is not None,
+                    }
+                )
+            rows.append(row)
+        return rows
+
+    season_rows = build_rows("season_sk", SKATER_STAT_FIELDS)
+    career_rows = build_rows("career_sk", SKATER_STAT_FIELDS)
+    goalie_season_rows = build_rows("season_g", GOALIE_STAT_FIELDS)
+    goalie_career_rows = build_rows("career_g", GOALIE_STAT_FIELDS)
+
+    context = {
+        "form": form,
+        "season": season,
+        "players": players,
+        "season_rows": season_rows,
+        "career_rows": career_rows,
+        "goalie_season_rows": goalie_season_rows,
+        "goalie_career_rows": goalie_career_rows,
+        "season_has_games": season_has_games,
+    }
+    return render(request, "GHLWebsiteApp/compare_players.html", context)
+
 def GamesRequest(request):
     season = get_seasonSetting()
     data = Game.objects.filter(season_num=season).values("game_num", "gamelength", "played_time", "a_team_num__club_abbr", "h_team_num__club_abbr", "a_team_num__team_logo_link", "h_team_num__team_logo_link" "a_team_gf", "h_team_gf").order_by("-played_time")[:15]
