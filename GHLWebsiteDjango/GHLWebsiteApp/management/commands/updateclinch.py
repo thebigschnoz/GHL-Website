@@ -14,7 +14,7 @@ class Command(BaseCommand):
         parser.add_argument("--gameplayed", action="store_true", help="Only run if at least one game was played yesterday in the active regular season.")
 
     def handle(self, *args, **options):
-        print(f"[updateclinch] Starting run at {datetime.utcnow().isoformat()}Z")
+        print(f"[updateclinch] Starting run at {datetime.datetime.utcnow().isoformat()}Z")
         gameplayed = options["gameplayed"]
         try:
             season = get_active_season()
