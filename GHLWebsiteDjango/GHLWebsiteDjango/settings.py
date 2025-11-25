@@ -161,7 +161,13 @@ LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/auth/login/'
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
 
+<<<<<<< HEAD
 ENV_PATH = Path(__file__).resolve().parent / ".env"
 load_dotenv(ENV_PATH)
 DISCORD_SPORTSCENTER_WEBHOOK_URL = os.getenv("DISCORD_SPORTSCENTER_WEBHOOK_URL", "")
 
+=======
+ENV_PATH = Path(__file__).resolve().parent.parent / ".env"
+load_dotenv(ENV_PATH)
+DISCORD_SPORTSCENTER_WEBHOOK_URL = os.getenv("DISCORD_SPORTSCENTER_WEBHOOK_URL", "")
+>>>>>>> 66c72a8fd965eeb77611e45f629d870b3267e1a3
