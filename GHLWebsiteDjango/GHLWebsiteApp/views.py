@@ -2052,47 +2052,87 @@ def weekly_stats_view(request):
         pk__in=player_ids
     ).order_by("username")
 
-    # Existing selection (if any)
+    # Existing three-stars selection (if any) for this week
     three_stars = WeeklyThreeStars.objects.filter(
-        season=season_num, week_start=selected_week
+        season=season_num,
+        week_start=selected_week,
     ).select_related("first_star", "second_star", "third_star").first()
 
+    # =========================
+    # HANDLE SAVE (POST)
+    # =========================
     if request.method == "POST" and "save_three_stars" in request.POST:
+        # Use the POSTed week so we always save against the correct Sunday
+        selected_week_str = request.POST.get("week")
+        if selected_week_str:
+            try:
+                selected_week = datetime.datetime.strptime(
+                    selected_week_str, "%Y-%m-%d"
+                ).date()
+            except (ValueError, TypeError):
+                messages.error(request, "Invalid week selected.")
+                return redirect("weekly_stats")
+
         first_id = request.POST.get("first_star") or None
         second_id = request.POST.get("second_star") or None
         third_id = request.POST.get("third_star") or None
-        blurb = request.POST.get("blurb", "").strip()
+        blurb = (request.POST.get("blurb") or "").strip()
 
-        if not (first_id and second_id and third_id):
+        # Basic “all three present” check
+        if not first_id or not second_id or not third_id:
             messages.error(request, "You must select all three stars.")
-        else:
-            three_stars, created = WeeklyThreeStars.objects.update_or_create(
-                season=season_num,
-                week_start=selected_week,
-                defaults={
-                    "first_star_id": first_id,
-                    "second_star_id": second_id,
-                    "third_star_id": third_id,
-                    "blurb": blurb,
-                    "created_by": request.user,
-                },
-            )
-            messages.success(request, "Three stars saved successfully.")
-            post_three_stars_to_discord(three_stars, selected_week, season_num)
-            return redirect(
-                reverse("weekly_stats") + f"?week={selected_week.isoformat()}"
-            )
+            # Go back to same week
+            return redirect(f"{reverse('weekly_stats')}?week={selected_week.strftime('%Y-%m-%d')}")
 
+        # Optional: prevent duplicate players in the three slots
+        if len({first_id, second_id, third_id}) < 3:
+            messages.error(request, "Each star must be a different player.")
+            return redirect(f"{reverse('weekly_stats')}?week={selected_week.strftime('%Y-%m-%d')}")
+
+        # Resolve Players; if anything is bogus, fail gracefully
+        try:
+            first_player = Player.objects.get(pk=first_id)
+            second_player = Player.objects.get(pk=second_id)
+            third_player = Player.objects.get(pk=third_id)
+        except Player.DoesNotExist:
+            messages.error(request, "Invalid player selected for a star.")
+            return redirect(f"{reverse('weekly_stats')}?week={selected_week.strftime('%Y-%m-%d')}")
+
+        # Save or update the record
+        three_stars, created = WeeklyThreeStars.objects.update_or_create(
+            season=season_num,
+            week_start=selected_week,
+            defaults={
+                "first_star": first_player,
+                "second_star": second_player,
+                "third_star": third_player,
+                "blurb": blurb or None,
+            },
+        )
+
+        # Fire off the Discord webhook
+        try:
+            post_three_stars_to_discord(three_stars, selected_week, season_num)
+        except Exception as e:
+            # Don't kill the page if webhook fails
+            print(f"[ThreeStars] Discord webhook failed: {e}")
+
+        messages.success(request, "Weekly Three Stars saved.")
+        return redirect(f"{reverse('weekly_stats')}?week={selected_week.strftime('%Y-%m-%d')}")
+
+    # =========================
+    # RENDER
+    # =========================
     context = {
-        'weeks': weeks,
-        'selected_week': selected_week,
-        'skater_stats': skater_stats,
-        'goalie_stats': goalie_stats,
+        "season": season_num,
+        "weeks": weeks,
+        "selected_week": selected_week,
+        "skater_stats": skater_stats,
+        "goalie_stats": goalie_stats,
         "players_for_week": players_for_week,
         "three_stars": three_stars,
     }
-
-    return render(request, 'GHLWebsiteApp/weekly_stats.html', context)
+    return render(request, "GHLWebsiteApp/weekly_stats.html", context)
 
 @manager_required
 def manager_view(request):
