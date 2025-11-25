@@ -2087,7 +2087,7 @@ def weekly_stats_view(request):
             return redirect(f"{reverse('weekly_stats')}?week={selected_week:%Y-%m-%d}")
 
         three_stars, created = WeeklyThreeStars.objects.update_or_create(
-            season=get_seasonSetting(),
+            season=Season.objects.get(season_num=season_num),
             week_start=selected_week,
             defaults={
                 "first_star": first_player,
