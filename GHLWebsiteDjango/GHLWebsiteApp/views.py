@@ -1778,10 +1778,26 @@ def build_weekly_player_line(player, week_start, season):
         g_agg = g_qs.aggregate(
             shots=Coalesce(Sum("shots_against"), 0),
             saves=Coalesce(Sum("saves"), 0),
-            so=Coalesce(Sum("shutout"), 0),
-            wins=Coalesce(Sum("win"), 0),
-            losses=Coalesce(Sum("loss"), 0),
-            otl=Coalesce(Sum("otloss"), 0),
+            so=Sum(Case(
+                When(shutout=True, then=1),
+                default=0,
+                output_field=models.IntegerField()
+            )),
+            wins=Sum(Case(
+                When(win=True, then=1),
+                default=0,
+                output_field=models.IntegerField()
+            )),
+            losses=Sum(Case(
+                When(loss=True, then=1),
+                default=0,
+                output_field=models.IntegerField()
+            )),
+            otl=Sum(Case(
+                When(otloss=True, then=1),
+                default=0,
+                output_field=models.IntegerField()
+            )),
             toi=Coalesce(Sum("game_num__gamelength"), 0),
         )
         shots = float(g_agg["shots"] or 0)
