@@ -1827,7 +1827,7 @@ def build_weekly_player_line(player, week_start, season):
         return "No stats recorded this week."
 
 def post_three_stars_to_discord(three_stars: WeeklyThreeStars, week_start: datetime.date, season: Season):
-    DEBUG = True
+    DEBUG = False
 
     if DEBUG:
         print("Posting weekly three stars to Discord...")
@@ -1853,14 +1853,16 @@ def post_three_stars_to_discord(three_stars: WeeklyThreeStars, week_start: datet
 
     if three_stars.blurb:
         lines.append("")
-        lines.append(f"_Write-up:_ {three_stars.blurb}")
+        lines.append(f"{three_stars.blurb}")
+    lines.append("")
+    lines.append("@everyone")
 
     if DEBUG:
         print("Discord message content:")
         for line in lines:
             print(line)
-    payload = {"content": "\n".join(lines)}
-
+    payload = {"content": "\n".join(lines), "allowed_mentions": {"parse": ["everyone"]},}
+               
     try:
         requests.post(url, json=payload, timeout=5)
         if DEBUG:
