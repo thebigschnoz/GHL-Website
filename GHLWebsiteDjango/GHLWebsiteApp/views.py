@@ -1805,7 +1805,7 @@ def build_weekly_player_line(player, week_start, season):
         goals = float((g_agg["shots"]-g_agg["saves"]) or 0)
 
         sv_pct = (saves / shots * 100.0) if shots > 0 else None
-        gaa = ((goals / float(g_agg["toi"])) / 3600) if g_gp > 0 else None
+        gaa = ((goals / float(g_agg["toi"])) * 3600) if g_gp > 0 else None
         record = f"{int(g_agg['wins'] or 0)}-{int(g_agg['losses'] or 0)}-{int(g_agg['otl'] or 0)}"
 
         parts = [f"Goalie: {g_gp} GP"]
