@@ -26,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-#8uol1ab_ikdu3ufqb_)6%a+&wb@9qot6yn=8ece1ol!k$yjca'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -160,5 +160,8 @@ DATETIME_INPUT_FORMATS = ("%s",)
 LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/auth/login/'
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
-load_dotenv()
+
+ENV_PATH = Path(__file__).resolve().parent / ".env"
+load_dotenv(ENV_PATH)
 DISCORD_SPORTSCENTER_WEBHOOK_URL = os.getenv("DISCORD_SPORTSCENTER_WEBHOOK_URL", "")
+
