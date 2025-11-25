@@ -1811,7 +1811,7 @@ def build_weekly_player_line(player, week_start, season):
         return "No stats recorded this week."
 
 def post_three_stars_to_discord(three_stars: WeeklyThreeStars, week_start: datetime.date, season: Season):
-    DEBUG = False
+    DEBUG = True
 
     if DEBUG:
         print("Posting weekly three stars to Discord...")
