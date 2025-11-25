@@ -1901,8 +1901,10 @@ def weekly_stats_view(request):
 
         print("start_date =", start_date)
         print("end_date =", end_date)
-        for record in skater_qs:
-            print(record.game_num.played_time)
+
+        # DEBUG
+        # for record in skater_qs:
+            # print(record.game_num.played_time)
 
         # Filter Goalie Records
         goalie_qs = GoalieRecord.objects.filter(
@@ -1914,9 +1916,6 @@ def weekly_stats_view(request):
         skater_qs = SkaterRecord.objects.none()
         goalie_qs = GoalieRecord.objects.none()
 
-    # =========================
-    # SKATER AGGREGATION
-    # =========================
     skater_map = defaultdict(lambda: {
         'total_goals': 0,
         'total_assists': 0,
@@ -1998,10 +1997,6 @@ def weekly_stats_view(request):
         -x['total_goals'],
         -x['plus_minus']
     ))
-
-    # =========================
-    # GOALIE AGGREGATION
-    # =========================
     goalie_map = defaultdict(lambda: {
         'shots_against': 0,
         'saves': 0,
@@ -2050,7 +2045,7 @@ def weekly_stats_view(request):
 
     players_for_week = Player.objects.filter(
         pk__in=player_ids
-    ).order_by("username")
+    ).order_by(Lower("username"))
 
     # Existing three-stars (if any) for this season + week
     three_stars = WeeklyThreeStars.objects.filter(
