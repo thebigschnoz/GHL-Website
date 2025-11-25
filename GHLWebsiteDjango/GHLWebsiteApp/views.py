@@ -1867,7 +1867,12 @@ def weekly_stats_view(request):
     weeks = sorted(weeks_set, reverse=True)
 
     # Handle user's selected week
-    selected_week_str = request.GET.get("week")
+    # Handle user's selected week
+    if request.method == "POST":
+        selected_week_str = request.POST.get("week") or request.GET.get("week")
+    else:
+        selected_week_str = request.GET.get("week")
+
     if selected_week_str:
         try:
             selected_week = datetime.datetime.strptime(selected_week_str, "%Y-%m-%d").date()
@@ -1892,7 +1897,7 @@ def weekly_stats_view(request):
             game_num__played_time__gte=start_date,
             game_num__played_time__lt=end_date,
             game_num__season_num = season_num
-        ).exclude(position=0)
+        ).exclude(position=0).order_by(Lower('ea_player_num__username'))
 
         print("start_date =", start_date)
         print("end_date =", end_date)
@@ -1904,7 +1909,7 @@ def weekly_stats_view(request):
             game_num__played_time__gte=start_date,
             game_num__played_time__lt=end_date,
             game_num__season_num = season_num
-        )
+        ).order_by(Lower('ea_player_num__username'))
     else:
         skater_qs = SkaterRecord.objects.none()
         goalie_qs = GoalieRecord.objects.none()

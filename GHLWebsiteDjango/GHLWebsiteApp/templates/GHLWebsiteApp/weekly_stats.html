@@ -10,7 +10,7 @@
         <label for="week-select">Select Week:</label>
         <select name="week" id="week-select" onchange="this.form.submit()">
             {% for w in weeks %}
-                <option value="{{ w|date:'Y-m-d' }}" {% if selected_week == w|date:'Y-m-d' %}selected{% endif %}>
+                <option value="{{ w|date:'Y-m-d' }}" {% if selected_week == w %}selected{% endif %}>
                     {{ w|date:"Y-m-d" }}
                 </option>
             {% endfor %}
@@ -18,67 +18,60 @@
     </form>
     {% if players_for_week %}
     <div class="section">
-        <div class="header">Weekly Three Stars</div>
-        <form method="post">
+        <h3>Weekly Three Stars</h3>
+        <form method="post" style="margin-top: 1rem;">
             {% csrf_token %}
-            <table class="fullstandings">
-                <colgroup>
-                    <col style="width: 120px;">
-                    <col>
-                </colgroup>
-                <tr>
-                    <th>Star</th>
-                    <th>Player</th>
-                </tr>
-                <tr>
-                    <td>⭐ 1st Star</td>
-                    <td>
-                        <select name="first_star">
-                            <option value="">---------</option>
-                            {% for p in players_for_week %}
-                                <option value="{{ p.id }}"
-                                    {% if three_stars and three_stars.first_star_id == p.id %}selected{% endif %}>
-                                    {{ p.username }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td>⭐⭐ 2nd Star</td>
-                    <td>
-                        <select name="second_star">
-                            <option value="">---------</option>
-                            {% for p in players_for_week %}
-                                <option value="{{ p.id }}"
-                                    {% if three_stars and three_stars.second_star_id == p.id %}selected{% endif %}>
-                                    {{ p.username }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td>⭐⭐⭐ 3rd Star</td>
-                    <td>
-                        <select name="third_star">
-                            <option value="">---------</option>
-                            {% for p in players_for_week %}
-                                <option value="{{ p.id }}"
-                                    {% if three_stars and three_stars.third_star_id == p.id %}selected{% endif %}>
-                                    {{ p.username }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </td>
-                </tr>
-            </table>
-            <div style="margin-top: 8px;">
-                <label for="id_blurb"><b>Write-up / notes (optional):</b></label><br>
-                <textarea id="id_blurb" name="blurb" rows="3" cols="70">{% if three_stars %}{{ three_stars.blurb }}{% endif %}</textarea>
-            </div>
-            <div style="margin-top: 8px;">
-                <button type="submit" name="save_three_stars">Save Three Stars</button>
+            <!-- Carry the selected week through POST -->
+            <input type="hidden" name="week" value="{{ selected_week|date:'Y-m-d' }}">
+
+            <div class="three-stars-form">
+                <div class="three-stars-row">
+                    <label for="first_star">1st Star:</label>
+                    <select name="first_star" id="first_star" required>
+                        <option value="">-- Select player --</option>
+                        {% for p in players_for_week %}
+                            <option value="{{ p.id }}"
+                                {% if three_stars and three_stars.first_star_id == p.id %}selected{% endif %}>
+                                {{ p.username }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="three-stars-row">
+                    <label for="second_star">2nd Star:</label>
+                    <select name="second_star" id="second_star" required>
+                        <option value="">-- Select player --</option>
+                        {% for p in players_for_week %}
+                            <option value="{{ p.id }}"
+                                {% if three_stars and three_stars.second_star_id == p.id %}selected{% endif %}>
+                                {{ p.username }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="three-stars-row">
+                    <label for="third_star">3rd Star:</label>
+                    <select name="third_star" id="third_star" required>
+                        <option value="">-- Select player --</option>
+                        {% for p in players_for_week %}
+                            <option value="{{ p.id }}"
+                                {% if three_stars and three_stars.third_star_id == p.id %}selected{% endif %}>
+                                {{ p.username }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="three-stars-row">
+                    <label for="blurb">Write-up:</label>
+                    <textarea name="blurb" id="blurb" rows="3">{{ three_stars.blurb|default_if_none:"" }}</textarea>
+                </div>
+
+                <button type="submit" name="save_three_stars" class="btn btn-primary">
+                    Save Three Stars
+                </button>
             </div>
         </form>
     </div>
