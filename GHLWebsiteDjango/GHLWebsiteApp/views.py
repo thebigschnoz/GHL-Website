@@ -2068,7 +2068,7 @@ def weekly_stats_view(request):
         blurb = (request.POST.get("blurb") or "").strip()
 
         # DEBUG: uncomment this once to see exactly what's coming in
-        print("POST DATA:", dict(request.POST))
+        # print("POST DATA:", dict(request.POST))
 
         if not first_id or not second_id or not third_id:
             messages.error(request, "You must select all three stars.")
