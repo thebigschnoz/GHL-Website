@@ -2107,8 +2107,9 @@ def weekly_stats_view(request):
         )
 
         # Fire Discord webhook (don’t let errors break the request)
+        seasonInstance = Season.objects.get(season_num=season_num)
         try:
-            post_three_stars_to_discord(three_stars, selected_week, season_num)
+            post_three_stars_to_discord(three_stars, selected_week, seasonInstance)
         except Exception as e:
             print(f"[ThreeStars] Discord webhook failed: {e}")
 
