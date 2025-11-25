@@ -5,6 +5,7 @@ from django.db.models.functions import Lower
 from decimal import *
 from django.contrib.auth.models import AbstractUser, User, Group
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.conf import settings
 
 class Season(models.Model):
     SEASON_CHOICES = [
@@ -687,6 +688,31 @@ class Signup(models.Model):
         # After we have a PK, enforce the primary ∈ secondaries rule.
         self.ensure_primary_in_secondaries()
 
+class WeeklyThreeStars(models.Model):
+    season = models.ForeignKey(Season, on_delete=models.CASCADE)
+    week_start = models.DateField()  # your GHL week start (Fri / Sun – whatever you're using)
+
+    first_star = models.ForeignKey(
+        Player, on_delete=models.PROTECT, related_name="three_star_first"
+    )
+    second_star = models.ForeignKey(
+        Player, on_delete=models.PROTECT, related_name="three_star_second"
+    )
+    third_star = models.ForeignKey(
+        Player, on_delete=models.PROTECT, related_name="three_star_third"
+    )
+
+    blurb = models.TextField(blank=True)  # optional write-up for the bot to print
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("season", "week_start")
+
+    def __str__(self):
+        return f"{self.season} – week of {self.week_start} three stars"
 
 from django.db.models.signals import post_save
 from django.dispatch import receiver

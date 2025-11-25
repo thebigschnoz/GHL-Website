@@ -16,7 +16,86 @@
             {% endfor %}
         </select>
     </form>
-    
+    {% if players_for_week %}
+    <div class="section">
+        <div class="header">Weekly Three Stars</div>
+        <form method="post">
+            {% csrf_token %}
+            <table class="fullstandings">
+                <colgroup>
+                    <col style="width: 120px;">
+                    <col>
+                </colgroup>
+                <tr>
+                    <th>Star</th>
+                    <th>Player</th>
+                </tr>
+                <tr>
+                    <td>⭐ 1st Star</td>
+                    <td>
+                        <select name="first_star">
+                            <option value="">---------</option>
+                            {% for p in players_for_week %}
+                                <option value="{{ p.id }}"
+                                    {% if three_stars and three_stars.first_star_id == p.id %}selected{% endif %}>
+                                    {{ p.username }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>⭐⭐ 2nd Star</td>
+                    <td>
+                        <select name="second_star">
+                            <option value="">---------</option>
+                            {% for p in players_for_week %}
+                                <option value="{{ p.id }}"
+                                    {% if three_stars and three_stars.second_star_id == p.id %}selected{% endif %}>
+                                    {{ p.username }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>⭐⭐⭐ 3rd Star</td>
+                    <td>
+                        <select name="third_star">
+                            <option value="">---------</option>
+                            {% for p in players_for_week %}
+                                <option value="{{ p.id }}"
+                                    {% if three_stars and three_stars.third_star_id == p.id %}selected{% endif %}>
+                                    {{ p.username }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            <div style="margin-top: 8px;">
+                <label for="id_blurb"><b>Write-up / notes (optional):</b></label><br>
+                <textarea id="id_blurb" name="blurb" rows="3" cols="70">{% if three_stars %}{{ three_stars.blurb }}{% endif %}</textarea>
+            </div>
+            <div style="margin-top: 8px;">
+                <button type="submit" name="save_three_stars">Save Three Stars</button>
+            </div>
+        </form>
+    </div>
+    {% elif three_stars %}
+    <div class="section">
+        <div class="header">Weekly Three Stars</div>
+        <p>
+            ⭐ 1st Star: <b>{{ three_stars.first_star.username }}</b><br>
+            ⭐⭐ 2nd Star: <b>{{ three_stars.second_star.username }}</b><br>
+            ⭐⭐⭐ 3rd Star: <b>{{ three_stars.third_star.username }}</b>
+        </p>
+        {% if three_stars.blurb %}
+            <p><i>{{ three_stars.blurb }}</i></p>
+        {% endif %}
+    </div>
+    {% endif %}
+
     {% if skater_stats %}
       <h3>Skater Stats</h3>
       <div class="standings-scroll"><table class="fullstandings sortable">

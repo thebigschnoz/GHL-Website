@@ -16,12 +16,14 @@ from io import BytesIO
 import csv
 import pytz
 import json
+import requests
 from django.utils import timezone as django_timezone
 from django.utils.timezone import localtime
 from django.core.paginator import Paginator
 from dal import autocomplete
 from collections import defaultdict
 from django.views.decorators.csrf import csrf_exempt
+from django.urls import reverse
 # from points_table_simulator import PointsTableSimulator
 est = pytz.timezone("America/New_York")
 
@@ -1722,6 +1724,124 @@ def player_details(request, player_id):
     }
     return JsonResponse(data)
 
+def build_weekly_player_line(player, week_start, season):
+    """
+    Build a one-line summary of this player's weekly stats
+    as skater and/or goalie between week_start and week_start+7.
+    """
+    week_end = week_start + datetime.timedelta(days=7)
+
+    # Skater stats (per game)
+    sk_qs = SkaterRecord.objects.filter(
+        ea_player_num=player,
+        game_num__played_time__gte=week_start,
+        game_num__played_time__lt=week_end,
+        game_num__season_num=season,
+    ).exclude(position=0)
+
+    sk_gp = sk_qs.count()
+    sk_line = None
+    if sk_gp > 0:
+        sk_agg = sk_qs.aggregate(
+            g=Coalesce(Sum("goals"), 0),
+            a=Coalesce(Sum("assists"), 0),
+            pts=Coalesce(Sum("points"), 0),
+            sog=Coalesce(Sum("sog"), 0),
+            hits=Coalesce(Sum("hits"), 0),
+            pim=Coalesce(Sum("pims"), 0),
+        )
+        def per_game(v):
+            return (v or 0) / sk_gp
+
+        sk_line = (
+            f"Skater: {sk_gp} GP, "
+            f"{per_game(sk_agg['g']):.2f} G/GP, "
+            f"{per_game(sk_agg['a']):.2f} A/GP, "
+            f"{per_game(sk_agg['pts']):.2f} P/GP, "
+            f"{per_game(sk_agg['hits']):.2f} Hits/GP, "
+            f"{per_game(sk_agg['sog']):.2f} SOG/GP, "
+            f"{per_game(sk_agg['pim']):.2f} PIM/GP"
+        )
+
+    # Goalie stats
+    g_qs = GoalieRecord.objects.filter(
+        ea_player_num=player,
+        game_num__played_time__gte=week_start,
+        game_num__played_time__lt=week_end,
+        game_num__season_num=season,
+    )
+
+    g_gp = g_qs.count()
+    g_line = None
+    if g_gp > 0:
+        g_agg = g_qs.aggregate(
+            shots=Coalesce(Sum("shots_against"), 0),
+            saves=Coalesce(Sum("saves"), 0),
+            gaa_goals=Coalesce(Sum("goals_against"), 0),
+            so=Coalesce(Sum("shutouts"), 0),
+            wins=Coalesce(Sum("wins"), 0),
+            losses=Coalesce(Sum("losses"), 0),
+            otl=Coalesce(Sum("ot_losses"), 0),
+        )
+        shots = float(g_agg["shots"] or 0)
+        saves = float(g_agg["saves"] or 0)
+        goals = float(g_agg["gaa_goals"] or 0)
+
+        sv_pct = (saves / shots * 100.0) if shots > 0 else None
+        gaa = (goals / g_gp) if g_gp > 0 else None
+        record = f"{int(g_agg['wins'] or 0)}-{int(g_agg['losses'] or 0)}-{int(g_agg['otl'] or 0)}"
+
+        parts = [f"Goalie: {g_gp} GP"]
+        if sv_pct is not None:
+            parts.append(f"{sv_pct:.1f}% SV")
+        if gaa is not None:
+            parts.append(f"{gaa:.2f} GAA")
+        parts.append(f"Record {record}")
+        parts.append(f"SO: {int(g_agg['so'] or 0)}")
+        g_line = ", ".join(parts)
+
+    if sk_line and g_line:
+        return sk_line + " | " + g_line
+    elif sk_line:
+        return sk_line
+    elif g_line:
+        return g_line
+    else:
+        return "No stats recorded this week."
+
+def post_three_stars_to_discord(three_stars: WeeklyThreeStars, week_start: datetime.date, season: Season):
+    url = getattr(settings, "DISCORD_SPORTSCENTER_WEBHOOK_URL", "")
+    if not url:
+        # No webhook configured; silently skip
+        return
+
+    week_label = week_start.strftime("%b %d, %Y")
+    title = f"**GHL Weekly Three Stars – Week of {week_label} ({season.season_text})**"
+
+    lines = [title, ""]
+
+    stars = [
+        ("1st Star", three_stars.first_star),
+        ("2nd Star", three_stars.second_star),
+        ("3rd Star", three_stars.third_star),
+    ]
+
+    for label, player in stars:
+        stat_line = build_weekly_player_line(player, week_start, season.season_num)
+        lines.append(f"**{label}: {player.username}** — {stat_line}")
+
+    if three_stars.blurb:
+        lines.append("")
+        lines.append(f"_Write-up:_ {three_stars.blurb}")
+
+    payload = {"content": "\n".join(lines)}
+
+    try:
+        requests.post(url, json=payload, timeout=5)
+    except Exception as e:
+        # Optional: log this somewhere; don't crash the request
+        print(f"Error posting three stars to Discord: {e}")
+
 @media_required
 def weekly_stats_view(request):
     # Build list of weeks (Sundays) for dropdown
@@ -1917,12 +2037,54 @@ def weekly_stats_view(request):
         })
 
     goalie_stats.sort(key=lambda x: (-x['svp'], x['games_played']))
+    player_ids = set()
+    for row in skater_stats:
+        player_ids.add(row["ea_player_num"])
+    for row in goalie_stats:
+        player_ids.add(row["ea_player_num"])
+
+    players_for_week = Player.objects.filter(
+        pk__in=player_ids
+    ).order_by("username")
+
+    # Existing selection (if any)
+    three_stars = WeeklyThreeStars.objects.filter(
+        season=season_num, week_start=selected_week
+    ).select_related("first_star", "second_star", "third_star").first()
+
+    if request.method == "POST" and "save_three_stars" in request.POST:
+        first_id = request.POST.get("first_star") or None
+        second_id = request.POST.get("second_star") or None
+        third_id = request.POST.get("third_star") or None
+        blurb = request.POST.get("blurb", "").strip()
+
+        if not (first_id and second_id and third_id):
+            messages.error(request, "You must select all three stars.")
+        else:
+            three_stars, created = WeeklyThreeStars.objects.update_or_create(
+                season=season_num,
+                week_start=selected_week,
+                defaults={
+                    "first_star_id": first_id,
+                    "second_star_id": second_id,
+                    "third_star_id": third_id,
+                    "blurb": blurb,
+                    "created_by": request.user,
+                },
+            )
+            messages.success(request, "Three stars saved successfully.")
+            post_three_stars_to_discord(three_stars, selected_week, season_num)
+            return redirect(
+                reverse("weekly_stats") + f"?week={selected_week.isoformat()}"
+            )
 
     context = {
         'weeks': weeks,
         'selected_week': selected_week,
         'skater_stats': skater_stats,
         'goalie_stats': goalie_stats,
+        "players_for_week": players_for_week,
+        "three_stars": three_stars,
     }
 
     return render(request, 'GHLWebsiteApp/weekly_stats.html', context)

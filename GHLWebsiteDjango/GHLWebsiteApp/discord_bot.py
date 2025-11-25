@@ -7,7 +7,6 @@ from discord.ext import commands
 from django.conf import settings
 from asgiref.sync import sync_to_async
 import asyncio
-from GHLWebsiteApp.models import Player, SkaterRecord
 from GHLWebsiteApp.models import *
 from django.db.models import Sum, Count, Case, When, Avg, F, Window, FloatField, Q, ExpressionWrapper, Value, OuterRef, Subquery, CharField
 from django.db.models.functions import Cast, Rank, Round, Lower, Coalesce
@@ -20,6 +19,7 @@ LOG_CHANNEL_ID = 1435172225060962374
 TOKEN = os.getenv("DISCORD_TOKEN")
 LEAGUE_ADMIN_ROLE = "All Admins"
 LEAGUE_GUILD_ID = 1021563211759230976
+SPORTSCENTER_CHANNEL_ID = 1026943297874313257
 
 if not TOKEN:
     raise ValueError("❌ DISCORD_TOKEN not found. Make sure it's in your .env file.")
