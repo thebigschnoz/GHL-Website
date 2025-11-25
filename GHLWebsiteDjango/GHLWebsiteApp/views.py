@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.admin.views.decorators import staff_member_required
+from django.conf import settings
 from .forms import *
 import datetime
 from GHLWebsiteApp.models import *
@@ -1810,9 +1811,13 @@ def build_weekly_player_line(player, week_start, season):
         return "No stats recorded this week."
 
 def post_three_stars_to_discord(three_stars: WeeklyThreeStars, week_start: datetime.date, season: Season):
+    DEBUG = False
+
+    if DEBUG:
+        print("Posting weekly three stars to Discord...")
     url = getattr(settings, "DISCORD_SPORTSCENTER_WEBHOOK_URL", "")
     if not url:
-        # No webhook configured; silently skip
+        print("No webhook configured; silently skipping")
         return
 
     week_label = week_start.strftime("%b %d, %Y")
@@ -1834,17 +1839,23 @@ def post_three_stars_to_discord(three_stars: WeeklyThreeStars, week_start: datet
         lines.append("")
         lines.append(f"_Write-up:_ {three_stars.blurb}")
 
+    if DEBUG:
+        print("Discord message content:")
+        for line in lines:
+            print(line)
     payload = {"content": "\n".join(lines)}
 
     try:
         requests.post(url, json=payload, timeout=5)
+        if DEBUG:
+            print("Posted successfully.")
     except Exception as e:
-        # Optional: log this somewhere; don't crash the request
         print(f"Error posting three stars to Discord: {e}")
 
 @media_required
 def weekly_stats_view(request):
     # Build list of weeks (Sundays) for dropdown
+    DEBUG = False
     weeks_set = set()
     season_num = get_seasonSetting()
 
@@ -1866,7 +1877,6 @@ def weekly_stats_view(request):
 
     weeks = sorted(weeks_set, reverse=True)
 
-    # Handle user's selected week
     # Handle user's selected week
     if request.method == "POST":
         selected_week_str = request.POST.get("week") or request.GET.get("week")
@@ -1899,12 +1909,11 @@ def weekly_stats_view(request):
             game_num__season_num = season_num
         ).exclude(position=0).order_by(Lower('ea_player_num__username'))
 
-        print("start_date =", start_date)
-        print("end_date =", end_date)
-
-        # DEBUG
-        # for record in skater_qs:
-            # print(record.game_num.played_time)
+        if DEBUG:
+            print("start_date =", start_date)
+            print("end_date =", end_date)
+            for record in skater_qs:
+                print(record.game_num.played_time)
 
         # Filter Goalie Records
         goalie_qs = GoalieRecord.objects.filter(
@@ -2067,8 +2076,8 @@ def weekly_stats_view(request):
         third_id = request.POST.get("third_star") or None
         blurb = (request.POST.get("blurb") or "").strip()
 
-        # DEBUG: uncomment this once to see exactly what's coming in
-        # print("POST DATA:", dict(request.POST))
+        if DEBUG:
+            print("POST DATA:", dict(request.POST))
 
         if not first_id or not second_id or not third_id:
             messages.error(request, "You must select all three stars.")

@@ -160,4 +160,5 @@ DATETIME_INPUT_FORMATS = ("%s",)
 LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/auth/login/'
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
+load_dotenv()
 DISCORD_SPORTSCENTER_WEBHOOK_URL = os.getenv("DISCORD_SPORTSCENTER_WEBHOOK_URL", "")
