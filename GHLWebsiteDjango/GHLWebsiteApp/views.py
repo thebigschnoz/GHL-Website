@@ -1778,18 +1778,18 @@ def build_weekly_player_line(player, week_start, season):
         g_agg = g_qs.aggregate(
             shots=Coalesce(Sum("shots_against"), 0),
             saves=Coalesce(Sum("saves"), 0),
-            gaa_goals=Coalesce(Sum("goals_against"), 0),
             so=Coalesce(Sum("shutouts"), 0),
             wins=Coalesce(Sum("wins"), 0),
             losses=Coalesce(Sum("losses"), 0),
             otl=Coalesce(Sum("ot_losses"), 0),
+            toi=Coalesce(Sum("game_num__gamelength"), 0),
         )
         shots = float(g_agg["shots"] or 0)
         saves = float(g_agg["saves"] or 0)
-        goals = float(g_agg["gaa_goals"] or 0)
+        goals = float((g_agg["shots"]-g_agg["saves"]) or 0)
 
         sv_pct = (saves / shots * 100.0) if shots > 0 else None
-        gaa = (goals / g_gp) if g_gp > 0 else None
+        gaa = ((goals / float(g_agg["toi"])) / 3600) if g_gp > 0 else None
         record = f"{int(g_agg['wins'] or 0)}-{int(g_agg['losses'] or 0)}-{int(g_agg['otl'] or 0)}"
 
         parts = [f"Goalie: {g_gp} GP"]
