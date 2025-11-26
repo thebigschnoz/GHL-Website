@@ -2065,10 +2065,13 @@ def weekly_stats_view(request):
 
     goalie_stats.sort(key=lambda x: (-x['svp'], x['games_played']))
     player_ids = set()
-    for row in skater_stats:
-        player_ids.add(row["ea_player_num"])
-    for row in goalie_stats:
-        player_ids.add(row["ea_player_num"])
+    if selected_week:
+        player_ids.update(
+            skater_qs.values_list("ea_player_num__pk", flat=True)
+        )
+        player_ids.update(
+            goalie_qs.values_list("ea_player_num__pk", flat=True)
+        )
 
     players_for_week = Player.objects.filter(
         pk__in=player_ids

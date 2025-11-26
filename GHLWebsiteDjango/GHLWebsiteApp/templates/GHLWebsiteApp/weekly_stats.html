@@ -64,9 +64,7 @@
 
             <div class="three-stars-row">
                 <label for="blurb">Write-up:</label>
-                <textarea name="blurb" id="blurb" rows="3" form="three-stars-form">
-                    {{ three_stars.blurb|default_if_none:"" }}
-                </textarea>
+                <textarea name="blurb" id="blurb" rows="3" form="three-stars-form">{{ three_stars.blurb|default_if_none:"" }}</textarea>
             </div>
 
             <button type="submit"
