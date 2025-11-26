@@ -34,7 +34,7 @@
                         {% else %}
                         <span style="font-weight: 400; font-size: 24px">Final</span>
                         {% endif %}
-                        <span style="font-weight: 200; font-size: 16px;">{{ gamelength }}</span>
+                        {% if game.played_time %}<span style="font-weight: 200; font-size: 16px;">{{ gamelength }}</span>{% endif %}
                     </div>
                 </div>
                 <div class="stats-team" style="background-image: linear-gradient(115deg, black 20%, {{ game.h_team_num.team_color }});">
@@ -54,6 +54,7 @@
             </div>
         </div>
         <div class="game-details">
+            {% if game.played_time %}
             <table class="stats-table">
                 <thead>
                     <tr>
@@ -196,7 +197,70 @@
                 <p>No three stars recorded for this game.</p>
                 {% endif %}
             </div>
+            {% else %}
+            <div class="lineups-section">
+                <h3 style="width: auto; margin-top: 20px;">Scheduled Lines</h3>
+                <div class="lineups-teams" style="display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;">
+
+                    <!-- Away team lines -->
+                    <div class="lineups-team-card section_lg" style="max-width: 280px;">
+                        <h4 style="margin-bottom: 8px;"><img src="{{ game.a_team_num.team_logo_link }}" alt="Away Team Logo" class="logo-sml"> {{ game.a_team_num.club_abbr }}</h4>
+                        {% if away_lineup.has_any %}
+                        <table class="stats-table">
+                            <tbody>
+                                {% for row in away_lineup.lines %}
+                                <tr class="no-bg">
+                                    <td class="stats-label" style="text-align: left; width: 40px;">{{ row.pos }}</td>
+                                    <td class="stats-value" style="text-align: left;">
+                                        {% if row.player %}
+                                        <a href="{% url 'player' row.player.ea_player_num %}" class="hoverlink noline">
+                                            {{ row.player.username }}
+                                        </a>
+                                        {% else %}
+                                        &mdash;
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <p style="font-style: italic;">No lines created yet.</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Home team lines -->
+                    <div class="lineups-team-card section_lg" style="max-width: 280px;">
+                        <h4 style="margin-bottom: 8px;"><img src="{{ game.h_team_num.team_logo_link }}" alt="Home Team Logo" class="logo-sml"> {{ game.h_team_num.club_abbr }}</h4>
+                        {% if home_lineup.has_any %}
+                        <table class="stats-table">
+                            <tbody>
+                                {% for row in home_lineup.lines %}
+                                <tr class="no-bg">
+                                    <td class="stats-label" style="text-align: left; width: 40px;">{{ row.pos }}</td>
+                                    <td class="stats-value" style="text-align: left;">
+                                        {% if row.player %}
+                                        <a href="{% url 'player' row.player.ea_player_num %}" class="hoverlink noline">
+                                            {{ row.player.username }}
+                                        </a>
+                                        {% else %}
+                                        &mdash;
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <p style="font-style: italic;">No lines created yet.</p>
+                        {% endif %}
+                    </div>
+
+                </div>
+            </div>
+            {% endif %}
         </div>
+        {% if game.played_time %}
         <div id="divider"></div>
         <div class="header" style="color: #fbe134; text-decoration: none;">{{ game.a_team_num.club_full_name }}</div>
         <div class="section_lg" style="align-items: auto; width: 90%; overflow-x: scroll; margin-bottom: 10px;"><center>
@@ -531,7 +595,7 @@
                 </tbody>
             </table>
         </center></div>
-    </center></div>
+    </center></div>{% endif %}
 </center>
 <script>
     function getGradientColor(value) {

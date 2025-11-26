@@ -1192,20 +1192,56 @@ def game(request, game):
     all_ratings = list(skater_ratings) + list(goalie_ratings)
     all_ratings.sort(key=lambda r: float(r["overall_rating"]), reverse=True)
     three_stars = all_ratings[:3]
+    positions_order = ["C", "LW", "RW", "LD", "RD", "G"]
+
+    def get_lineup(team_obj):
+        schedules = (
+            Scheduling.objects
+            .filter(game=gamenum, team=team_obj)
+            .select_related("player", "position")
+        )
+
+        pos_map = {}
+        for s in schedules:
+            if s.player and s.position:
+                pos_map[s.position.positionShort] = s.player
+
+        lines = []
+        has_any = False
+        for pos in positions_order:
+            player = pos_map.get(pos)
+            if player:
+                has_any = True
+            lines.append(
+                {
+                    "pos": pos,
+                    "player": player,
+                }
+            )
+
+        return {
+            "has_any": has_any,
+            "lines": lines,
+        }
+
+    away_lineup = get_lineup(gamenum.a_team_num)
+    home_lineup = get_lineup(gamenum.h_team_num)
     context = {"game": gamenum,
-               "a_skater_records": a_skater_records,
-               "h_skater_records": h_skater_records,
-               "a_goalie_records": a_goalie_records,
-               "h_goalie_records": h_goalie_records,
-               "a_team_standing": a_team_standing,
-               "h_team_standing": h_team_standing,
-               "a_team_record": a_team_record,
-               "h_team_record": h_team_record,
-               "a_team_toa": a_team_toa_formatted,
-               "h_team_toa": h_team_toa_formatted,
-               "comparison_stats": comparison_stats,
-               "gamelength": gamelength_formatted,
-               "three_stars": three_stars,
+        "a_skater_records": a_skater_records,
+        "h_skater_records": h_skater_records,
+        "a_goalie_records": a_goalie_records,
+        "h_goalie_records": h_goalie_records,
+        "a_team_standing": a_team_standing,
+        "h_team_standing": h_team_standing,
+        "a_team_record": a_team_record,
+        "h_team_record": h_team_record,
+        "a_team_toa": a_team_toa_formatted,
+        "h_team_toa": h_team_toa_formatted,
+        "comparison_stats": comparison_stats,
+        "gamelength": gamelength_formatted,
+        "three_stars": three_stars,
+        "away_lineup": away_lineup,
+        "home_lineup": home_lineup,
     }
     return render(request, "GHLWebsiteApp/game.html", context)
 
