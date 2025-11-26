@@ -29,7 +29,7 @@
                     <option value="">-- Select player --</option>
                     {% for p in players_for_week %}
                         <option value="{{ p.pk }}"
-                            {% if three_stars and three_stars.first_star_id == p.id %}selected{% endif %}>
+                            {% if three_stars and three_stars.first_star_id == p.pk %}selected{% endif %}>
                             {{ p.username }}
                         </option>
                     {% endfor %}
@@ -42,7 +42,7 @@
                     <option value="">-- Select player --</option>
                     {% for p in players_for_week %}
                         <option value="{{ p.pk }}"
-                            {% if three_stars and three_stars.second_star_id == p.id %}selected{% endif %}>
+                            {% if three_stars and three_stars.second_star_id == p.pk %}selected{% endif %}>
                             {{ p.username }}
                         </option>
                     {% endfor %}
@@ -55,7 +55,7 @@
                     <option value="">-- Select player --</option>
                     {% for p in players_for_week %}
                         <option value="{{ p.pk }}"
-                            {% if three_stars and three_stars.third_star_id == p.id %}selected{% endif %}>
+                            {% if three_stars and three_stars.third_star_id == p.pk %}selected{% endif %}>
                             {{ p.username }}
                         </option>
                     {% endfor %}

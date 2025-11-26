@@ -2121,6 +2121,13 @@ def weekly_stats_view(request):
         })
 
     goalie_stats.sort(key=lambda x: (-x['svp'], x['games_played']))
+
+    # Existing three-stars (if any) for this season + week
+    three_stars = WeeklyThreeStars.objects.filter(
+        season__in=season_ids,
+        week_start=selected_week,
+    ).select_related("first_star", "second_star", "third_star").first()
+
     player_ids = set()
     if selected_week:
         player_ids.update(
@@ -2130,15 +2137,20 @@ def weekly_stats_view(request):
             goalie_qs.values_list("ea_player_num__pk", flat=True)
         )
 
+        # Make absolutely sure the three-star players are in the list,
+        # even if they somehow don't appear in the stat query.
+        if three_stars:
+            player_ids.update(
+                [
+                    three_stars.first_star_id,
+                    three_stars.second_star_id,
+                    three_stars.third_star_id,
+                ]
+            )
+
     players_for_week = Player.objects.filter(
         pk__in=player_ids
     ).order_by(Lower("username"))
-
-    # Existing three-stars (if any) for this season + week
-    three_stars = WeeklyThreeStars.objects.filter(
-        season=week_season_id,
-        week_start=selected_week,
-    ).select_related("first_star", "second_star", "third_star").first()
 
     # --- Handle POST: saving three stars ---
     if request.method == "POST" and "save_three_stars" in request.POST:
