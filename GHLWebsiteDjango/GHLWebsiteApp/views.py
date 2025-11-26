@@ -1912,12 +1912,14 @@ def weekly_stats_view(request):
     DEBUG = False
     weeks_set = set()
     season_num = get_seasonSetting()
+    prev_season = season_num - 1 if season_num > 1 else season_num
+    season_ids = [season_num, prev_season]
 
     if season_num is not None:
         # Fetch all played_times in this season
         dates_qs = (
             SkaterRecord.objects
-            .filter(game_num__season_num=season_num)
+            .filter(game_num__season_num__in=season_ids)
             .exclude(position=0)
             .values_list('game_num__played_time', flat=True)
         )
