@@ -2337,6 +2337,25 @@ div.lineups-section h3 {
   }
 }
 
+ol.stars {
+  list-style: none; /* Remove default numbering */
+  counter-reset: custom-counter; /* Initialize the counter */
+  padding-left: 0; /* Adjust padding if needed */
+}
+
+ol.stars li {
+  counter-increment: custom-counter; /* Increment the counter */
+  position: relative; /* For positioning the pseudo-element */
+  margin-bottom: 0.5em; /* Space between items */
+}
+
+ol.stars li::before {
+    content: 
+      counter(custom-counter, words) "⭐: "; /* Use the 'words' counter style */
+    font-weight: bold; /* Optional: Make the text bold */
+    margin-right: 0.5em; /* Space between the word and the list item content */
+  }
+
 .standings-scroll {
   width: 100%;
   overflow-x: auto;          /* horizontal scroll */

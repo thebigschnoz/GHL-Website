@@ -86,6 +86,33 @@
                         {% endfor %}
                     </table></center>
                 </div>
+                <div class="section" style="justify-content: center;">
+                    <div class="header">Latest Three Stars</div>
+                    {% if latest_three_stars %}
+                        <div class="three-stars-section" style="margin: auto;">
+                            <h3>Week of {{ latest_three_stars.week_start|date:"M j, Y" }}</h3>
+                            <ol class="stars">
+                                <li>
+                                    <a href="{% url 'player' latest_three_stars.first_star.ea_player_num %}" class="noline">
+                                        {{ latest_three_stars.first_star.username }}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'player' latest_three_stars.second_star.ea_player_num %}" class="noline">
+                                        {{ latest_three_stars.second_star.username }}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'player' latest_three_stars.third_star.ea_player_num %}" class="noline">
+                                        {{ latest_three_stars.third_star.username }}
+                                    </a>
+                                </li>
+                            </ol>
+                        </div>
+                    {% else %}
+                        <p style="margin-top: 8px;">No weekly three stars have been created yet.</p>
+                    {% endif %}
+                </div>
             </td>
 
             <td id="rightside">

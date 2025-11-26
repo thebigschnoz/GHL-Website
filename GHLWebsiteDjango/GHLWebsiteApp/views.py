@@ -596,7 +596,26 @@ def index(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     activeteams = Team.objects.filter(isActive=True)
-    context = {"standings": standings, "leaders": leaders, "thisseason": thisseason, "username": username, "gp": gp, "goals": goals, "assists": assists, "plusminus": plusminus, "pims": pims, "season": season, "announcement": page_obj, "activeteams": activeteams}
+    latest_three_stars = (
+        WeeklyThreeStars.objects
+        .select_related("season", "first_star", "second_star", "third_star")
+        .order_by("-week_start", "-created_at")
+        .first()
+    )
+    context = {"standings": standings,
+               "leaders": leaders,
+               "thisseason": thisseason,
+               "username": username,
+               "gp": gp,
+               "goals": goals,
+               "assists": assists,
+               "plusminus": plusminus,
+               "pims": pims,
+               "season": season,
+               "announcement": page_obj,
+               "activeteams": activeteams,
+               "latest_three_stars": latest_three_stars,
+              }
     return render(request, "GHLWebsiteApp/index.html", context)
 
 def standings(request):
@@ -2197,9 +2216,9 @@ def weekly_stats_view(request):
             season=Season.objects.get(season_num=week_season_id),
             week_start=selected_week,
             defaults={
-                "first_star": first_player,
-                "second_star": second_player,
-                "third_star": third_player,
+                "first_star": Player.objects.get(ea_player_num=first_player),
+                "second_star": Player.objects.get(ea_player_num=second_player),
+                "third_star": Player.objects.get(ea_player_num=third_player),
                 "blurb": blurb or None,
             },
         )
