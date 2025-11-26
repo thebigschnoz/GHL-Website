@@ -2329,6 +2329,13 @@ div.lineups-section h3 {
   background-color: transparent;
 }
 
+@media (max-width: 768px) {
+  .game-details .lineups-section {
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto;
+  }
+}
 
 .standings-scroll {
   width: 100%;
