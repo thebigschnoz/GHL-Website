@@ -1892,7 +1892,7 @@ def post_three_stars_to_discord(three_stars: WeeklyThreeStars, week_start: datet
         return
 
     week_label = week_start.strftime("%b %d, %Y")
-    title = f"**GHL Weekly Three Stars – Week of {week_label} ({season.season_text})**"
+    title = f"**GHL Weekly Three Stars – Week of {week_label}**"
 
     lines = [title, ""]
 
@@ -2170,6 +2170,49 @@ def weekly_stats_view(request):
     players_for_week = Player.objects.filter(
         pk__in=player_ids
     ).order_by(Lower("username"))
+    week_season_id = None
+
+    if selected_week:
+        # Boundaries of selected week (Sunday → Saturday)
+        start_date = django_timezone.make_aware(
+            datetime.datetime.combine(
+                selected_week,
+                datetime.time.min
+            ),
+            datetime.timezone.utc,
+        )
+        end_date = start_date + datetime.timedelta(days=7)
+
+        # Figure out which season this week actually belongs to
+        season_for_week = (
+            Game.objects
+            .filter(
+                played_time__gte=start_date,
+                played_time__lt=end_date,
+                season_num__in=season_ids,
+            )
+            .values("season_num")
+            .annotate(num=Count("pk"))
+            .order_by("-num")
+            .first()
+        )
+        # If there are games, take the dominant season_num for this week.
+        # Fallback to current season if somehow no match.
+        week_season_id = season_for_week["season_num"] if season_for_week else season_num
+
+    # Existing three-stars (if any) for this *week’s* season
+    three_stars = None
+    if selected_week and week_season_id:
+        three_stars = (
+            WeeklyThreeStars.objects
+            .filter(
+                season__season_num=week_season_id,
+                week_start=selected_week,
+            )
+            .select_related("first_star", "second_star", "third_star")
+            .first()
+        )
+
 
     # --- Handle POST: saving three stars ---
     if request.method == "POST" and "save_three_stars" in request.POST:
@@ -2210,7 +2253,9 @@ def weekly_stats_view(request):
         third_player = request.POST.get("third_star") or None
         blurb = (request.POST.get("blurb") or "").strip()
 
-        # ...same validation as before...
+        if len({first_player, second_player, third_player}) < 3:
+            messages.error(request, "Each star must be a different player.")
+            return redirect(f"{reverse('weekly_stats')}?week={selected_week:%Y-%m-%d}")
 
         three_stars, created = WeeklyThreeStars.objects.update_or_create(
             season=Season.objects.get(season_num=week_season_id),
@@ -2222,8 +2267,7 @@ def weekly_stats_view(request):
                 "blurb": blurb or None,
             },
         )
-
-        # Fire Discord webhook with the SAME season
+        
         seasonInstance = Season.objects.get(season_num=week_season_id)
         try:
             post_three_stars_to_discord(three_stars, selected_week, seasonInstance)
@@ -2233,7 +2277,6 @@ def weekly_stats_view(request):
         messages.success(request, "Weekly Three Stars saved.")
         return redirect(f"{reverse('weekly_stats')}?week={selected_week:%Y-%m-%d}")
 
-    # Render
     context = {
         "season": season_num,
         "weeks": weeks,
