@@ -79,12 +79,6 @@ def verify_twitch_signature(message_id, timestamp, body, signature):
     ).hexdigest()
     return hmac.compare_digest(signature, expected)
 
-def handle_stream_event(event):
-    username = event["broadcaster_user_name"]
-    user_id = event["broadcaster_user_id"]
-    print(f"[Twitch] handle_stream_event for {username} ({user_id})")
-    asyncio.create_task(process_twitch_live(username, user_id))
-
 async def renew_eventsub():
     streamers = await sync_to_async(list)(
         TwitchStreamer.objects.filter(subscribed=True)
@@ -914,43 +908,6 @@ async def unsubscribe_from_stream(user_id):
                     headers=headers,
                 )
             return True
-
-async def process_twitch_live(username, user_id):
-    print(f"[Twitch] process_twitch_live start username={username}, user_id={user_id}")
-    title = await fetch_stream_title(user_id)
-    print(f"[Twitch] Current title for {username}: {title!r}")
-
-    if not title:
-        print(f"[Twitch] No title returned; aborting.")
-        return
-
-    if "ghl" not in title.lower():
-        print(f"[Twitch] Title does not contain 'ghl'; skipping announcement.")
-        return
-
-    user = await twitch_get_user(username)
-    if not user:
-        print(f"[Twitch] twitch_get_user returned None for {username}; aborting.")
-        return
-    avatar = user["profile_image_url"]
-    print(f"[Twitch] Using avatar={avatar}")
-
-    channel = bot.get_channel(STREAM_EVENTS_CHANNEL_ID)
-    print(f"[Twitch] STREAM_EVENTS_CHANNEL_ID={STREAM_EVENTS_CHANNEL_ID}, channel={channel}")
-    if not channel:
-        print("[Twitch] Channel not found; is the bot in the right guild / has correct ID?")
-        return
-    embed = discord.Embed(
-        title=f"{username} is LIVE!",
-        description=f"{title}",
-        color=discord.Color.purple(),
-    )
-    embed.add_field(name="Watch:", value=f"https://twitch.tv/{username}")
-    embed.set_thumbnail(url=avatar)
-    content = "@everyone"
-    if channel:
-        await channel.send(embed=embed, content=content)
-        print("[Twitch] Announcement sent.")
 
 async def twitch_get_user(username):
     token = await get_twitch_token()

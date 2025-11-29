@@ -17,6 +17,7 @@ from io import BytesIO
 import csv
 import pytz
 import json
+import os
 import requests
 from django.utils import timezone as django_timezone
 from django.utils.timezone import localtime
@@ -25,8 +26,13 @@ from dal import autocomplete
 from collections import defaultdict
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
-# from points_table_simulator import PointsTableSimulator
+
 est = pytz.timezone("America/New_York")
+
+DISCORD_STREAM_WEBHOOK_URL = os.getenv("DISCORD_STREAM_WEBHOOK_URL")
+TWITCH_CLIENT_ID = os.getenv("TWITCH_CLIENT_ID")
+TWITCH_CLIENT_SECRET = os.getenv("TWITCH_CLIENT_SECRET")
+TWITCH_SECRET = os.getenv("TWITCH_SECRET")
 
 def media_required(view_func):
     decorated_view_func = user_passes_test(
@@ -70,6 +76,82 @@ def delete_trade_block_player(request, pk):
         return HttpResponseForbidden()
     trade.delete()
     return redirect('team_management')
+
+def get_twitch_token():
+    url = "https://id.twitch.tv/oauth2/token"
+    params = {
+        "client_id": TWITCH_CLIENT_ID,
+        "client_secret": TWITCH_CLIENT_SECRET,
+        "grant_type": "client_credentials",
+    }
+    r = requests.post(url, params=params, timeout=10)
+    r.raise_for_status()
+    return r.json()["access_token"]
+
+def fetch_stream_and_user(user_id: str):
+    token = get_twitch_token()
+    headers = {
+        "Client-ID": TWITCH_CLIENT_ID,
+        "Authorization": f"Bearer {token}",
+    }
+
+    # get current stream
+    s = requests.get(
+        "https://api.twitch.tv/helix/streams",
+        headers=headers,
+        params={"user_id": user_id},
+        timeout=10,
+    ).json()
+    if not s["data"]:
+        return None, None, None
+    stream = s["data"][0]
+    title = stream["title"]
+    username_login = stream["user_login"]
+
+    # get user info (for avatar)
+    u = requests.get(
+        "https://api.twitch.tv/helix/users",
+        headers=headers,
+        params={"id": user_id},
+        timeout=10,
+    ).json()
+    avatar = u["data"][0]["profile_image_url"] if u["data"] else None
+
+    return username_login, title, avatar
+
+def send_stream_announcement(username: str, user_id: str):
+    print(f"[Twitch] send_stream_announcement for {username} ({user_id})")
+
+    login, title, avatar = fetch_stream_and_user(user_id)
+    if not title:
+        print("[Twitch] No active stream; skipping.")
+        return
+
+    if "ghl" not in title.lower():
+        print(f"[Twitch] Title does not contain 'ghl'; skipping. title={title!r}")
+        return
+
+    if not DISCORD_STREAM_WEBHOOK_URL:
+        print("[Twitch] DISCORD_STREAM_WEBHOOK_URL not set; cannot send announcement.")
+        return
+
+    embed = {
+        "title": f"{username} is LIVE!",
+        "description": title,
+        "url": f"https://twitch.tv/{login or username}",
+        "color": 0x9146FF,  # Twitch purple
+    }
+    if avatar:
+        embed["thumbnail"] = {"url": avatar}
+
+    payload = {
+        "content": "@everyone",
+        "embeds": [embed],
+    }
+
+    resp = requests.post(DISCORD_STREAM_WEBHOOK_URL, json=payload, timeout=10)
+    print(f"[Discord webhook] status={resp.status_code} body={resp.text[:200]}")
+
 
 def get_seasonSetting():
     try:
@@ -2760,7 +2842,7 @@ def signup_list(request):
 
 @csrf_exempt
 def twitch_callback(request):
-    from GHLWebsiteApp.discord_bot import verify_twitch_signature, handle_stream_event
+    from GHLWebsiteApp.discord_bot import verify_twitch_signature
 
     signature = request.headers.get("Twitch-Eventsub-Message-Signature", "")
     msg_type = request.headers.get("Twitch-Eventsub-Message-Type", "")
@@ -2768,7 +2850,6 @@ def twitch_callback(request):
     timestamp = request.headers.get("Twitch-Eventsub-Message-Timestamp", "")
     body = request.body
 
-    # DEBUG
     print(f"[Twitch] Incoming callback: type={msg_type}, id={message_id}, ts={timestamp}")
 
     if not verify_twitch_signature(message_id, timestamp, body, signature):
@@ -2785,8 +2866,10 @@ def twitch_callback(request):
 
     if msg_type == "notification":
         event = data["event"]
-        print(f"[Twitch] Notification for {event.get('broadcaster_user_name')} ({event.get('broadcaster_user_id')})")
-        handle_stream_event(event)
+        username = event["broadcaster_user_name"]
+        user_id = event["broadcaster_user_id"]
+        print(f"[Twitch] Notification for {username} ({user_id})")
+        send_stream_announcement(username, user_id)
 
     return HttpResponse(status=200)
 
