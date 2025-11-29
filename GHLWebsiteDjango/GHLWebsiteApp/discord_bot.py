@@ -8,17 +8,24 @@ from django.conf import settings
 from asgiref.sync import sync_to_async
 import asyncio
 from GHLWebsiteApp.models import *
-from django.db.models import Sum, Count, Case, When, Avg, F, Window, FloatField, Q, ExpressionWrapper, Value, OuterRef, Subquery, CharField
-from django.db.models.functions import Cast, Rank, Round, Lower, Coalesce
+from django.db.models import Sum, Count, Case, When, Avg, FloatField, Q
+from django.db.models.functions import Cast, Coalesce
 from GHLWebsiteApp.views import get_seasonSetting
 from zoneinfo import ZoneInfo
+import aiohttp
+import hmac, hashlib
 
 load_dotenv()
 
 LOG_CHANNEL_ID = 1435172225060962374
+STREAM_EVENTS_CHANNEL_ID = 1026951604794036327
 TOKEN = os.getenv("DISCORD_TOKEN")
-LEAGUE_ADMIN_ROLE = "All Admins"
+LEAGUE_ADMIN_ROLES = ["All Admins", "The Big Kahunas"]
 LEAGUE_GUILD_ID = 1021563211759230976
+TWITCH_CLIENT_ID = os.getenv("TWITCH_CLIENT_ID")
+TWITCH_CLIENT_SECRET = os.getenv("TWITCH_CLIENT_SECRET")
+TWITCH_SECRET = os.getenv("TWITCH_SECRET")
+TWITCH_EVENT_CALLBACK = "https://gamershockeyleague.com/twitch/eventsub"
 
 if not TOKEN:
     raise ValueError("❌ DISCORD_TOKEN not found. Make sure it's in your .env file.")
@@ -45,6 +52,41 @@ async def on_ready():
         print(f"🔁 Slash commands synced")
     except Exception as e:
         print(f"❌ Sync failed: {e}")
+    try:
+        await renew_eventsub()
+    except Exception as e:
+        print(f"❌ EventSub renewal failed: {e}")
+
+async def get_twitch_token():
+    url = "https://id.twitch.tv/oauth2/token"
+    params = {
+        "client_id": TWITCH_CLIENT_ID,
+        "client_secret": TWITCH_CLIENT_SECRET,
+        "grant_type": "client_credentials",
+    }
+    async with aiohttp.ClientSession() as session:
+        async with session.post(url, params=params) as resp:
+            data = await resp.json()
+            return data["access_token"]
+
+def verify_twitch_signature(signature, body):
+    expected = "sha256=" + hmac.new(
+        TWITCH_SECRET.encode(), body, hashlib.sha256
+    ).hexdigest()
+    return hmac.compare_digest(signature, expected)
+
+def handle_stream_event(event):
+    username = event["broadcaster_user_name"]
+    user_id = event["broadcaster_user_id"]
+
+    asyncio.create_task(process_twitch_live(username, user_id))
+
+async def renew_eventsub():
+    streamers = await sync_to_async(list)(
+        TwitchStreamer.objects.filter(subscribed=True)
+    )
+    for streamer in streamers:
+        await subscribe_to_stream(streamer.user_id)
 
 def get_team_ranking(team):
     ordered_teams = list(
@@ -158,13 +200,28 @@ def ordinal_suffix(n):
     else:
         return {1: 'st', 2: 'nd', 3: 'rd'}.get(n % 10, 'th')
 
+async def fetch_stream_title(user_id):
+    token = await get_twitch_token()
+    headers = {
+        "Client-ID": TWITCH_CLIENT_ID,
+        "Authorization": f"Bearer {token}",
+    }
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get(
+            f"https://api.twitch.tv/helix/streams?user_id={user_id}",
+            headers=headers
+        ) as resp:
+            data = await resp.json()
+
+    if not data["data"]:
+        return ""
+    return data["data"][0]["title"]
+
 async def is_league_admin(interaction):
-    # Must be executed inside the LEAGUE_GUILD
     if interaction.guild_id != LEAGUE_GUILD_ID:
         return False
-    
-    # Must have the required role inside the league server
-    return any(r.name == LEAGUE_ADMIN_ROLE for r in interaction.user.roles)
+    return any(r.name == LEAGUE_ADMIN_ROLES for r in interaction.user.roles)
     
 # --- SLASH COMMANDS ---
 @bot.tree.command(name="statsskater", description="Show a player's skater stats for this season")
@@ -764,7 +821,7 @@ async def deny(interaction: discord.Interaction, guild_id: str):
             ephemeral=True
         )
 
-    if not any(r.name == LEAGUE_ADMIN_ROLE for r in interaction.user.roles):
+    if not any(r.name == LEAGUE_ADMIN_ROLES for r in interaction.user.roles):
         return await interaction.followup.send(
             "⛔ You do not have permission to perform this action.",
             ephemeral=True
@@ -801,4 +858,135 @@ async def deny(interaction: discord.Interaction, guild_id: str):
     # Log to league log channel
     await bot_log(
         f"❌ DENIED by `{interaction.user}` — `{guild_id}` → **{pending.requested_team.club_abbr}**"
+    )
+
+async def subscribe_to_stream(user_id):
+    token = await get_twitch_token()
+    headers = {
+        "Client-ID": TWITCH_CLIENT_ID,
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json",
+    }
+
+    payload = {
+      "type": "stream.online",
+      "version": "1",
+      "condition": { "broadcaster_user_id": user_id },
+      "transport": {
+          "method": "webhook",
+          "callback": TWITCH_EVENT_CALLBACK,
+          "secret": TWITCH_SECRET,
+      }
+    }
+
+    async with aiohttp.ClientSession() as session:
+        await session.post(
+            "https://api.twitch.tv/helix/eventsub/subscriptions",
+            json=payload,
+            headers=headers,
+        )
+
+async def unsubscribe_from_stream(user_id):
+    token = await get_twitch_token()
+    headers = {
+        "Client-ID": TWITCH_CLIENT_ID,
+        "Authorization": f"Bearer {token}",
+    }
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get(
+            "https://api.twitch.tv/helix/eventsub/subscriptions",
+            headers=headers
+        ) as resp:
+            data = await resp.json()
+
+    for sub in data.get("data", []):
+        if sub["condition"].get("broadcaster_user_id") == user_id:
+            async with aiohttp.ClientSession() as session:
+                await session.delete(
+                    f"https://api.twitch.tv/helix/eventsub/subscriptions?id={sub['id']}",
+                    headers=headers,
+                )
+            return True
+
+
+async def process_twitch_live(username, user_id):
+    title = await fetch_stream_title(user_id)
+
+    if "ghl" not in title.lower():
+        return
+
+    user = await twitch_get_user(username)
+    avatar = user["profile_image_url"]
+
+    channel = bot.get_channel(STREAM_EVENTS_CHANNEL_ID)
+    embed = discord.Embed(
+        title=f"{username} is LIVE!",
+        description=f"{title}",
+        color=discord.Color.purple(),
+    )
+    embed.add_field(name="Watch:", value=f"https://twitch.tv/{username}")
+    embed.set_thumbnail(url=avatar)
+    content = "@everyone"
+    if channel:
+        await channel.send(embed=embed, content=content)
+
+async def twitch_get_user(username):
+    token = await get_twitch_token()
+    headers = {
+        "Client-ID": TWITCH_CLIENT_ID,
+        "Authorization": f"Bearer {token}",
+    }
+    async with aiohttp.ClientSession() as session:
+        async with session.get(
+            f"https://api.twitch.tv/helix/users?login={username}",
+            headers=headers
+        ) as resp:
+            data = await resp.json()
+
+    if not data["data"]:
+        return None
+
+    return data["data"][0]  # contains id, display_name, login
+
+@bot.tree.command(name="addstreamer")
+async def addstreamer(interaction, username: str):
+    if not await is_league_admin(interaction):
+        return await interaction.response.send_message("No permission.", ephemeral=True)
+
+    user = await twitch_get_user(username)
+    if not user:
+        return await interaction.response.send_message("Streamer not found.")
+
+    streamer, created = await sync_to_async(TwitchStreamer.objects.get_or_create)(
+        username=user["login"],
+        user_id=user["id"],
+    )
+
+    streamer.subscribed = True
+    await sync_to_async(streamer.save)()
+
+    await subscribe_to_stream(user["id"])
+
+    return await interaction.response.send_message(
+        f"Added `{username}` to GHL stream watch."
+    )
+
+@bot.tree.command(name="removestreamer")
+async def removestreamer(interaction, username: str):
+    if not await is_league_admin(interaction):
+        return await interaction.response.send_message("No permission.", ephemeral=True)
+
+    try:
+        streamer = await sync_to_async(TwitchStreamer.objects.get)(username=username)
+    except TwitchStreamer.DoesNotExist:
+        return await interaction.response.send_message("Not found.")
+
+    await unsubscribe_from_stream(streamer.user_id)
+
+    streamer.subscribed = False
+    await sync_to_async(streamer.save)()
+
+    await interaction.response.send_message(
+        f"Stopped watching `{username}`."
     )

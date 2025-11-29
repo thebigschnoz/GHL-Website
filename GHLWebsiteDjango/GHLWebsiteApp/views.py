@@ -2758,6 +2758,29 @@ def signup_list(request):
         },
     )
 
+@csrf_exempt
+def twitch_callback(request):
+    from GHLWebsiteApp.discord_bot import verify_twitch_signature, handle_stream_event
+
+    signature = request.headers.get("Twitch-Eventsub-Message-Signature")
+    msg_type = request.headers.get("Twitch-Eventsub-Message-Type")
+    body = request.body
+
+    if not verify_twitch_signature(signature, body):
+        return HttpResponse(status=403)
+
+    data = json.loads(body)
+
+    # Twitch’s initial verification handshake
+    if msg_type == "webhook_callback_verification":
+        return HttpResponse(data["challenge"])
+
+    if msg_type == "notification":
+        event = data["event"]
+        handle_stream_event(event)
+
+    return HttpResponse(status=200)
+
 
 class PlayerAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):

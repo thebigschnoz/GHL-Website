@@ -40,4 +40,5 @@ urlpatterns = [
     path("signup/", views.season_signup, name="season_signup"),
     path("signups/manage/", views.signup_list, name="signup_list"),
     path("compare-players/", views.compare_players, name="compare_players"),
+    path("twitch/eventsub", views.twitch_callback),
 ]
