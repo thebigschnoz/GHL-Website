@@ -2762,24 +2762,34 @@ def signup_list(request):
 def twitch_callback(request):
     from GHLWebsiteApp.discord_bot import verify_twitch_signature, handle_stream_event
 
-    signature = request.headers.get("Twitch-Eventsub-Message-Signature")
-    msg_type = request.headers.get("Twitch-Eventsub-Message-Type")
+    signature = request.headers.get("Twitch-Eventsub-Message-Signature", "")
+    msg_type = request.headers.get("Twitch-Eventsub-Message-Type", "")
+    message_id = request.headers.get("Twitch-Eventsub-Message-Id", "")
+    timestamp = request.headers.get("Twitch-Eventsub-Message-Timestamp", "")
     body = request.body
 
-    if not verify_twitch_signature(signature, body):
+    # DEBUG
+    print(f"[Twitch] Incoming callback: type={msg_type}, id={message_id}, ts={timestamp}")
+
+    if not verify_twitch_signature(message_id, timestamp, body, signature):
+        print("[Twitch] Signature verification FAILED")
         return HttpResponse(status=403)
+
+    print("[Twitch] Signature verification OK")
 
     data = json.loads(body)
 
-    # Twitch’s initial verification handshake
     if msg_type == "webhook_callback_verification":
+        print("[Twitch] Handshake challenge received")
         return HttpResponse(data["challenge"])
 
     if msg_type == "notification":
         event = data["event"]
+        print(f"[Twitch] Notification for {event.get('broadcaster_user_name')} ({event.get('broadcaster_user_id')})")
         handle_stream_event(event)
 
     return HttpResponse(status=200)
+
 
 
 class PlayerAutocomplete(autocomplete.Select2QuerySetView):

@@ -69,16 +69,20 @@ async def get_twitch_token():
             data = await resp.json()
             return data["access_token"]
 
-def verify_twitch_signature(signature, body):
+def verify_twitch_signature(message_id, timestamp, body, signature):
+    if not signature:
+        return False
+
+    hmac_message = message_id.encode("utf-8") + timestamp.encode("utf-8") + body
     expected = "sha256=" + hmac.new(
-        TWITCH_SECRET.encode(), body, hashlib.sha256
+        TWITCH_SECRET.encode("utf-8"), hmac_message, hashlib.sha256
     ).hexdigest()
     return hmac.compare_digest(signature, expected)
 
 def handle_stream_event(event):
     username = event["broadcaster_user_name"]
     user_id = event["broadcaster_user_id"]
-
+    print(f"[Twitch] handle_stream_event for {username} ({user_id})")
     asyncio.create_task(process_twitch_live(username, user_id))
 
 async def renew_eventsub():
@@ -869,22 +873,24 @@ async def subscribe_to_stream(user_id):
     }
 
     payload = {
-      "type": "stream.online",
-      "version": "1",
-      "condition": { "broadcaster_user_id": user_id },
-      "transport": {
-          "method": "webhook",
-          "callback": TWITCH_EVENT_CALLBACK,
-          "secret": TWITCH_SECRET,
-      }
+        "type": "stream.online",
+        "version": "1",
+        "condition": {"broadcaster_user_id": user_id},
+        "transport": {
+            "method": "webhook",
+            "callback": TWITCH_EVENT_CALLBACK,
+            "secret": TWITCH_SECRET,
+        },
     }
 
     async with aiohttp.ClientSession() as session:
-        await session.post(
+        async with session.post(
             "https://api.twitch.tv/helix/eventsub/subscriptions",
             json=payload,
             headers=headers,
-        )
+        ) as resp:
+            text = await resp.text()
+            print(f"[Twitch] subscribe_to_stream user_id={user_id} status={resp.status} body={text}")
 
 async def unsubscribe_from_stream(user_id):
     token = await get_twitch_token()
@@ -909,17 +915,31 @@ async def unsubscribe_from_stream(user_id):
                 )
             return True
 
-
 async def process_twitch_live(username, user_id):
+    print(f"[Twitch] process_twitch_live start username={username}, user_id={user_id}")
     title = await fetch_stream_title(user_id)
+    print(f"[Twitch] Current title for {username}: {title!r}")
+
+    if not title:
+        print(f"[Twitch] No title returned; aborting.")
+        return
 
     if "ghl" not in title.lower():
+        print(f"[Twitch] Title does not contain 'ghl'; skipping announcement.")
         return
 
     user = await twitch_get_user(username)
+    if not user:
+        print(f"[Twitch] twitch_get_user returned None for {username}; aborting.")
+        return
     avatar = user["profile_image_url"]
+    print(f"[Twitch] Using avatar={avatar}")
 
     channel = bot.get_channel(STREAM_EVENTS_CHANNEL_ID)
+    print(f"[Twitch] STREAM_EVENTS_CHANNEL_ID={STREAM_EVENTS_CHANNEL_ID}, channel={channel}")
+    if not channel:
+        print("[Twitch] Channel not found; is the bot in the right guild / has correct ID?")
+        return
     embed = discord.Embed(
         title=f"{username} is LIVE!",
         description=f"{title}",
@@ -930,6 +950,7 @@ async def process_twitch_live(username, user_id):
     content = "@everyone"
     if channel:
         await channel.send(embed=embed, content=content)
+        print("[Twitch] Announcement sent.")
 
 async def twitch_get_user(username):
     token = await get_twitch_token()
@@ -949,7 +970,7 @@ async def twitch_get_user(username):
 
     return data["data"][0]  # contains id, display_name, login
 
-@bot.tree.command(name="addstreamer")
+@bot.tree.command(name="addstreamer", description="Add a Twitch streamer to the GHL stream watch list. League admins only.")
 async def addstreamer(interaction, username: str):
     if not await is_league_admin(interaction):
         return await interaction.response.send_message("No permission.", ephemeral=True)
@@ -972,7 +993,7 @@ async def addstreamer(interaction, username: str):
         f"Added `{username}` to GHL stream watch."
     )
 
-@bot.tree.command(name="removestreamer")
+@bot.tree.command(name="removestreamer", description="Remove a Twitch streamer from the GHL stream watch list. League admins only.")
 async def removestreamer(interaction, username: str):
     if not await is_league_admin(interaction):
         return await interaction.response.send_message("No permission.", ephemeral=True)
