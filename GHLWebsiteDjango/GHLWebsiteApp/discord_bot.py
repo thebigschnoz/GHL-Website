@@ -221,7 +221,7 @@ async def fetch_stream_title(user_id):
 async def is_league_admin(interaction):
     if interaction.guild_id != LEAGUE_GUILD_ID:
         return False
-    return any(r.name == LEAGUE_ADMIN_ROLES for r in interaction.user.roles)
+    return any(r.name in LEAGUE_ADMIN_ROLES for r in interaction.user.roles)
     
 # --- SLASH COMMANDS ---
 @bot.tree.command(name="statsskater", description="Show a player's skater stats for this season")
