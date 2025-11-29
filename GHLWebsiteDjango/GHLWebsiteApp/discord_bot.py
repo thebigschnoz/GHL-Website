@@ -934,7 +934,7 @@ async def addstreamer(interaction, username: str):
 
     user = await twitch_get_user(username)
     if not user:
-        return await interaction.response.send_message("Streamer not found.")
+        return await interaction.response.send_message("Streamer not found.", ephemeral=True)
 
     streamer, created = await sync_to_async(TwitchStreamer.objects.get_or_create)(
         username=user["login"],
@@ -947,7 +947,7 @@ async def addstreamer(interaction, username: str):
     await subscribe_to_stream(user["id"])
 
     return await interaction.response.send_message(
-        f"Added `{username}` to GHL stream watch."
+        f"Added `{username}` to GHL stream watch.", ephemeral=True
     )
 
 @bot.tree.command(name="removestreamer", description="Remove a Twitch streamer from the GHL stream watch list. League admins only.")
@@ -958,7 +958,7 @@ async def removestreamer(interaction, username: str):
     try:
         streamer = await sync_to_async(TwitchStreamer.objects.get)(username=username)
     except TwitchStreamer.DoesNotExist:
-        return await interaction.response.send_message("Not found.")
+        return await interaction.response.send_message("Not found.", ephemeral=True)
 
     await unsubscribe_from_stream(streamer.user_id)
 
@@ -966,5 +966,5 @@ async def removestreamer(interaction, username: str):
     await sync_to_async(streamer.save)()
 
     await interaction.response.send_message(
-        f"Stopped watching `{username}`."
+        f"Stopped watching `{username}`.", ephemeral=True
     )
