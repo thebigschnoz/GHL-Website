@@ -2264,7 +2264,7 @@ def weekly_stats_view(request):
                 "first_star": Player.objects.get(ea_player_num=first_player),
                 "second_star": Player.objects.get(ea_player_num=second_player),
                 "third_star": Player.objects.get(ea_player_num=third_player),
-                "blurb": blurb or None,
+                "blurb": blurb,
             },
         )
         
