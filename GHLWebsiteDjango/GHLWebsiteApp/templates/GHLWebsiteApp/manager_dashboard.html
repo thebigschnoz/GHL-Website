@@ -129,7 +129,13 @@
                             {% for label, leader in team_leaders.items %}
                             <tr>
                                 <td>{{ label }}</td>
-                                <td class="hoverlink"><a href="{% url 'player' leader.ea_player_num %}">{{ leader.ea_player_num__username|default:"-" }}</a></td>
+                                {% if leader.ea_player_num %}
+                                    <a href="{% url 'player' leader.ea_player_num %}">
+                                        {{ leader.ea_player_num__username|default:"-" }}
+                                    </a>
+                                {% else %}
+                                    -
+                                {% endif %}
                                 <td>
                                     {% if label == "G" %}
                                         {{ leader.numgoals|default:"-" }}
