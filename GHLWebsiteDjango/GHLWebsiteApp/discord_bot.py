@@ -220,6 +220,17 @@ async def is_league_admin(interaction):
     if interaction.guild_id != LEAGUE_GUILD_ID:
         return False
     return any(r.name in LEAGUE_ADMIN_ROLES for r in interaction.user.roles)
+
+async def get_random_chirp():
+    """
+    Returns a random active Chirp instance, optionally filtered by severity.
+    """
+    def _pick():
+        qs = Chirp.objects.filter(active=True)
+        return qs.order_by("?").first()
+
+    return await sync_to_async(_pick)()
+
     
 # --- SLASH COMMANDS ---
 @bot.tree.command(name="statsskater", description="Show a player's skater stats for this season")
@@ -968,3 +979,28 @@ async def removestreamer(interaction, username: str):
     await interaction.response.send_message(
         f"Stopped watching `{username}`.", ephemeral=True
     )
+
+@bot.tree.command(name="chirp", description="Send a GHL-style chirp at someone.")
+@app_commands.describe(user="Who do you want to chirp?")
+async def chirp(
+    interaction: discord.Interaction,
+    user: discord.Member,
+):
+    # Basic sanitize: user must be in this guild
+    if user.guild != interaction.guild:
+        return await interaction.response.send_message(
+            "They’re not even in this barn.", ephemeral=True
+        )
+
+    # Fetch random chirp from DB
+    chirp_obj = await get_random_chirp()
+    if not chirp_obj:
+        return await interaction.response.send_message(
+            "No chirps found in the database. Tell an admin to add some.",
+            ephemeral=True,
+        )
+
+    template = chirp_obj.text
+    text = template.format(mention=user.mention)
+
+    await interaction.response.send_message(text)

@@ -722,6 +722,16 @@ class TwitchStreamer(models.Model):
     def __str__(self):
         return self.username
 
+class Chirp(models.Model):
+    text = models.TextField(
+        help_text="Use {mention} where the target's Discord mention should go."
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.text[:40]}"
+
+
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
