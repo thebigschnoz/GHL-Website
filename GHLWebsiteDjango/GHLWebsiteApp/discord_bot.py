@@ -226,9 +226,7 @@ async def get_random_chirp():
     Returns a random active Chirp instance, optionally filtered by severity.
     """
     def _pick():
-        qs = Chirp.objects.filter(active=True)
-        return qs.order_by("?").first()
-
+        return Chirp.objects.order_by("?").first()
     return await sync_to_async(_pick)()
 
     
